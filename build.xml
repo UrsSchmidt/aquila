@@ -8,6 +8,7 @@
 
     <target name="clean">
         <delete dir="${bin.dir}" />
+        <delete dir="${src.dir}/aquila/antlr/" />
         <delete file="${jar.file}" />
     </target>
 

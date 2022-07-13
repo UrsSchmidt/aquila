@@ -1,3 +1,10 @@
+implement functions/procedures!
+    there should also be three functions introduced:
+        forall(dict, (obj, obj) -> {});
+        forallchars(str, (str) -> {});
+        foralllines(str, (str) -> {});
+    common stream functions: map, fold, filter, remove, etc.
+
 break/continue statements in loops?
 
 predefined functions:
@@ -41,13 +48,6 @@ predefined functions:
         delete('/path/to/file');
         delete('/path/to/dir/');
         read/write file line-by-line
-
-implement functions/procedures!
-    there should also be three functions introduced:
-        forall(dict, (obj, obj) -> {});
-        forallchars(str, (str) -> {});
-        foralllines(str, (str) -> {});
-common stream functions: map, fold, filter, remove, etc.
 
 look at Python grammar
 look at Ruby grammar
