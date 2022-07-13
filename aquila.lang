@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="aquila" _name="Aquila" version="2.0" _section="Source">
+  <metadata>
+    <property name="globs">*.aq</property>
+  </metadata>
+
+  <styles>
+    <style id="builtin" _name="Builtin Function" map-to="def:builtin"/>
+    <style id="comment" _name="Comment" map-to="def:comment"/>
+    <style id="keyword" _name="Keyword" map-to="def:keyword"/>
+    <style id="number" _name="Number" map-to="def:number"/>
+    <style id="string" _name="String" map-to="def:string"/>
+  </styles>
+
+  <definitions>
+    <context id="aquila">
+      <include>
+
+        <context id="comment" style-ref="comment" end-at-line-end="true">
+          <start>#</start>
+          <include>
+            <context ref="def:in-line-comment"/>
+          </include>
+        </context>
+
+        <context id="string" style-ref="string">
+          <match>'[^\n\r']*'</match>
+        </context>
+
+        <context id="number" style-ref="number">
+          <match>\b(0b[0-1]+|0o[0-7]+|0x[0-9a-f]+|[0-9]+)\b</match>
+        </context>
+
+        <context id="builtin" style-ref="builtin">
+          <keyword>args</keyword>     <!-- variable -->
+          <keyword>bool2str</keyword>
+          <keyword>boolean</keyword>
+          <keyword>chr</keyword>
+          <keyword>dict2str</keyword>
+          <keyword>dictionary</keyword>
+          <keyword>env</keyword>      <!-- variable -->
+          <keyword>exit</keyword>
+          <keyword>gcd</keyword>
+          <keyword>int2str</keyword>
+          <keyword>integer</keyword>
+          <keyword>join</keyword>
+          <keyword>length</keyword>
+          <keyword>ord</keyword>
+          <keyword>sgn</keyword>
+          <keyword>size</keyword>
+          <keyword>sleep</keyword>
+          <keyword>split</keyword>
+          <keyword>str2bool</keyword>
+          <keyword>str2dict</keyword>
+          <keyword>str2int</keyword>
+          <keyword>string</keyword>
+        </context>
+
+        <context id="keyword" style-ref="keyword">
+          <keyword>and</keyword>
+          <keyword>call</keyword>
+          <keyword>elif</keyword>
+          <keyword>else</keyword>
+          <keyword>eq</keyword>
+          <keyword>false</keyword>
+          <keyword>for</keyword>
+          <keyword>foreach</keyword>
+          <keyword>from</keyword>
+          <keyword>if</keyword>
+          <keyword>in</keyword>
+          <keyword>key</keyword>
+          <keyword>loop</keyword>
+          <keyword>mod</keyword>
+          <keyword>ne</keyword>
+          <keyword>not</keyword>
+          <keyword>or</keyword>
+          <keyword>read</keyword>
+          <keyword>rem</keyword>
+          <keyword>remove</keyword>
+          <keyword>step</keyword>
+          <keyword>to</keyword>
+          <keyword>true</keyword>
+          <keyword>value</keyword>
+          <keyword>while</keyword>
+          <keyword>write</keyword>
+          <keyword>xor</keyword>
+        </context>
+
+      </include>
+    </context>
+  </definitions>
+</language>

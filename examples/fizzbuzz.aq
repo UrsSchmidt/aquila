@@ -1,0 +1,16 @@
+#!/usr/local/bin/aq
+
+for i from 1 to 100 (
+    if i mod 3 = 0 (
+        s := 'Fizz';
+    ) else (
+        s := '';
+    )
+    if i mod 5 = 0 (
+        s := s & 'Buzz';
+    )
+    if s eq '' (
+        s := int2str(i);
+    )
+    write s;
+)

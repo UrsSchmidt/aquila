@@ -1,0 +1,11 @@
+#!/usr/local/bin/aq
+
+l := '';
+for c from ord(' ') to ord('~') (
+    l := l & chr(c);
+    if c mod 0x10 = 0x0f (
+        write l;
+        l := '';
+    )
+)
+write l;

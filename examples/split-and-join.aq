@@ -1,0 +1,10 @@
+#!/usr/local/bin/aq
+
+s := '1;2;3';
+write s;
+
+p := split(';', s);
+write dict2str(p);
+
+t := join(',', p);
+write t;

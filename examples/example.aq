@@ -1,0 +1,65 @@
+#!/usr/local/bin/aq
+
+#write args;
+#write env;
+
+write '12345: ' & int2str(12345);
+write '0b10101010: ' & int2str(0b10101010);
+write '0o755: ' & int2str(0o755);
+write '0xabcd: ' & int2str(0xabcd);
+
+write '1 + 2 * 3: ' & int2str(1 + 2 * 3);
+write '|-72|: ' & int2str(|-72|);
+write 'sgn(-72): ' & int2str(sgn(-72));
+write 'gcd(8, 12): ' & int2str(gcd(8, 4));
+
+abc.def := 2;
+write 'abc.def: ' & int2str(abc.def);
+
+a := {
+    mykey: 'myvalue';
+    ['mystringkey']: 'myvalue2';
+    [2 + 3 * 4]: 42 * 69;
+};
+write 'size(a): ' & int2str(size(a));
+write 'a: ' & dict2str(a);
+write 'a.mykey: ' & a.mykey;
+
+if a.mykey eq 'myvalue' (
+    write 'OK';
+) else (
+    write 'NOT OK';
+)
+
+for i from 10 to 1 step -3 (
+    write int2str(i);
+)
+
+remove a[2 + 3 * 4];
+foreach key k value v in a (
+    if integer(k) and integer(v) (
+        write int2str(k) & ' : ' & int2str(v);
+    ) elif string(k) and string(v) (
+        write k & ' : ' & v;
+    )
+)
+
+x := 'abc';
+write 'length(x): ' & int2str(length(x));
+
+# array example
+array := { 5; 4; 3; 2; 1; };
+array[4] := 42;
+remove array[2];
+write 'array: ' & dict2str(array);
+foreach value v in array (
+    write int2str(v);
+)
+
+write bool2str(str2bool('true'));
+write dict2str(str2dict('{a:42;}'));
+write int2str(str2int('42'));
+
+y := 123;
+y := 'abc'; # err
+write 'y: ' & y;

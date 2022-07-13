@@ -1,0 +1,55 @@
+break/continue statements in loops?
+
+predefined functions:
+    on integers:
+        factorial(n) (or use a! ?)
+        pow(a, b) (or use a^b ?), log(a, b), root(a, b), sqrt(a), cbrt(a), lb(a), ln(a), lg(a)
+    on strings:
+        look at Java String
+            charAt, substring
+            indexOf, lastIndexOf
+            contains, endsWith, startsWith
+            replace
+            repeat??
+            count??
+            'a' in 'abc' # returns true
+        look at VB6
+            left, mid, right
+            strreverse
+    on maps (do these manipulate the map directly or return a new map?)
+        normalize([]) # fixes array indices to go from 0..length-1
+        reverse([])
+        shuffle([])
+        sort([])
+        on integer valued maps
+            max([])
+            min([])
+            sum([])
+            product([])
+        123 : {123,124} # returns true
+    files:
+        exists('/path/to/file') : Boolean
+        exists('/path/to/dir/') : Boolean
+        create('/path/to/file');
+        create('/path/to/dir/');
+        move('/src/file', '/dst/file');
+        move('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
+        move('/src/dir/', '/dst/dir/');
+        copy('/src/file', '/dst/file');
+        copy('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
+        copy('/src/dir/', '/dst/dir/');
+        delete('/path/to/file');
+        delete('/path/to/dir/');
+        read/write file line-by-line
+
+implement functions/procedures!
+    there should also be three functions introduced:
+        forall(dict, (obj, obj) -> {});
+        forallchars(str, (str) -> {});
+        foralllines(str, (str) -> {});
+common stream functions: map, fold, filter, remove, etc.
+
+look at Python grammar
+look at Ruby grammar
+look at Ruby standard library
+look at Java standard library

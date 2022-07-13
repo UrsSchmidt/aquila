@@ -1,0 +1,57 @@
+<project name="aquila" basedir="." default="package">
+
+    <property name="main.class" value="aquila.Main" />
+    <property name="bin.dir"    value="bin" />
+    <property name="src.dir"    value="src" />
+    <property name="antlr.file" value="../antlr-4.10.1-complete.jar" />
+    <property name="jar.file"   value="${ant.project.name}.jar" />
+
+    <target name="clean">
+        <delete dir="${bin.dir}" />
+        <delete file="${jar.file}" />
+    </target>
+
+    <target name="build" depends="clean">
+        <mkdir dir="${bin.dir}" />
+        <java jar="${antlr.file}" fork="true">
+            <arg value="Aquila.g4" />
+            <arg value="-visitor" />
+            <arg value="-no-listener" />
+            <arg value="-encoding" />
+            <arg value="utf8" />
+            <arg value="-o" />
+            <arg value="src/aquila/antlr" />
+            <arg value="-package" />
+            <arg value="aquila.antlr" />
+        </java>
+        <javac srcdir="${src.dir}" destdir="${bin.dir}" classpath="${antlr.file}" debug="on" includeantruntime="false">
+            <compilerarg line="-encoding utf8" />
+            <compilerarg value="-Xlint:cast" />
+            <compilerarg value="-Xlint:classfile" />
+            <compilerarg value="-Xlint:deprecation" />
+            <compilerarg value="-Xlint:divzero" />
+            <compilerarg value="-Xlint:empty" />
+            <compilerarg value="-Xlint:fallthrough" />
+            <compilerarg value="-Xlint:finally" />
+            <compilerarg value="-Xlint:options" />
+            <compilerarg value="-Xlint:overrides" />
+            <compilerarg value="-Xlint:path" />
+            <!-- compilerarg value="-Xlint:rawtypes" /-->
+            <compilerarg value="-Xlint:static" />
+            <compilerarg value="-Xlint:try" />
+            <!-- compilerarg value="-Xlint:unchecked" /-->
+            <compilerarg value="-Xlint:varargs" />
+        </javac>
+    </target>
+
+    <target name="package" depends="build">
+        <jar destfile="${jar.file}">
+            <fileset dir="${bin.dir}" />
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}" />
+                <attribute name="Class-Path" value="${antlr.file}" />
+            </manifest>
+        </jar>
+    </target>
+
+</project>
