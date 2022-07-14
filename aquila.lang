@@ -45,11 +45,14 @@
           <keyword>int2str</keyword>
           <keyword>integer</keyword>
           <keyword>join</keyword>
+          <keyword>left</keyword>
           <keyword>length</keyword>
+          <keyword>mid</keyword>
           <keyword>ord2char</keyword>
           <keyword>pow</keyword>
           <keyword>repeat</keyword>
           <keyword>replace</keyword>
+          <keyword>right</keyword>
           <keyword>sgn</keyword>
           <keyword>size</keyword>
           <keyword>sleep</keyword>

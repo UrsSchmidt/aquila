@@ -754,12 +754,29 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final Map arg2 = (Map) arguments.get(1);
             result = String.join(arg1, arg2.values());
         }   break;
+        case "left": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.substring(0, arg2.intValueExact());
+        }   break;
         case "length": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
             }
             final String arg1 = (String) arguments.get(0);
             result = BigInteger.valueOf(arg1.length());
+        }   break;
+        case "mid": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = arg1.substring(arg2.intValueExact(), arg2.intValueExact() + arg3.intValueExact());
         }   break;
         case "ord2char": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
@@ -792,6 +809,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg2 = (String) arguments.get(1);
             final String arg3 = (String) arguments.get(2);
             result = arg1.replace(arg2, arg3);
+        }   break;
+        case "right": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.substring(arg1.length() - arg2.intValueExact());
         }   break;
         case "sgn": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {

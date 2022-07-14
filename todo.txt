@@ -11,11 +11,8 @@ predefined functions:
     on integers:
         factorial(n) (or use a! ?)
     on strings:
-        look at Java String
-            indexOf, lastIndexOf
-        look at VB6
-            left, mid, right
-            strreverse
+        indexOf, lastIndexOf
+        how?: format, matches, like
     on maps (do these manipulate the map directly or return a new map?)
         normalize([]) # fixes array indices to go from 0..length-1
         reverse([])
@@ -27,6 +24,7 @@ predefined functions:
             sum([])
             product([])
     files:
+        stuff on paths like `basename` etc
         exists('/path/to/file') : Boolean
         exists('/path/to/dir/') : Boolean
         create('/path/to/file');
@@ -41,7 +39,6 @@ predefined functions:
         delete('/path/to/dir/');
         read/write file line-by-line
 
-look at Python grammar
-look at Ruby grammar
-look at Ruby standard library
-look at Java standard library
+inline if? select?
+
+look at other languages for further ideas

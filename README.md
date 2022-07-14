@@ -51,9 +51,12 @@ The following operations are available on Strings: `&` (concatenation), `eq` (eq
 The following predefined functions are available on Strings:
  * `char2ord(a)` returns the Unicode value of the first character of a
  * `charat(a, b)` returns the character with the index b in a
+ * `left(a, b)` returns the substring from a that starts at 0 and has length b
  * `length(a)` returns the number of characters in a
+ * `mid(a, b, c)` returns the substring from a that starts at b and has length c
  * `repeat(a, b)` returns a repeated b times
  * `replace(a, b, c)` replace all occurrences of b in a with c
+ * `right(a, b)` returns the substring from a that starts at length - b and has length b
  * `str2bool(a)` parsing a to a Boolean
  * `str2dict(a)` parsing a to a Dictionary
  * `str2int(a)` parsing a to an Integer

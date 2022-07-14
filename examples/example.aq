@@ -26,6 +26,7 @@ a := {
 write 'size(a): ' & int2str(size(a));
 write 'a: ' & dict2str(a);
 write 'a.mykey: ' & a.mykey;
+write 'myvalue : a: ' & bool2str('myvalue' : a);
 
 if a.mykey eq 'myvalue' (
     write 'OK';
