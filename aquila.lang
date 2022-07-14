@@ -46,10 +46,12 @@
           <keyword>join</keyword>
           <keyword>length</keyword>
           <keyword>ord</keyword>
+          <keyword>pow</keyword>
           <keyword>sgn</keyword>
           <keyword>size</keyword>
           <keyword>sleep</keyword>
           <keyword>split</keyword>
+          <keyword>sqrt</keyword>
           <keyword>str2bool</keyword>
           <keyword>str2dict</keyword>
           <keyword>str2int</keyword>

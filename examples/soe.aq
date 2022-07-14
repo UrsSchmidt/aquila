@@ -2,7 +2,7 @@
 
 for i from 2 to 100 (
     numbers[i] := true;
-    for j from 2 to i - 1 ( # TODO to sqrt(i)
+    for j from 2 to sqrt(i) (
         if i mod j = 0 (
             numbers[i] := false;
             # TODO break;

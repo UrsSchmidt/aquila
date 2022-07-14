@@ -10,7 +10,6 @@ break/continue statements in loops?
 predefined functions:
     on integers:
         factorial(n) (or use a! ?)
-        pow(a, b) (or use a^b ?), log(a, b), root(a, b), sqrt(a), cbrt(a), lb(a), ln(a), lg(a)
     on strings:
         look at Java String
             charAt, substring

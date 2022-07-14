@@ -740,6 +740,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             result = BigInteger.valueOf((long) arg1.charAt(0));
         }   break;
+        case "pow": {
+            if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
+                return null;
+            }
+            final BigInteger arg1 = (BigInteger) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.pow(arg2.intValueExact());
+        }   break;
         case "sgn": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
@@ -778,6 +786,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 resultMap.put(BigInteger.valueOf(i), parts[i]);
             }
             result = resultMap;
+        }   break;
+        case "sqrt": {
+            if (!checkArgs(ctx, arguments, TYPE_INT)) {
+                return null;
+            }
+            final BigInteger arg1 = (BigInteger) arguments.get(0);
+            result = arg1.sqrt();
         }   break;
         case "str2bool": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {

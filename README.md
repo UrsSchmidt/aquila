@@ -37,8 +37,8 @@ If you do not care about the keys, you can also use `{ v1; v2; v3; }` as a short
 
 You can use either `.key` or `[keyExpression]` to access the values of the dictionary.
 The following predefined functions are available on Dictionaries:
- * `size` returns the number of key/value pairs
- * `dict2str` returns the Dictionary as a String
+ * `size(a)` returns the number of key/value pairs in a
+ * `dict2str(a)` returns a as a String
 
 Dictionaries are implemented as `TreeMap`.
 
@@ -48,11 +48,11 @@ Strings are written like this: `'Hello, world!'`
 
 The following operations are available on Strings: `&` (concatenation), `eq` (equals) and `ne` (not equals).
 The following predefined functions are available on Strings:
- * `length` returns the number of characters
- * `ord` returns the Unicode value of the first character
- * `str2bool` parsing to a Boolean
- * `str2dict` parsing to a Dictionary
- * `str2int` parsing to an Integer
+ * `length(a)` returns the number of characters in a
+ * `ord(a)` returns the Unicode value of the first character of a
+ * `str2bool(a)` parsing a to a Boolean
+ * `str2dict(a)` parsing a to a Dictionary
+ * `str2int(a)` parsing a to an Integer
 
 Since the interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
 
@@ -66,10 +66,12 @@ Integers are written like this:
 
 The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=` and `|x|`.
 The following predefined functions are available on Integers:
- * `chr` returns a String containing a single Unicode character
- * `gcd` returns the greatest common divisor
- * `int2str` returns the Integer as a String
- * `sgn` returns the sign
+ * `chr(a)` returns a String containing a single Unicode character
+ * `gcd(a, b)` returns the greatest common divisor of a and b
+ * `int2str(a)` returns a as a String
+ * `pow(a, b)` returns the a to the power of b
+ * `sgn(a)` returns the sign of a
+ * `sqrt(a)` returns the square root of a
 
 Integers are implemented as `BigInteger`.
 
@@ -79,7 +81,7 @@ The two Booleans are `true` and `false`.
 
 The following operations are available on Booleans: `not`, `and`, `or` and `xor`.
 The following predefined functions are available on Booleans:
- * `bool2str` returns the Boolean as a String
+ * `bool2str(a)` returns a as a String
 
 ### Checking for types
 
