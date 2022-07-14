@@ -13,9 +13,6 @@ predefined functions:
     on strings:
         look at Java String
             indexOf, lastIndexOf
-            contains, endsWith, startsWith
-            replace
-            repeat??
             'a' in 'abc' # returns true
         look at VB6
             left, mid, right

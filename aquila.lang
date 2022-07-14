@@ -37,8 +37,10 @@
           <keyword>boolean</keyword>
           <keyword>char2ord</keyword>
           <keyword>charat</keyword>
+          <keyword>contains</keyword>
           <keyword>dict2str</keyword>
           <keyword>dictionary</keyword>
+          <keyword>endswith</keyword>
           <keyword>env</keyword>        <!-- variable -->
           <keyword>exit</keyword>
           <keyword>gcd</keyword>
@@ -48,11 +50,14 @@
           <keyword>length</keyword>
           <keyword>ord2char</keyword>
           <keyword>pow</keyword>
+          <keyword>repeat</keyword>
+          <keyword>replace</keyword>
           <keyword>sgn</keyword>
           <keyword>size</keyword>
           <keyword>sleep</keyword>
           <keyword>split</keyword>
           <keyword>sqrt</keyword>
+          <keyword>startswith</keyword>
           <keyword>str2bool</keyword>
           <keyword>str2dict</keyword>
           <keyword>str2int</keyword>

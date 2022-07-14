@@ -690,6 +690,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             result = arg1.charAt(arg2.intValueExact());
         }   break;
+        case "contains": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            result = arg1.contains(arg2);
+        }   break;
         case "dict2str": {
             if (!checkArgs(ctx, arguments, TYPE_DICT)) {
                 return null;
@@ -700,6 +708,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "dictionary":
             result = checkArgsNoFail(ctx, arguments, TYPE_DICT);
             break;
+        case "endswith": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            result = arg1.endsWith(arg2);
+        }   break;
         case "exit": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
@@ -756,6 +772,23 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             result = arg1.pow(arg2.intValueExact());
         }   break;
+        case "repeat": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.repeat(arg2.intValueExact());
+        }   break;
+        case "replace": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final String arg3 = (String) arguments.get(2);
+            result = arg1.replace(arg2, arg3);
+        }   break;
         case "sgn": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
@@ -801,6 +834,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             final BigInteger arg1 = (BigInteger) arguments.get(0);
             result = arg1.sqrt();
+        }   break;
+        case "startswith": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            result = arg1.endsWith(arg2);
         }   break;
         case "str2bool": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
