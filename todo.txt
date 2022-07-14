@@ -23,21 +23,30 @@ predefined functions:
             min([])
             sum([])
             product([])
-    files:
-        stuff on paths like `basename` etc
-        exists('/path/to/file') : Boolean
-        exists('/path/to/dir/') : Boolean
-        create('/path/to/file');
-        create('/path/to/dir/');
-        move('/src/file', '/dst/file');
-        move('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
-        move('/src/dir/', '/dst/dir/');
-        copy('/src/file', '/dst/file');
-        copy('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
-        copy('/src/dir/', '/dst/dir/');
-        delete('/path/to/file');
-        delete('/path/to/dir/');
-        read/write file line-by-line
+    files and directories:
+        paths:
+            parent('/path/to/file') : String # returns '/path/to/'
+            parent('/path/to/dir/') : String # returns '/path/to/'
+            base('/path/to/file') : String # returns 'file'
+            base('/path/to/dir/') : String # returns 'dir'
+            extension('/path/to/file.ext') : String # returns 'ext'
+            absolute(root, '../file') : String # return '/absolute/path/to/file'
+            relative(root, '/absolute/path/to/file') : String # return '../file'
+        operations:
+            exists('/path/to/file') : Boolean
+            exists('/path/to/dir/') : Boolean
+            create('/path/to/file');
+            create('/path/to/dir/');
+            move('/src/file', '/dst/file');
+            move('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
+            move('/src/dir/', '/dst/dir/');
+            copy('/src/file', '/dst/file');
+            copy('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
+            copy('/src/dir/', '/dst/dir/');
+            delete('/path/to/file');
+            delete('/path/to/dir/');
+        content operations:
+            read/write file line-by-line
 
 inline if? select?
 

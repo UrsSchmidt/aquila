@@ -1,7 +1,7 @@
 #!/usr/local/bin/aq
 
-#write args;
-#write env;
+#write dict2str(args);
+#write dict2str(env);
 
 write '12345: ' & int2str(12345);
 write '0b10101010: ' & int2str(0b10101010);
