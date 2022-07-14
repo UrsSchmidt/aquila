@@ -764,6 +764,9 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             result = arg1;
             System.exit(arg1.intValueExact());
         }   break;
+        case "function":
+            result = checkArgsNoFail(ctx, arguments, TYPE_FUNC);
+            break;
         case "gcd": {
             if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
                 return null;

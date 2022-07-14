@@ -42,6 +42,7 @@
           <keyword>dictionary</keyword>
           <keyword>env</keyword>        <!-- variable -->
           <keyword>exit</keyword>
+          <keyword>function</keyword>
           <keyword>gcd</keyword>
           <keyword>int2str</keyword>
           <keyword>integer</keyword>

@@ -100,7 +100,7 @@ The following predefined functions are available on Booleans:
 
 ### Checking for types
 
-You can check for types by using the predefined functions `boolean`, `dictionary`, `integer` and `string`:
+You can check for types by using the predefined functions `boolean`, `dictionary`, `function`, `integer` and `string`:
 ```
 a := 123;
 write bool2str(integer(a)); # true
