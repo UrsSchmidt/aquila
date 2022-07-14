@@ -1,0 +1,12 @@
+#!/usr/local/bin/aq
+
+factorial := \n : Integer ->
+    if n < 1 (
+        0 # error
+    ) elif n = 1 (
+        1
+    ) else (
+        n * factorial(n - 1)
+    );
+
+write int2str(factorial(4)); # 24

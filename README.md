@@ -28,7 +28,14 @@ Comments are written like this: `# this is a comment`
 
 ## Types
 
-There are four types as of now: Dictionaries, Strings, Integers and Booleans. You **cannot** define your own types.
+There are five types as of now: Functions, Dictionaries, Strings, Integers and Booleans. You **cannot** define your own types.
+
+### Functions
+
+Functions are always written as lambdas: `\x, y -> x + y`
+You can assign Functions to variables like any other value: `a := \x -> 2 * x;`
+You can also write recursive Functions by using the variable that you assign the Function to: `a := \x -> x + a(x - 1)`
+You can also add additional (runtime) type-safety by stating, what type each of parameters has: `a := \i : Integer, a : Any -> a`
 
 ### Dictionaries
 

@@ -1,29 +1,15 @@
 #!/usr/local/bin/aq
 
-for i from 99 to 1 step -1 (
-    # first half
-    if i = 0 ( # TODO move to function
-        s := 'No more bottles';
-    ) elif i = 1 (
-        s := 'One bottle';
-    ) else (
-        s := int2str(i) & ' bottles';
-    )
-    s := s & ' of beer';
+n := 99;
+
+f := \n : Integer ->
+    (if n = 0 ('No more') else (int2str(n))) & ' bottle' & (if n <> 1 ('s') else ('')) & ' of beer';
+
+s := f(n);
+for i from n to 1 step -1 (
     write s & ' on the wall,';
     write s & '.';
-
-    j := i - 1;
-
-    # second half
-    if j = 0 (
-        t := 'No more bottles';
-    ) elif j = 1 (
-        t := 'One bottle';
-    ) else (
-        t := int2str(j) & ' bottles';
-    )
-    t := t & ' of beer';
+    s := f(i - 1);
     write 'Take one down, pass it around,';
-    write t & ' on the wall.';
+    write s & ' on the wall.';
 )

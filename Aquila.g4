@@ -74,7 +74,14 @@ lhsPart
     ;
 
 expression
-    : logicalOperation
+    : ifExpression
+    ;
+
+ifExpression
+    :   'if' condition+=expression '(' then+=expression ')'
+     ('elif' condition+=expression '(' then+=expression ')')*
+      'else' '(' elseBlock=expression ')'
+    | logicalOperation
     ;
 
 logicalOperation
@@ -148,6 +155,7 @@ factor
     : bracketExpression
     | absExpression
     | dictAggregate
+    | lambdaExpression
     | literal
     | functionCall
     | accessExpression
@@ -172,6 +180,14 @@ dictAggregatePair
 dictAggregateKey
     : Identifier
     | '[' expression ']'
+    ;
+
+lambdaExpression
+    : '\\' (lambdaExpressionParameter (',' lambdaExpressionParameter)*)? '->' (expression | block)
+    ;
+
+lambdaExpressionParameter
+    : Identifier (':' Type)?
     ;
 
 literal
@@ -211,6 +227,15 @@ Integer
     | '0o' [0-7]+
     | '0x' [0-9a-f]+
     | [0-9]+
+    ;
+
+Type
+    : 'Any'
+    | 'Function'
+    | 'Dictionary'
+    | 'String'
+    | 'Integer'
+    | 'Boolean'
     ;
 
 False

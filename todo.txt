@@ -48,6 +48,4 @@ predefined functions:
         content operations:
             read/write file line-by-line
 
-inline if? select?
-
 look at other languages for further ideas

@@ -17,6 +17,7 @@ import aquila.antlr.AquilaParser.BlockContext;
 import aquila.antlr.AquilaParser.LhsContext;
 import aquila.antlr.AquilaParser.LhsPartContext;
 import aquila.antlr.AquilaParser.ExpressionContext;
+import aquila.antlr.AquilaParser.IfExpressionContext;
 import aquila.antlr.AquilaParser.LogicalOperationContext;
 import aquila.antlr.AquilaParser.LogicalOperatorContext;
 import aquila.antlr.AquilaParser.UnaryLogicalOperationContext;
@@ -35,6 +36,8 @@ import aquila.antlr.AquilaParser.AbsExpressionContext;
 import aquila.antlr.AquilaParser.DictAggregateContext;
 import aquila.antlr.AquilaParser.DictAggregatePairContext;
 import aquila.antlr.AquilaParser.DictAggregateKeyContext;
+import aquila.antlr.AquilaParser.LambdaExpressionContext;
+import aquila.antlr.AquilaParser.LambdaExpressionParameterContext;
 import aquila.antlr.AquilaParser.LiteralContext;
 import aquila.antlr.AquilaParser.FunctionCallContext;
 import aquila.antlr.AquilaParser.AccessExpressionContext;
@@ -60,9 +63,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     private static final boolean STRICT = true; // XXX make this an option
 
+    private static final String TYPE_ANY  = "Any";
+    private static final String TYPE_FUNC = "Function";
     private static final String TYPE_DICT = "Dictionary";
-    private static final String TYPE_STR = "String";
-    private static final String TYPE_INT = "Integer";
+    private static final String TYPE_STR  = "String";
+    private static final String TYPE_INT  = "Integer";
     private static final String TYPE_BOOL = "Boolean";
 
     private static final Comparator<Object> DICT_COMPARATOR = new Comparator<>() {
@@ -315,6 +320,25 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitExpression(ExpressionContext ctx) {
         return visitChildren(ctx);
+    }
+
+    @Override
+    public Object visitIfExpression(IfExpressionContext ctx) {
+        if (ctx.condition != null && !ctx.condition.isEmpty()
+         && ctx.then != null && !ctx.then.isEmpty()
+         && ctx.condition.size() == ctx.then.size()) {
+            for (int i = 0; i < ctx.condition.size(); i++) {
+                final Object condition = visit(ctx.condition.get(i));
+                if (Boolean.TRUE.equals(condition)) {
+                    return visit(ctx.then.get(i));
+                }
+            }
+            return visit(ctx.elseBlock);
+        } else if (ctx.logicalOperation() != null) {
+            return visit(ctx.logicalOperation());
+        } else {
+            throw new AssertionError();
+        }
     }
 
     @Override
@@ -591,6 +615,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             return visit(ctx.absExpression());
         } else if (ctx.dictAggregate() != null) {
             return visit(ctx.dictAggregate());
+        } else if (ctx.lambdaExpression() != null) {
+            return visit(ctx.lambdaExpression());
         } else if (ctx.literal() != null) {
             return visit(ctx.literal());
         } else if (ctx.functionCall() != null) {
@@ -645,6 +671,16 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } else {
             throw new AssertionError();
         }
+    }
+
+    @Override
+    public Object visitLambdaExpression(LambdaExpressionContext ctx) {
+        return ctx;
+    }
+
+    @Override
+    public Object visitLambdaExpressionParameter(LambdaExpressionParameterContext ctx) {
+        throw new AssertionError();
     }
 
     @Override
@@ -898,8 +934,46 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             result = arg1.substring(arg2.intValueExact(), arg3.intValueExact());
         }   break;
         default:
-            result = null; // TODO implement functions!
-            break;
+            if (variables.containsKey(identifier)) {
+                final Object object = variables.get(identifier);
+                if (object instanceof LambdaExpressionContext) {
+                    final LambdaExpressionContext function = (LambdaExpressionContext) object;
+                    List<String> parameters = new ArrayList<>();
+                    List<String> types = new ArrayList<>();
+                    for (LambdaExpressionParameterContext lepc : function.lambdaExpressionParameter()) {
+                        parameters.add(lepc.Identifier().getText());
+                        types.add(lepc.Type() != null ? lepc.Type().getText() : TYPE_ANY);
+                    }
+                    if (!checkArgs(ctx, arguments, types.toArray(new String[0]))) {
+                        return null;
+                    }
+                    Map variablesBefore = variables;
+                    variables = new TreeMap<>(DICT_COMPARATOR);
+                    variables.putAll(variablesBefore);
+                    for (int i = 0; i < parameters.size(); i++) {
+                        final String parameter = parameters.get(i);
+                        final Object argument = arguments.get(i);
+                        // TODO does this have to be fully qualified?
+                        variables.put(parameter, argument);
+                    }
+                    if (function.expression() != null) {
+                        result = visit(function.expression());
+                    } else if (function.block() != null) {
+                        visit(function.block());
+                        result = null;
+                    } else {
+                        throw new AssertionError();
+                    }
+                    variables.clear();
+                    variables = variablesBefore;
+                } else {
+                    typeMismatch(TYPE_FUNC, typeOf(object), ctx);
+                    return null;
+                }
+            } else {
+                missingKey(variables, identifier, ctx);
+                return null;
+            }
         }
         return result;
     }
@@ -920,9 +994,9 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         for (int i = 0; i < types.length; i++) {
             final String type = types[i];
             final Object argument = arguments.get(i);
-            if (!typeOf(argument).equals(type)) {
+            if (!type.equals(TYPE_ANY) && !typeOf(argument).equals(type)) {
                 if (failOnTypeMismatch) {
-                    typeMismatch(type, typeOf(argument), ctx);
+                    typeMismatch(type, typeOf(argument), ctx.arguments.get(i));
                 }
                 return false;
             }
@@ -978,7 +1052,9 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (o == null) {
             throw new NullPointerException();
         }
-        if (o instanceof Map) {
+        if (o instanceof LambdaExpressionContext) {
+            return TYPE_FUNC;
+        } else if (o instanceof Map) {
             return TYPE_DICT;
         } else if (o instanceof String) {
             return TYPE_STR;
