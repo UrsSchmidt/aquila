@@ -65,7 +65,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static final String TYPE_INT = "Integer";
     private static final String TYPE_BOOL = "Boolean";
 
-    private static final Comparator DICT_COMPARATOR = new Comparator<>() {
+    private static final Comparator<Object> DICT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(Object o1, Object o2) {
             final String s1 = Interpreter.toString(o1);

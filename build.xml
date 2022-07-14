@@ -37,10 +37,10 @@
             <compilerarg value="-Xlint:options" />
             <compilerarg value="-Xlint:overrides" />
             <compilerarg value="-Xlint:path" />
-            <!-- compilerarg value="-Xlint:rawtypes" /-->
+            <compilerarg value="-Xlint:-rawtypes" />
             <compilerarg value="-Xlint:static" />
             <compilerarg value="-Xlint:try" />
-            <!-- compilerarg value="-Xlint:unchecked" /-->
+            <compilerarg value="-Xlint:-unchecked" />
             <compilerarg value="-Xlint:varargs" />
         </javac>
     </target>
