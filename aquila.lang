@@ -37,10 +37,8 @@
           <keyword>boolean</keyword>
           <keyword>char2ord</keyword>
           <keyword>charat</keyword>
-          <keyword>contains</keyword>
           <keyword>dict2str</keyword>
           <keyword>dictionary</keyword>
-          <keyword>endswith</keyword>
           <keyword>env</keyword>        <!-- variable -->
           <keyword>exit</keyword>
           <keyword>gcd</keyword>
@@ -57,7 +55,6 @@
           <keyword>sleep</keyword>
           <keyword>split</keyword>
           <keyword>sqrt</keyword>
-          <keyword>startswith</keyword>
           <keyword>str2bool</keyword>
           <keyword>str2dict</keyword>
           <keyword>str2int</keyword>
@@ -71,6 +68,7 @@
           <keyword>elif</keyword>
           <keyword>else</keyword>
           <keyword>eq</keyword>
+          <keyword>ew</keyword>
           <keyword>false</keyword>
           <keyword>for</keyword>
           <keyword>foreach</keyword>
@@ -87,6 +85,7 @@
           <keyword>rem</keyword>
           <keyword>remove</keyword>
           <keyword>step</keyword>
+          <keyword>sw</keyword>
           <keyword>to</keyword>
           <keyword>true</keyword>
           <keyword>value</keyword>

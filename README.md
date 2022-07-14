@@ -36,6 +36,7 @@ Dictionary aggregates are written like this: `{ key : value; }`
 If you do not care about the keys, you can also use `{ v1; v2; v3; }` as a shorthand for `{ 0 : v1; 1 : v2; 2 : v3; }`.
 
 You can use either `.key` or `[keyExpression]` to access the values of the dictionary.
+The following operations are available on Dictionaries: `:` (contains).
 The following predefined functions are available on Dictionaries:
  * `size(a)` returns the number of key/value pairs in a
  * `dict2str(a)` returns a as a String
@@ -46,16 +47,13 @@ Dictionaries are implemented as `TreeMap`.
 
 Strings are written like this: `'Hello, world!'`
 
-The following operations are available on Strings: `&` (concatenation), `eq` (equals) and `ne` (not equals).
+The following operations are available on Strings: `&` (concatenation), `eq` (equals), `ew` (ends with), `in` (contains), `ne` (not equals) and `sw` (starts with).
 The following predefined functions are available on Strings:
  * `char2ord(a)` returns the Unicode value of the first character of a
  * `charat(a, b)` returns the character with the index b in a
- * `contains(a, b)` returns whether a contains the substring b
- * `endswith(a, b)` returns whether a ends with b
  * `length(a)` returns the number of characters in a
  * `repeat(a, b)` returns a repeated b times
  * `replace(a, b, c)` replace all occurrences of b in a with c
- * `startswith(a, b)` returns whether a starts with b
  * `str2bool(a)` parsing a to a Boolean
  * `str2dict(a)` parsing a to a Dictionary
  * `str2int(a)` parsing a to an Integer

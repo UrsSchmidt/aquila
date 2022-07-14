@@ -100,14 +100,18 @@ relation
     ;
 
 relationalOperator
-    : '<='
+    : ':' /* dictionary in (contains) */
+    | '<='
     | '<>'
     | '<'
     | '='
     | '>='
     | '>'
-    | 'eq' /* string compare */
-    | 'ne' /* string compare */
+    | 'eq' /* string equals */
+    | 'ew' /* string ends with */
+    | 'in' /* string in (contains) */
+    | 'ne' /* string not equals */
+    | 'sw' /* string starts with */
     ;
 
 addition
