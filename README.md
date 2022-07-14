@@ -48,11 +48,13 @@ Strings are written like this: `'Hello, world!'`
 
 The following operations are available on Strings: `&` (concatenation), `eq` (equals) and `ne` (not equals).
 The following predefined functions are available on Strings:
+ * `char2ord(a)` returns the Unicode value of the first character of a
+ * `charat(a, b)` returns the character with the index b in a
  * `length(a)` returns the number of characters in a
- * `ord(a)` returns the Unicode value of the first character of a
  * `str2bool(a)` parsing a to a Boolean
  * `str2dict(a)` parsing a to a Dictionary
  * `str2int(a)` parsing a to an Integer
+ * `substring(a, b, c)` returns the substring from a that starts at b and ends at c
 
 Since the interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
 
@@ -66,9 +68,9 @@ Integers are written like this:
 
 The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=` and `|x|`.
 The following predefined functions are available on Integers:
- * `chr(a)` returns a String containing a single Unicode character
  * `gcd(a, b)` returns the greatest common divisor of a and b
  * `int2str(a)` returns a as a String
+ * `ord2char(a)` returns a String containing a single Unicode character
  * `pow(a, b)` returns the a to the power of b
  * `sgn(a)` returns the sign of a
  * `sqrt(a)` returns the square root of a

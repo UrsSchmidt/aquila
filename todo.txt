@@ -12,12 +12,10 @@ predefined functions:
         factorial(n) (or use a! ?)
     on strings:
         look at Java String
-            charAt, substring
             indexOf, lastIndexOf
             contains, endsWith, startsWith
             replace
             repeat??
-            count??
             'a' in 'abc' # returns true
         look at VB6
             left, mid, right

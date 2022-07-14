@@ -675,12 +675,20 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "boolean":
             result = checkArgsNoFail(ctx, arguments, TYPE_BOOL);
             break;
-        case "chr": {
-            if (!checkArgs(ctx, arguments, TYPE_INT)) {
+        case "char2ord": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
             }
-            final BigInteger arg1 = (BigInteger) arguments.get(0);
-            result = Character.toString((char) arg1.intValueExact());
+            final String arg1 = (String) arguments.get(0);
+            result = BigInteger.valueOf((long) arg1.charAt(0));
+        }   break;
+        case "charat": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.charAt(arg2.intValueExact());
         }   break;
         case "dict2str": {
             if (!checkArgs(ctx, arguments, TYPE_DICT)) {
@@ -733,12 +741,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             result = BigInteger.valueOf(arg1.length());
         }   break;
-        case "ord": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+        case "ord2char": {
+            if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
             }
-            final String arg1 = (String) arguments.get(0);
-            result = BigInteger.valueOf((long) arg1.charAt(0));
+            final BigInteger arg1 = (BigInteger) arguments.get(0);
+            result = Character.toString((char) arg1.intValueExact());
         }   break;
         case "pow": {
             if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
@@ -818,6 +826,15 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "string":
             result = checkArgsNoFail(ctx, arguments, TYPE_STR);
             break;
+        case "substring": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = arg1.substring(arg2.intValueExact(), arg3.intValueExact());
+        }   break;
         default:
             result = null; // TODO implement functions!
             break;

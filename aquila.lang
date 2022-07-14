@@ -32,20 +32,21 @@
         </context>
 
         <context id="builtin" style-ref="builtin">
-          <keyword>args</keyword>     <!-- variable -->
+          <keyword>args</keyword>       <!-- variable -->
           <keyword>bool2str</keyword>
           <keyword>boolean</keyword>
-          <keyword>chr</keyword>
+          <keyword>char2ord</keyword>
+          <keyword>charat</keyword>
           <keyword>dict2str</keyword>
           <keyword>dictionary</keyword>
-          <keyword>env</keyword>      <!-- variable -->
+          <keyword>env</keyword>        <!-- variable -->
           <keyword>exit</keyword>
           <keyword>gcd</keyword>
           <keyword>int2str</keyword>
           <keyword>integer</keyword>
           <keyword>join</keyword>
           <keyword>length</keyword>
-          <keyword>ord</keyword>
+          <keyword>ord2char</keyword>
           <keyword>pow</keyword>
           <keyword>sgn</keyword>
           <keyword>size</keyword>
@@ -56,6 +57,7 @@
           <keyword>str2dict</keyword>
           <keyword>str2int</keyword>
           <keyword>string</keyword>
+          <keyword>substring</keyword>
         </context>
 
         <context id="keyword" style-ref="keyword">
