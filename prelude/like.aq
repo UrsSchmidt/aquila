@@ -8,6 +8,8 @@ likeh := \t : String, q : String ->
     #t ne '' and (like(t, q) or likeh(tail(t), q));
     if t ne '' (like(t, q) or likeh(tail(t), q)) else (false);
 
+# a very simplistic implementation of like()
+# handles ?, * and #
 like := \s : String, p : String ->
     if s eq '' (
         containsonly(p, '*')
@@ -16,7 +18,11 @@ like := \s : String, p : String ->
     ) elif containsonly(p, '*') (
         true
     ) else (
-        # TODO lots of code duplication here (head(s), tail(s)):
+        # TODO code duplication:
+        # head(s) written two times
+        # tail(s) written three times
+        # head(p) written two times
+        # tail(p) written four times
         switch head(p):
         case '?' (
             like(tail(s), tail(p))

@@ -1,8 +1,8 @@
 #!/usr/local/bin/aq
 
-## character classes
+## Functions on characters (Strings with length = 1)
 
-# TODO lots of code duplication here (char2ord(c)):
+# TODO code duplication: char2ord(c) written two times each:
 isdigit := \c : String ->
     char2ord('0') <= char2ord(c) and char2ord(c) <= char2ord('9');
 isuppercase := \c : String ->
@@ -10,7 +10,17 @@ isuppercase := \c : String ->
 islowercase := \c : String ->
     char2ord('a') <= char2ord(c) and char2ord(c) <= char2ord('z');
 
-## Javaian functions
+## Functions on Strings
+
+containsonly := \s : String, t : String ->
+    if s eq '' (
+        true
+    ) elif s sw t (
+        # TODO add a version of substring without the third paramters:
+        containsonly(substring(s, length(t), length(s)), t)
+    ) else (
+        false
+    );
 
 isblank := \s : String ->
     if s eq '' (true)
@@ -44,15 +54,3 @@ trimright := \s : String ->
     else (s);
 trim := \s : String ->
     trimright(trimleft(s));
-
-## non-Javaian functions
-
-containsonly := \s : String, t : String ->
-    if s eq '' (
-        true
-    ) elif s sw t (
-        # TODO add a version of substring without the third paramters:
-        containsonly(substring(s, length(t), length(s)), t)
-    ) else (
-        false
-    );

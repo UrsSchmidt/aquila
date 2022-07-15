@@ -1,5 +1,7 @@
 #!/usr/local/bin/aq
 
+# Sieve of Eratosthenes
+
 for i from 2 to 100 (
     numbers[i] := true;
     for j from 2 to sqrt(i) (

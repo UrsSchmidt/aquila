@@ -34,15 +34,16 @@ There are five types as of now: Functions, Dictionaries, Strings, Integers and B
 
 Functions are always written as lambdas: `\x, y -> x + y`
 You can assign Functions to variables like any other value: `a := \x -> 2 * x;`
-You can also write recursive Functions by using the variable that you assign the Function to: `a := \x -> x + a(x - 1);`
-You can also add additional (runtime) type-safety by stating, what type each of parameters has: `a := \i : Integer, a : Any -> a;`
+You can also write recursive Functions by using the variable that you assign the Function to: `fact := \n -> if n = 0 (1) else (n * factorial(n - 1));`
+You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
+Here you can also use `Any` to explicitly state, that the argument can take any type.
 
 ### Dictionaries
 
 Dictionary aggregates are written like this: `{ key : value; }`
 If you do not care about the keys, you can also use `{ v1; v2; v3; }` as a shorthand for `{ 0 : v1; 1 : v2; 2 : v3; }`.
 
-You can use either `.key` or `[keyExpression]` to access the values of the dictionary.
+You can use either `.key` or `[keyExpression]` to access the values of the Dictionary.
 The following operations are available on Dictionaries: `:` (contains).
 The following predefined functions are available on Dictionaries:
  * `size(a)` returns the number of key/value pairs in a

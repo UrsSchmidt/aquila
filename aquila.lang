@@ -8,9 +8,9 @@
     <style id="builtin" _name="Builtin Function" map-to="def:builtin"/>
     <style id="comment" _name="Comment" map-to="def:comment"/>
     <style id="keyword" _name="Keyword" map-to="def:keyword"/>
-    <style id="number" _name="Number" map-to="def:number"/>
-    <style id="string" _name="String" map-to="def:string"/>
-    <style id="type" _name="Type" map-to="def:type"/>
+    <style id="number"  _name="Number"  map-to="def:number"/>
+    <style id="string"  _name="String"  map-to="def:string"/>
+    <style id="type"    _name="Type"    map-to="def:type"/>
   </styles>
 
   <definitions>

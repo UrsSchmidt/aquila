@@ -115,7 +115,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitProgram(ProgramContext ctx) {
         for (StatementContext sc : ctx.statement()) {
-            visit(sc);
+            try {
+                visit(sc);
+            } catch (Exception e) {
+                exception(e, sc);
+                return null;
+            }
         }
         return null;
     }
@@ -336,7 +341,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     // FIXME pass further arguments
                     Main.run(new String[] { file.toString() });
                 } catch (IOException e) {
-                    ioException(e, ctx.rhs);
+                    exception(e, ctx.rhs);
                     return null;
                 }
             } else {
@@ -675,7 +680,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } else if (ctx.literal() != null) {
             return visit(ctx.literal());
         } else if (ctx.functionCall() != null) {
-            return visit(ctx.functionCall());
+            final Object result = visit(ctx.functionCall());
+            if (result == null) {
+                expectedNonVoidFunction(ctx.functionCall());
+                return null;
+            }
+            return result;
         } else if (ctx.accessExpression() != null) {
             return visit(ctx.accessExpression());
         } else {
@@ -799,7 +809,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             final String arg1 = (String) arguments.get(0);
             final BigInteger arg2 = (BigInteger) arguments.get(1);
-            result = arg1.charAt(arg2.intValueExact());
+            result = Character.toString(arg1.charAt(arg2.intValueExact()));
         }   break;
         case "dict2str": {
             if (!checkArgs(ctx, arguments, TYPE_DICT)) {
@@ -835,7 +845,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 return null;
             }
             final String arg1 = (String) arguments.get(0);
-            result = arg1.substring(0, 1);
+            result = arg1.isEmpty() ? "" : arg1.substring(0, 1);
         }   break;
         case "int2str": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
@@ -1208,20 +1218,24 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         }
     }
 
-    private static void fileNotFound(File file, ParserRuleContext ctx) {
-        error("File not found: " + file, ctx);
+    private static void exception(Exception e, ParserRuleContext ctx) {
+        error("An exception occurred: " + e.getClass().getSimpleName() + ": `" + e.getMessage() + "`", ctx);
     }
 
-    private static void ioException(IOException e, ParserRuleContext ctx) {
-        error("IOException occurred! Was: " + e.getMessage(), ctx);
+    private static void fileNotFound(File file, ParserRuleContext ctx) {
+        error("File not found! Expected: " + file, ctx);
     }
 
     private static void missingKey(Map expectedMap, Object wasKey, ParserRuleContext ctx) {
         error("Missing key! Expected one of: " + expectedMap.keySet() + ", but was key `" + toString(wasKey) + "`!", ctx);
     }
 
+    private static void expectedNonVoidFunction(ParserRuleContext ctx) {
+        error("Expected non-void Function!", ctx);
+    }
+
     private static void parsingError(String expectedType, String wasValue, ParserRuleContext ctx) {
-        error("Parsing error! Expected type `" + expectedType + "`, but was `" + wasValue + "`!", ctx);
+        error("Parsing error! Expected type `" + expectedType + "`, but was value `" + wasValue + "`!", ctx);
     }
 
     private static void typeMismatch(String expectedType, String wasType, ParserRuleContext ctx) {

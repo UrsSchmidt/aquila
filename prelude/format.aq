@@ -1,0 +1,25 @@
+#!/usr/local/bin/aq
+
+run 'stringfunctions.aq';
+
+# a very simplistic implementation of format()
+# handles %% and %0-%1
+format := \s : String, d : Dictionary ->
+    if s eq '' (
+        ''
+    ) elif s sw '%' (
+        # TODO code duplication: charat(s, 1) written three times:
+        (if isdigit(charat(s, 1)) (
+            d[str2int(charat(s, 1))]
+        ) else (
+            charat(s, 1)
+        ))
+        # TODO add a version of substring without the third paramters:
+        & format(substring(s, 2, length(s)), d)
+    ) else (
+        head(s) & format(tail(s), d)
+    );
+
+write 'abc % def:       ' & format('abc %% ghi', {});
+write 'abc def ghi:     ' & format('abc %0 ghi', { 'def'; });
+write 'abc def ghi jkl: ' & format('abc %0 %1 jkl', { 'def'; 'ghi'; });

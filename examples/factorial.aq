@@ -2,7 +2,7 @@
 
 factorial := \n : Integer ->
     if n < 1 (
-        0 # error
+        0 # TODO error
     ) elif n = 1 (
         1
     ) else (
