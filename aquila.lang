@@ -41,7 +41,12 @@
           <keyword>dict2str</keyword>
           <keyword>dictionary</keyword>
           <keyword>env</keyword>        <!-- variable -->
+          <keyword>exists</keyword>
           <keyword>exit</keyword>
+          <keyword>filter</keyword>
+          <keyword>fold</keyword>
+          <keyword>forall</keyword>
+          <keyword>foreach</keyword>
           <keyword>function</keyword>
           <keyword>gcd</keyword>
           <keyword>head</keyword>
@@ -50,6 +55,7 @@
           <keyword>join</keyword>
           <keyword>left</keyword>
           <keyword>length</keyword>
+          <keyword>map</keyword>
           <keyword>mid</keyword>
           <keyword>ord2char</keyword>
           <keyword>pow</keyword>
@@ -80,11 +86,9 @@
           <keyword>ew</keyword>
           <keyword>false</keyword>
           <keyword>for</keyword>
-          <keyword>foreach</keyword>
           <keyword>from</keyword>
           <keyword>if</keyword>
           <keyword>in</keyword>
-          <keyword>key</keyword>
           <keyword>loop</keyword>
           <keyword>mod</keyword>
           <keyword>ne</keyword>
@@ -99,7 +103,6 @@
           <keyword>switch</keyword>
           <keyword>to</keyword>
           <keyword>true</keyword>
-          <keyword>value</keyword>
           <keyword>while</keyword>
           <keyword>write</keyword>
           <keyword>xor</keyword>

@@ -4,17 +4,17 @@
 #write dict2str(env);
 
 abc.def := 2;
-write 'abc.def: ' & int2str(abc.def);
+write 'abc.def = 2: ' & int2str(abc.def);
 
 a := {
     mykey: 'myvalue';
     ['mystringkey']: 'myvalue2';
     [2 + 3 * 4]: 42 * 69;
 };
-write 'size(a): ' & int2str(size(a));
+write 'size(a) = 3: ' & int2str(size(a));
 write 'a: ' & dict2str(a);
-write 'a.mykey: ' & a.mykey;
-write 'myvalue : a: ' & bool2str('myvalue' : a);
+write 'a.mykey = myvalue: ' & a.mykey;
+write 'myvalue : a = true: ' & bool2str('myvalue' : a);
 
 if a.mykey eq 'myvalue' (
     write 'OK';
@@ -27,30 +27,30 @@ for i from 10 to 1 step -3 (
 )
 
 remove a[2 + 3 * 4];
-foreach key k value v in a (
+call foreach(a, \k, v -> (
     if integer(k) and integer(v) (
         write int2str(k) & ' : ' & int2str(v);
     ) elif string(k) and string(v) (
         write k & ' : ' & v;
     )
-)
+));
 
 x := 'abc';
-write 'length(x): ' & int2str(length(x));
+write 'length(x) = 3: ' & int2str(length(x));
 
 # array example
 array := { 5; 4; 3; 2; 1; };
 array[4] := 42;
 remove array[2];
 write 'array: ' & dict2str(array);
-foreach value v in array (
+call foreach(array, \k, v -> (
     write int2str(v);
-)
+));
 
-write bool2str(str2bool('true'));
-write dict2str(str2dict('{a:42;}'));
-write int2str(str2int('42'));
+write 'true: ' & bool2str(str2bool('true'));
+write '{a:42;}: ' & dict2str(str2dict('{a:42;}'));
+write '42: ' & int2str(str2int('42'));
 
 y := 123;
-y := 'abc'; # err
+y := 'abc'; # error
 write 'y: ' & y;

@@ -38,13 +38,29 @@ You can also write recursive Functions by using the variable that you assign the
 You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 Here you can also use `Any` to explicitly state, that the argument can take any type.
 
+The following predefined functions are available on Functions:
+ * `foreach(d : Dictionary, f : Function)`
+   `(Dictionary, (Any, Any) -> Void) -> Void`
+ * `forall(d : Dictionary, f : Function)`
+   `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
+ * `exists(d : Dictionary, f : Function)`
+   `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
+ * `filter(d : Dictionary, f : Function)`
+   `(Dictionary, (Any, Any) -> Boolean)) -> Dictionary`
+ * `map(d : Dictionary, f : Function)`
+   `(Dictionary, (Any, Any) -> Any)) -> Dictionary`
+ * `fold(d : Dictionary, n : Any, f : Function)`
+   `(Dictionary, Any, (Any, Any) -> Any) -> Any`
+
 ### Dictionaries
 
 Dictionary aggregates are written like this: `{ key : value; }`
 If you do not care about the keys, you can also use `{ v1; v2; v3; }` as a shorthand for `{ 0 : v1; 1 : v2; 2 : v3; }`.
 
 You can use either `.key` or `[keyExpression]` to access the values of the Dictionary.
+
 The following operations are available on Dictionaries: `:` (contains).
+
 The following predefined functions are available on Dictionaries:
  * `size(a)` returns the number of key/value pairs in a
  * `dict2str(a)` returns a as a String
@@ -56,6 +72,7 @@ Dictionaries are implemented as `TreeMap`.
 Strings are written like this: `'Hello, world!'`
 
 The following operations are available on Strings: `&` (concatenation), `eq` (equals), `ew` (ends with), `in` (contains), `ne` (not equals) and `sw` (starts with).
+
 The following predefined functions are available on Strings:
  * `char2ord(a)` returns the Unicode value of the first character of a
  * `charat(a, b)` returns the character with the index b in a
@@ -83,6 +100,7 @@ Integers are written like this:
  * Hexadecimal: `0xabcd`
 
 The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=`, `n!` and `|x|`.
+
 The following predefined functions are available on Integers:
  * `gcd(a, b)` returns the greatest common divisor of a and b
  * `int2str(a)` returns a as a String
@@ -98,6 +116,7 @@ Integers are implemented as `BigInteger`.
 The two Booleans are `true` and `false`.
 
 The following operations are available on Booleans: `not`, `and`, `or` and `xor`.
+
 The following predefined functions are available on Booleans:
  * `bool2str(a)` returns a as a String
 
@@ -190,16 +209,6 @@ for i from 1 to 100 step 2 (
 )
 ```
 If not needed, the step part can be omitted, it will default to `step 1`.
-
-### Foreach statements
-
-Foreach statements are written like this (in this example iterating over all elements of myDictionary and printing their keys and values):
-```
-foreach key k value v in myDictionary (
-    # code
-)
-```
-If not needed, the key and/or the value can both be omitted.
 
 ### Read statements
 

@@ -8,7 +8,6 @@ statement
     : ifStatement
     | loopStatement
     | forStatement
-    | foreachStatement
     | readStatement
     | writeStatement
     | assignStatement
@@ -36,10 +35,6 @@ loopStatement
 
 forStatement
     : 'for' Identifier 'from' from=expression 'to' to=expression ('step' step=expression)? block
-    ;
-
-foreachStatement
-    : 'foreach' ('key' key=Identifier)? ('value' value=Identifier)? 'in' expression block
     ;
 
 readStatement
