@@ -3,18 +3,6 @@
 #write dict2str(args);
 #write dict2str(env);
 
-write '12345: ' & int2str(12345);
-write '0b10101010: ' & int2str(0b10101010);
-write '0o755: ' & int2str(0o755);
-write '0xabcd: ' & int2str(0xabcd);
-
-write '1 + 2 * 3: ' & int2str(1 + 2 * 3);
-write '|-72|: ' & int2str(|-72|);
-write 'pow(2, 3): ' & int2str(pow(2, 3));
-write 'sgn(-72): ' & int2str(sgn(-72));
-write 'sqrt(49): ' & int2str(sqrt(49));
-write 'gcd(8, 12): ' & int2str(gcd(8, 4));
-
 abc.def := 2;
 write 'abc.def: ' & int2str(abc.def);
 

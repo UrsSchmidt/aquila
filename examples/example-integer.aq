@@ -1,0 +1,16 @@
+#!/usr/local/bin/aq
+
+write '12345:            ' & int2str(12345);
+write '0b10101010 = 170: ' & int2str(0b10101010);
+write '0o755 = 493:      ' & int2str(0o755);
+write '0xabcd = 43981:   ' & int2str(0xabcd);
+
+write '1 + 2 * 3 = 7:  ' & int2str(1 + 2 * 3);
+write '|72| = 72:      ' & int2str(|72|);
+write '|-72| = 72:     ' & int2str(|-72|);
+write 'pow(2, 3) = 8:  ' & int2str(pow(2, 3));
+write 'sgn(72) = 1:    ' & int2str(sgn(72));
+write 'sgn(-72) = -1:  ' & int2str(sgn(-72));
+write 'sqrt(49) = 7:   ' & int2str(sqrt(49));
+write 'gcd(8, 12) = 4: ' & int2str(gcd(8, 4));
+write '6! = 720:       ' & int2str(6!);

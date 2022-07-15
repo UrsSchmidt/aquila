@@ -33,6 +33,8 @@ import aquila.antlr.AquilaParser.MultiplicationContext;
 import aquila.antlr.AquilaParser.MultiplicationOperatorContext;
 import aquila.antlr.AquilaParser.UnaryAdditionContext;
 import aquila.antlr.AquilaParser.UnaryAdditionalOperatorContext;
+import aquila.antlr.AquilaParser.FactorialContext;
+import aquila.antlr.AquilaParser.FactorialOperatorContext;
 import aquila.antlr.AquilaParser.FactorContext;
 import aquila.antlr.AquilaParser.BracketExpressionContext;
 import aquila.antlr.AquilaParser.AbsExpressionContext;
@@ -641,7 +643,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitUnaryAddition(UnaryAdditionContext ctx) {
-        Object result = visit(ctx.factor());
+        Object result = visit(ctx.factorial());
         if (ctx.unaryAdditionalOperator() != null) {
             if (result instanceof BigInteger) {
                 switch (ctx.unaryAdditionalOperator().getText()) {
@@ -655,7 +657,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     throw new AssertionError();
                 }
             } else {
-                typeMismatch(TYPE_INT, typeOf(result), ctx.factor());
+                typeMismatch(TYPE_INT, typeOf(result), ctx.factorial());
                 return null;
             }
         }
@@ -664,6 +666,40 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitUnaryAdditionalOperator(UnaryAdditionalOperatorContext ctx) {
+        throw new AssertionError();
+    }
+
+    @Override
+    public Object visitFactorial(FactorialContext ctx) {
+        Object result = visit(ctx.factor());
+        if (ctx.factorialOperator() != null) {
+            if (result instanceof BigInteger) {
+                switch (ctx.factorialOperator().getText()) {
+                case "!":
+                    result = factorial((BigInteger) result);
+                    break;
+                default:
+                    throw new AssertionError();
+                }
+            } else {
+                typeMismatch(TYPE_INT, typeOf(result), ctx.factor());
+                return null;
+            }
+        }
+        return result;
+    }
+
+    private static BigInteger factorial(BigInteger n) {
+        if (n == null || n.compareTo(BigInteger.ONE) < 0) {
+            throw new IllegalArgumentException();
+        }
+        return n.equals(BigInteger.ONE)
+            ? BigInteger.ONE
+            : n.multiply(factorial(n.subtract(BigInteger.ONE)));
+    }
+
+    @Override
+    public Object visitFactorialOperator(FactorialOperatorContext ctx) {
         throw new AssertionError();
     }
 

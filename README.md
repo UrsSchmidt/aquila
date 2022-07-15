@@ -82,7 +82,7 @@ Integers are written like this:
  * Octal: `0o755`
  * Hexadecimal: `0xabcd`
 
-The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=` and `|x|`.
+The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=`, `n!` and `|x|`.
 The following predefined functions are available on Integers:
  * `gcd(a, b)` returns the greatest common divisor of a and b
  * `int2str(a)` returns a as a String

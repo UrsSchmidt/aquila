@@ -8,8 +8,6 @@ implement functions/procedures! (almost done)
 break/continue statements in loops?
 
 predefined functions:
-    on integers:
-        factorial(n) (or use a! ?)
     on strings:
         indexOf, lastIndexOf
         implement in Aquila as part of the prelude: format, matches (regex), like (glob)

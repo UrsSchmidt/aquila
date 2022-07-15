@@ -156,12 +156,20 @@ multiplicationOperator
     ;
 
 unaryAddition
-    : unaryAdditionalOperator? factor
+    : unaryAdditionalOperator? factorial
     ;
 
 unaryAdditionalOperator
     : '+'
     | '-'
+    ;
+
+factorial
+    : factor factorialOperator?
+    ;
+
+factorialOperator
+    : '!'
     ;
 
 factor

@@ -1,5 +1,8 @@
 #!/usr/local/bin/aq
 
+# there is also the n! operator available
+# this file only serves as an examples as to how to implement it on your own
+
 factorial := \n : Integer ->
     if n < 1 (
         0 # TODO error
