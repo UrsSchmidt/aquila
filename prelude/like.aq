@@ -1,0 +1,50 @@
+#!/usr/local/bin/aq
+
+run 'stringfunctions.aq';
+
+# TODO make this function local to like()
+likeh := \t : String, q : String ->
+    # TODO can't use `and` here because it does not short circuit (yet?)
+    #t ne '' and (like(t, q) or likeh(tail(t), q));
+    if t ne '' (like(t, q) or likeh(tail(t), q)) else (false);
+
+like := \s : String, p : String ->
+    if s eq '' (
+        containsonly(p, '*')
+    ) elif p eq '' (
+        false
+    ) elif containsonly(p, '*') (
+        true
+    ) else (
+        # TODO lots of code duplication here (head(s), tail(s)):
+        switch head(p):
+        case '?' (
+            like(tail(s), tail(p))
+        )
+        case '*' (
+            likeh(s, tail(p))
+        )
+        case '#' (
+            isdigit(head(s)) and like(tail(s), tail(p))
+        )
+        default (
+            head(s) eq head(p) and like(tail(s), tail(p))
+        )
+    );
+
+write 'true:  ' & bool2str(like('abc', '*'));
+write 'true:  ' & bool2str(like('abc', '**'));
+write 'false: ' & bool2str(like('abc', '??'));
+write 'true:  ' & bool2str(like('abc', '???'));
+write 'true:  ' & bool2str(like('abc', 'a*'));
+write 'true:  ' & bool2str(like('abc', 'a*c'));
+write 'true:  ' & bool2str(like('abc', 'a??'));
+write 'true:  ' & bool2str(like('abc', 'a?c'));
+write 'false: ' & bool2str(like('abc', 'abx'));
+write 'false: ' & bool2str(like('abc', 'x*'));
+write 'false: ' & bool2str(like('abc', 'x??'));
+write 'false: ' & bool2str(like('abc', 'xyz'));
+write 'false: ' & bool2str(like('abc', '###'));
+write 'false: ' & bool2str(like('123', '##'));
+write 'true:  ' & bool2str(like('123', '###'));
+# TODO add more test cases

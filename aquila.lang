@@ -44,6 +44,7 @@
           <keyword>exit</keyword>
           <keyword>function</keyword>
           <keyword>gcd</keyword>
+          <keyword>head</keyword>
           <keyword>int2str</keyword>
           <keyword>integer</keyword>
           <keyword>join</keyword>
@@ -65,11 +66,14 @@
           <keyword>str2int</keyword>
           <keyword>string</keyword>
           <keyword>substring</keyword>
+          <keyword>tail</keyword>
         </context>
 
         <context id="keyword" style-ref="keyword">
           <keyword>and</keyword>
           <keyword>call</keyword>
+          <keyword>case</keyword>
+          <keyword>default</keyword>
           <keyword>elif</keyword>
           <keyword>else</keyword>
           <keyword>eq</keyword>
@@ -89,8 +93,10 @@
           <keyword>read</keyword>
           <keyword>rem</keyword>
           <keyword>remove</keyword>
+          <keyword>run</keyword>
           <keyword>step</keyword>
           <keyword>sw</keyword>
+          <keyword>switch</keyword>
           <keyword>to</keyword>
           <keyword>true</keyword>
           <keyword>value</keyword>

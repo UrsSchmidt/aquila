@@ -5,6 +5,7 @@ import aquila.antlr.AquilaParser;
 import aquila.antlr.AquilaParser.ProgramContext;
 import aquila.antlr.AquilaParser.StatementContext;
 import aquila.antlr.AquilaParser.IfStatementContext;
+import aquila.antlr.AquilaParser.SwitchStatementContext;
 import aquila.antlr.AquilaParser.LoopStatementContext;
 import aquila.antlr.AquilaParser.ForStatementContext;
 import aquila.antlr.AquilaParser.ForeachStatementContext;
@@ -13,11 +14,13 @@ import aquila.antlr.AquilaParser.WriteStatementContext;
 import aquila.antlr.AquilaParser.AssignStatementContext;
 import aquila.antlr.AquilaParser.CallStatementContext;
 import aquila.antlr.AquilaParser.RemoveStatementContext;
+import aquila.antlr.AquilaParser.RunStatementContext;
 import aquila.antlr.AquilaParser.BlockContext;
 import aquila.antlr.AquilaParser.LhsContext;
 import aquila.antlr.AquilaParser.LhsPartContext;
 import aquila.antlr.AquilaParser.ExpressionContext;
 import aquila.antlr.AquilaParser.IfExpressionContext;
+import aquila.antlr.AquilaParser.SwitchExpressionContext;
 import aquila.antlr.AquilaParser.LogicalOperationContext;
 import aquila.antlr.AquilaParser.LogicalOperatorContext;
 import aquila.antlr.AquilaParser.UnaryLogicalOperationContext;
@@ -44,6 +47,8 @@ import aquila.antlr.AquilaParser.AccessExpressionContext;
 import aquila.antlr.AquilaParser.AccessExpressionPartContext;
 import aquila.antlr.AquilaVisitor;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -83,10 +88,15 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         }
     };
 
-    private Map variables = new TreeMap<>(DICT_COMPARATOR);
+    /* variables are shared between multiple instances
+       to allow for function declarations to be used in different files */
+    private static Map variables = new TreeMap<>(DICT_COMPARATOR);
+
+    private final File scriptRoot;
 
     public Interpreter(String[] args) {
         super();
+        scriptRoot = new File(args[0]).getParentFile();
         /* passing command line arguments */
         Map argsMap = new TreeMap<>(DICT_COMPARATOR);
         for (int i = 0; i < args.length; i++) {
@@ -117,15 +127,31 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitIfStatement(IfStatementContext ctx) {
-        for (int i = 0; i < ctx.expression().size(); i++) {
-            final Object expression = visit(ctx.expression(i));
-            if (Boolean.TRUE.equals(expression)) {
-                visit(ctx.block(i));
+        for (int i = 0; i < ctx.condition.size(); i++) {
+            final Object condition = visit(ctx.condition.get(i));
+            if (Boolean.TRUE.equals(condition)) {
+                visit(ctx.then.get(i));
                 return null;
             }
         }
         if (ctx.elseBlock != null) {
             visit(ctx.elseBlock);
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitSwitchStatement(SwitchStatementContext ctx) {
+        final Object switchHeadExpression = visit(ctx.switchHeadExpression);
+        for (int i = 0; i < ctx.condition.size(); i++) {
+            final Object condition = visit(ctx.condition.get(i));
+            if (switchHeadExpression.equals(condition)) {
+                visit(ctx.then.get(i));
+                return null;
+            }
+        }
+        if (ctx.defaultBlock != null) {
+            visit(ctx.defaultBlock);
         }
         return null;
     }
@@ -219,6 +245,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             System.out.println(rhs);
         } else {
             typeMismatch(TYPE_STR, typeOf(rhs), ctx.rhs);
+            return null;
         }
         return null;
     }
@@ -300,6 +327,30 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     }
 
     @Override
+    public Object visitRunStatement(RunStatementContext ctx) {
+        final Object rhs = visit(ctx.rhs);
+        if (rhs instanceof String) {
+            final File file = new File(scriptRoot, (String) rhs);
+            if (file.exists()) {
+                try {
+                    // FIXME pass further arguments
+                    Main.run(new String[] { file.toString() });
+                } catch (IOException e) {
+                    ioException(e, ctx.rhs);
+                    return null;
+                }
+            } else {
+                fileNotFound(file, cts.rhs);
+                return null;
+            }
+        } else {
+            typeMismatch(TYPE_STR, typeOf(rhs), ctx.rhs);
+            return null;
+        }
+        return null;
+    }
+
+    @Override
     public Object visitBlock(BlockContext ctx) {
         for (StatementContext sc : ctx.statement()) {
             visit(sc);
@@ -324,21 +375,25 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitIfExpression(IfExpressionContext ctx) {
-        if (ctx.condition != null && !ctx.condition.isEmpty()
-         && ctx.then != null && !ctx.then.isEmpty()
-         && ctx.condition.size() == ctx.then.size()) {
-            for (int i = 0; i < ctx.condition.size(); i++) {
-                final Object condition = visit(ctx.condition.get(i));
-                if (Boolean.TRUE.equals(condition)) {
-                    return visit(ctx.then.get(i));
-                }
+        for (int i = 0; i < ctx.condition.size(); i++) {
+            final Object condition = visit(ctx.condition.get(i));
+            if (Boolean.TRUE.equals(condition)) {
+                return visit(ctx.then.get(i));
             }
-            return visit(ctx.elseBlock);
-        } else if (ctx.logicalOperation() != null) {
-            return visit(ctx.logicalOperation());
-        } else {
-            throw new AssertionError();
         }
+        return visit(ctx.elseExpression);
+    }
+
+    @Override
+    public Object visitSwitchExpression(SwitchExpressionContext ctx) {
+        final Object switchHeadExpression = visit(ctx.switchHeadExpression);
+        for (int i = 0; i < ctx.condition.size(); i++) {
+            final Object condition = visit(ctx.condition.get(i));
+            if (switchHeadExpression.equals(condition)) {
+                return visit(ctx.then.get(i));
+            }
+        }
+        return visit(ctx.defaultExpression);
     }
 
     @Override
@@ -775,6 +830,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             result = arg1.gcd(arg2);
         }   break;
+        case "head": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = arg1.substring(0, 1);
+        }   break;
         case "int2str": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
@@ -935,6 +997,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             final BigInteger arg3 = (BigInteger) arguments.get(2);
             result = arg1.substring(arg2.intValueExact(), arg3.intValueExact());
+        }   break;
+        case "tail": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = arg1.isEmpty() ? "" : arg1.substring(1);
         }   break;
         default:
             if (variables.containsKey(identifier)) {
@@ -1137,6 +1206,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } else {
             throw new AssertionError();
         }
+    }
+
+    private static void fileNotFound(File file, ParserRuleContext ctx) {
+        error("File not found: " + file, ctx);
+    }
+
+    private static void ioException(IOException e, ParserRuleContext ctx) {
+        error("IOException occurred! Was: " + e.getMessage(), ctx);
     }
 
     private static void missingKey(Map expectedMap, Object wasKey, ParserRuleContext ctx) {

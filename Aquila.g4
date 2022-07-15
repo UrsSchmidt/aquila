@@ -14,16 +14,21 @@ statement
     | assignStatement
     | callStatement
     | removeStatement
+    | runStatement
     ;
 
-/* expression has to evaluate to true, everything else is false */
 ifStatement
-    : 'if' expression block
-     ('elif' expression block)*
+    :   'if' condition+=expression then+=block
+     ('elif' condition+=expression then+=block)*
      ('else' elseBlock=block)?
     ;
 
-/* expression has to evaluate to true, everything else is false */
+switchStatement
+    : 'switch' switchHeadExpression=expression ':'
+     ('case' condition+=expression then+=block)*
+     ('default' defaultBlock=block)?
+    ;
+
 loopStatement
     : 'while' expression bottom=block
     | 'loop' top=block 'while' expression (';' | bottom=block)
@@ -33,17 +38,14 @@ forStatement
     : 'for' Identifier 'from' from=expression 'to' to=expression ('step' step=expression)? block
     ;
 
-/* iterates over all members of the result of the expression */
 foreachStatement
     : 'foreach' ('key' key=Identifier)? ('value' value=Identifier)? 'in' expression block
     ;
 
-/* reads a line from stdin */
 readStatement
     : 'read' lhs ';'
     ;
 
-/* writes whatever is the result of expression to stdout (with trailing newline) */
 writeStatement
     : 'write' rhs=expression ';'
     ;
@@ -58,6 +60,10 @@ callStatement
 
 removeStatement
     : 'remove' lhs ';'
+    ;
+
+runStatement
+    : 'run' rhs=expression ';'
     ;
 
 block
@@ -75,13 +81,20 @@ lhsPart
 
 expression
     : ifExpression
+    | switchExpression
+    | logicalOperation
     ;
 
 ifExpression
     :   'if' condition+=expression '(' then+=expression ')'
      ('elif' condition+=expression '(' then+=expression ')')*
-      'else' '(' elseBlock=expression ')'
-    | logicalOperation
+      'else' '(' elseExpression=expression ')'
+    ;
+
+switchExpression
+    : 'switch' switchHeadExpression=expression ':'
+     ('case' condition+=expression '(' then+=expression ')')*
+      'default' '(' defaultExpression=expression ')'
     ;
 
 logicalOperation

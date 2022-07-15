@@ -1,7 +1,6 @@
-add if expressions to documentation
 throw error when visiting a function call in an expression that returned null
 
-implement functions/procedures!
+implement functions/procedures! (almost done)
     there should also be three functions introduced:
         forall(dict, (obj, obj) -> {});
         forallchars(str, (str) -> {});
@@ -51,4 +50,4 @@ predefined functions:
         content operations:
             read/write file line-by-line
 
-look at other languages for further ideas
+look at other languages for further ideas (python, perl, ruby, groovy, actionscript)

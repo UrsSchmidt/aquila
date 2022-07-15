@@ -1,0 +1,58 @@
+#!/usr/local/bin/aq
+
+## character classes
+
+# TODO lots of code duplication here (char2ord(c)):
+isdigit := \c : String ->
+    char2ord('0') <= char2ord(c) and char2ord(c) <= char2ord('9');
+isuppercase := \c : String ->
+    char2ord('A') <= char2ord(c) and char2ord(c) <= char2ord('Z');
+islowercase := \c : String ->
+    char2ord('a') <= char2ord(c) and char2ord(c) <= char2ord('z');
+
+## Javaian functions
+
+isblank := \s : String ->
+    if s eq '' (true)
+    elif char2ord(s) <= ' ' (isblank(tail(s)))
+    else (false);
+
+# TODO lines(s : String) : Dictionary
+
+space := \n : Integer ->
+    repeat(' ', n);
+
+tolowercase := \s : String ->
+    (if s eq '' ('')
+     elif isuppercase(s) (ord2char(char2ord(head(s)) + 0x20))
+     else (head(s)))
+    & tolowercase(tail(s));
+touppercase := \s : String ->
+    (if s eq '' ('')
+     elif islowercase(s) (ord2char(char2ord(head(s)) - 0x20))
+     else (head(s)))
+    & touppercase(tail(s));
+
+trimleft := \s : String ->
+    if s eq '' ('')
+    # the left(s, 1) is implied by char2ord():
+    elif char2ord(s) <= ' ' (trimleft(tail(s)))
+    else (s);
+trimright := \s : String ->
+    if s eq '' ('')
+    elif char2ord(right(s, 1)) <= ' ' (trimright(tail(s)))
+    else (s);
+trim := \s : String ->
+    trimright(trimleft(s));
+
+## non-Javaian functions
+
+containsonly := \s : String, t : String ->
+    if s eq '' (
+        true
+    ) elif s sw t (
+        # TODO add a version of substring without the third paramters:
+        containsonly(substring(s, length(t), length(s)), t)
+    ) else (
+        false
+    );

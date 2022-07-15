@@ -14,7 +14,7 @@
 
     <target name="build" depends="clean">
         <mkdir dir="${bin.dir}" />
-        <java jar="${antlr.file}" fork="true">
+        <java jar="${antlr.file}" failonerror="true" fork="true">
             <arg value="Aquila.g4" />
             <arg value="-visitor" />
             <arg value="-no-listener" />
