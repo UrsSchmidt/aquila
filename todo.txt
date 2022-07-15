@@ -14,7 +14,7 @@ predefined functions:
         factorial(n) (or use a! ?)
     on strings:
         indexOf, lastIndexOf
-        how?: format, matches, like
+        implement in Aquila as part of the prelude: format, matches (regex), like (glob)
     on maps (do these manipulate the map directly or return a new map?)
         normalize([]) # fixes array indices to go from 0..length-1
         reverse([])
@@ -51,3 +51,5 @@ predefined functions:
             read/write file line-by-line
 
 look at other languages for further ideas (python, perl, ruby, groovy, actionscript)
+
+rewrite the Interpreter in C++ (using ANTLRs C++ backend with CMake and libgmp)

@@ -340,7 +340,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     return null;
                 }
             } else {
-                fileNotFound(file, cts.rhs);
+                fileNotFound(file, ctx.rhs);
                 return null;
             }
         } else {
