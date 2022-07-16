@@ -73,7 +73,8 @@
           <keyword>str2dict</keyword>
           <keyword>str2int</keyword>
           <keyword>string</keyword>
-          <keyword>substring</keyword>
+          <keyword>substring1</keyword>
+          <keyword>substring2</keyword>
           <keyword>tail</keyword>
         </context>
 

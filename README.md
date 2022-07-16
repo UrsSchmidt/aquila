@@ -87,7 +87,8 @@ The following predefined functions are available on Strings:
  * `str2int(a)` parsing a to an Integer
 
  * `charat(a, b)` returns the character with the index b in a
- * `substring(a, b, c)` returns the substring from a that starts at b and ends at c
+ * `substring1(a, b)` returns the substring from a that starts at b
+ * `substring2(a, b, c)` returns the substring from a that starts at b and ends at c
 
  * `left(a, b)` returns the substring from a that starts at 0 and has length b
  * `mid(a, b, c)` returns the substring from a that starts at b and has length c

@@ -1,3 +1,7 @@
+fix all TODOs/FIXMEs
+
+write a test-suite?
+
 predefined functions:
     on strings:
         implement in Aquila as part of the prelude: format, matches (regex), like (glob)

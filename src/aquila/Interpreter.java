@@ -1131,7 +1131,15 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "string":
             result = checkArgsNoFail(ctx, arguments, TYPE_STR);
             break;
-        case "substring": {
+        case "substring1": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.substring(arg2.intValueExact());
+        }   break;
+        case "substring2": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
                 return null;
             }

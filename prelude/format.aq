@@ -14,8 +14,7 @@ format := \s : String, d : Dictionary ->
         ) else (
             charat(s, 1)
         ))
-        # TODO add a version of substring without the third paramters:
-        & format(substring(s, 2, length(s)), d)
+        & format(substring1(s, 2), d)
     ) else (
         head(s) & format(tail(s), d)
     );

@@ -36,8 +36,7 @@ containsonly := \s : String, t : String ->
     if s eq '' (
         true
     ) elif s sw t (
-        # TODO add a version of substring without the third paramters:
-        containsonly(substring(s, length(t), length(s)), t)
+        containsonly(substring1(s, length(t)), t)
     ) else (
         false
     );
@@ -45,6 +44,7 @@ containsonly := \s : String, t : String ->
 lines := \s : String ->
     split(LF, replace(replace(s, CRLF, LF), CR, LF));
 
+# can't name this `reverse` because that is already reserved for reversing Dictionaries
 strreverse := \s : String ->
     if s eq '' ('') else (strreverse(tail(s)) & head(s));
 
