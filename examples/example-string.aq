@@ -1,0 +1,9 @@
+#!/usr/local/bin/aq
+
+run '../prelude/stringfunctions.aq';
+
+str := 'HeLlO, WoRlD!';
+
+write 'strreverse:  ' & strreverse(str);
+write 'tolowercase: ' & tolowercase(str);
+write 'touppercase: ' & touppercase(str);

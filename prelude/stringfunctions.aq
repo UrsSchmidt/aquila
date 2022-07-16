@@ -16,6 +16,8 @@ APOS := ord2char(0x27);
 ## Functions on characters (Strings with length = 1)
 
 # TODO code duplication: char2ord(c) written two times each:
+isprintableascii := \c : String ->
+    char2ord(' ') <= char2ord(c) and char2ord(c) <= char2ord('~');
 isdigit := \c : String ->
     char2ord('0') <= char2ord(c) and char2ord(c) <= char2ord('9');
 isuppercase := \c : String ->
@@ -24,6 +26,11 @@ islowercase := \c : String ->
     char2ord('a') <= char2ord(c) and char2ord(c) <= char2ord('z');
 
 ## Functions on Strings
+
+isblank := \s : String ->
+    if s eq '' (true)
+    elif char2ord(s) <= ' ' (isblank(tail(s)))
+    else (false);
 
 containsonly := \s : String, t : String ->
     if s eq '' (
@@ -35,27 +42,29 @@ containsonly := \s : String, t : String ->
         false
     );
 
-isblank := \s : String ->
-    if s eq '' (true)
-    elif char2ord(s) <= ' ' (isblank(tail(s)))
-    else (false);
-
 lines := \s : String ->
     split(LF, replace(replace(s, CRLF, LF), CR, LF));
+
+strreverse := \s : String ->
+    if s eq '' ('') else (strreverse(tail(s)) & head(s));
 
 space := \n : Integer ->
     repeat(' ', n);
 
 tolowercase := \s : String ->
-    (if s eq '' ('')
-     elif isuppercase(s) (ord2char(char2ord(head(s)) + 0x20))
-     else (head(s)))
-    & tolowercase(tail(s));
+    if s eq '' ('')
+    else (
+        (if isuppercase(s) (ord2char(char2ord(head(s)) + 0x20))
+         else (head(s)))
+        & tolowercase(tail(s))
+    );
 touppercase := \s : String ->
-    (if s eq '' ('')
-     elif islowercase(s) (ord2char(char2ord(head(s)) - 0x20))
-     else (head(s)))
-    & touppercase(tail(s));
+    if s eq '' ('')
+    else (
+        (if islowercase(s) (ord2char(char2ord(head(s)) - 0x20))
+         else (head(s)))
+        & touppercase(tail(s))
+    );
 
 trimleft := \s : String ->
     if s eq '' ('')
