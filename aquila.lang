@@ -44,6 +44,8 @@
           <keyword>exists</keyword>
           <keyword>exit</keyword>
           <keyword>filter</keyword>
+          <keyword>findleft</keyword>
+          <keyword>findright</keyword>
           <keyword>fold</keyword>
           <keyword>forall</keyword>
           <keyword>foreach</keyword>

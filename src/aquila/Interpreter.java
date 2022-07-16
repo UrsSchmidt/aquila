@@ -873,6 +873,24 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             result = resultMap;
         }   break;
+        case "findleft": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = BigInteger.valueOf(arg1.indexOf(arg2, arg3.intValueExact()));
+        }   break;
+        case "findright": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = BigInteger.valueOf(arg1.lastIndexOf(arg2, arg3.intValueExact()));
+        }   break;
         case "fold": {
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_ANY, TYPE_FUNC)) {
                 return null;

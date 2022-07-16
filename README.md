@@ -76,6 +76,8 @@ The following operations are available on Strings: `&` (concatenation), `eq` (eq
 The following predefined functions are available on Strings:
  * `char2ord(a)` returns the Unicode value of the first character of a
  * `charat(a, b)` returns the character with the index b in a
+ * `findleft(a, b, c)` returns the first occurrence of b in a starting from the left at c
+ * `findright(a, b, c)` returns the first occurrence of b in a starting from the right at c
  * `head(a)` returns the first character of the String
  * `left(a, b)` returns the substring from a that starts at 0 and has length b
  * `length(a)` returns the number of characters in a
