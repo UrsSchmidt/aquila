@@ -1,5 +1,13 @@
 #!/usr/local/bin/aq
 
+## Characters
+
+TAB  := ord2char(0x09);
+LF   := ord2char(0x0a);
+CR   := ord2char(0x0d);
+CRLF := CR & LF;
+APOS := ord2char(0x27);
+
 ## Functions on characters (Strings with length = 1)
 
 # TODO code duplication: char2ord(c) written two times each:
@@ -27,7 +35,8 @@ isblank := \s : String ->
     elif char2ord(s) <= ' ' (isblank(tail(s)))
     else (false);
 
-# TODO lines(s : String) : Dictionary
+lines := \s : String ->
+    split(replace(replace(s, CRLF, LF), CR, LF), LF);
 
 space := \n : Integer ->
     repeat(' ', n);

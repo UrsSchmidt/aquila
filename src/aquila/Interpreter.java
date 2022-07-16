@@ -1296,7 +1296,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
         } catch (Exception e) {
             /* do nothing */
-            e.printStackTrace();
         }
         parsingError(TYPE_DICT, s, ctx);
         return null;

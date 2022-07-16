@@ -34,7 +34,7 @@ There are five types as of now: Functions, Dictionaries, Strings, Integers and B
 
 Functions are always written as lambdas: `\x, y -> x + y`
 You can assign Functions to variables like any other value: `a := \x -> 2 * x;`
-You can also write recursive Functions by using the variable that you assign the Function to: `fact := \n -> if n = 0 (1) else (n * factorial(n - 1));`
+You can also write recursive Functions by using the variable that you assign the Function to: `factorial := \n -> if n = 0 (1) else (n * factorial(n - 1));`
 You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 Here you can also use `Any` to explicitly state, that the argument can take any type.
 
