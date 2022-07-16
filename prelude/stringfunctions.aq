@@ -68,3 +68,12 @@ trimright := \s : String ->
     else (s);
 trim := \s : String ->
     trimright(trimleft(s));
+
+foreachchar := \s : String, f : Function -> (
+    for i from 0 to length(s) - 1 (
+        call f(charat(s, i));
+    )
+);
+foreachline := \s : String, f : Function -> (
+    call foreach(lines(s), f);
+);

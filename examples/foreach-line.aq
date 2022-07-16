@@ -4,4 +4,4 @@ run '../prelude/stringfunctions.aq';
 
 multilinestr := 'line 1' & LF & 'line 2' & LF;
 
-call foreach(lines(multilinestr), \k, line -> (write line;));
+call foreachline(multilinestr, \k, line -> (write line;));
