@@ -1,7 +1,6 @@
 implement functions/procedures! (almost done)
     there should also be these two functions introduced:
         foreachchar(str, (str) -> {});
-        foreachline(str, (str) -> {});
 
 break/continue statements in loops?
 

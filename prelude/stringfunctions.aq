@@ -2,9 +2,14 @@
 
 ## Characters
 
-TAB  := ord2char(0x09);
-LF   := ord2char(0x0a);
-CR   := ord2char(0x0d);
+NUL  := ord2char(0x00);
+BEL  := ord2char(0x07); # \a
+BS   := ord2char(0x08); # \b
+HT   := ord2char(0x09); # \t
+LF   := ord2char(0x0a); # \n
+VT   := ord2char(0x0b); # \v
+FF   := ord2char(0x0c); # \f
+CR   := ord2char(0x0d); # \r
 CRLF := CR & LF;
 APOS := ord2char(0x27);
 
@@ -36,7 +41,7 @@ isblank := \s : String ->
     else (false);
 
 lines := \s : String ->
-    split(replace(replace(s, CRLF, LF), CR, LF), LF);
+    split(LF, replace(replace(s, CRLF, LF), CR, LF));
 
 space := \n : Integer ->
     repeat(' ', n);
