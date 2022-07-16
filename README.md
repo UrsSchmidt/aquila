@@ -39,10 +39,12 @@ You can also add additional (runtime) type-safety by stating what type each of p
 Here you can also use `Any` to explicitly state, that the argument can take any type.
 
 The following predefined functions are available on Functions:
+
  * `foreach(d : Dictionary, f : Function)`
    `(Dictionary, (Any, Any) -> Void) -> Void`
  * `forall(d : Dictionary, f : Function)`
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
+
  * `exists(d : Dictionary, f : Function)`
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
  * `filter(d : Dictionary, f : Function)`
@@ -62,7 +64,9 @@ You can use either `.key` or `[keyExpression]` to access the values of the Dicti
 The following operations are available on Dictionaries: `:` (contains).
 
 The following predefined functions are available on Dictionaries:
+
  * `size(a)` returns the number of key/value pairs in a
+
  * `dict2str(a)` returns a as a String
 
 Dictionaries are implemented as `TreeMap`.
@@ -74,22 +78,28 @@ Strings are written like this: `'Hello, world!'`
 The following operations are available on Strings: `&` (concatenation), `eq` (equals), `ew` (ends with), `in` (contains), `ne` (not equals) and `sw` (starts with).
 
 The following predefined functions are available on Strings:
- * `char2ord(a)` returns the Unicode value of the first character of a
- * `charat(a, b)` returns the character with the index b in a
- * `findleft(a, b, c)` returns the first occurrence of b in a starting from the left at c
- * `findright(a, b, c)` returns the first occurrence of b in a starting from the right at c
- * `head(a)` returns the first character of the String
- * `left(a, b)` returns the substring from a that starts at 0 and has length b
+
  * `length(a)` returns the number of characters in a
- * `mid(a, b, c)` returns the substring from a that starts at b and has length c
- * `repeat(a, b)` returns a repeated b times
- * `replace(a, b, c)` replace all occurrences of b in a with c
- * `right(a, b)` returns the substring from a that starts at length - b and has length b
+
+ * `char2ord(a)` returns the Unicode value of the first character of a
  * `str2bool(a)` parsing a to a Boolean
  * `str2dict(a)` parsing a to a Dictionary
  * `str2int(a)` parsing a to an Integer
+
+ * `charat(a, b)` returns the character with the index b in a
  * `substring(a, b, c)` returns the substring from a that starts at b and ends at c
+
+ * `left(a, b)` returns the substring from a that starts at 0 and has length b
+ * `mid(a, b, c)` returns the substring from a that starts at b and has length c
+ * `right(a, b)` returns the substring from a that starts at length - b and has length b
+
+ * `head(a)` returns the first character of the String
  * `tail(a)` returns everything after the first character of the String
+
+ * `findleft(a, b, c)` returns the first occurrence of b in a starting from the left at c
+ * `findright(a, b, c)` returns the first occurrence of b in a starting from the right at c
+ * `repeat(a, b)` returns a repeated b times
+ * `replace(a, b, c)` replace all occurrences of b in a with c
 
 Since the interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
 
@@ -104,9 +114,11 @@ Integers are written like this:
 The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=`, `n!` and `|x|`.
 
 The following predefined functions are available on Integers:
- * `gcd(a, b)` returns the greatest common divisor of a and b
+
  * `int2str(a)` returns a as a String
  * `ord2char(a)` returns a String containing a single Unicode character
+
+ * `gcd(a, b)` returns the greatest common divisor of a and b
  * `pow(a, b)` returns the a to the power of b
  * `sgn(a)` returns the sign of a
  * `sqrt(a)` returns the square root of a
@@ -120,6 +132,7 @@ The two Booleans are `true` and `false`.
 The following operations are available on Booleans: `not`, `and`, `or` and `xor`.
 
 The following predefined functions are available on Booleans:
+
  * `bool2str(a)` returns a as a String
 
 ### Checking for types
