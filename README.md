@@ -1,6 +1,6 @@
 # Aquila
 
-Aquila is a small scripting language that is run by an interpreter written in Java 11. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Perl, Python, Ruby and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
+Aquila is a small scripting language that is run by an interpreter written in Java 11. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Haskell, Perl, Python, Ruby and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
 
 ## Building the interpreter
 
@@ -148,7 +148,7 @@ write bool2str(integer(a)); # true
 
 ### If expressions
 
-Inline if expressions are written like this:
+`if` expressions are written like this:
 ```
 if expression (
     # expression
@@ -158,11 +158,21 @@ if expression (
     # expression
 )
 ```
-There can be 0..n elif (short for else if) parts and the else part is mandatory.
+There can be 0..n `elif` (short for else if) parts and the `else` part is mandatory.
+
+### Let expressions
+
+`let` expressions are written like this:
+```
+let a = 1 + 2, b = 3 * 4 (
+    # expression
+)
+```
+There can be 1..n bindings after the `let`.
 
 ### Switch expressions
 
-Inline switch expressions are written like this:
+`switch` expressions are written like this:
 ```
 switch expression:
 case expression (
@@ -172,13 +182,13 @@ default (
     # expression
 )
 ```
-There can be 0..n case parts and the default part is mandatory.
+There can be 0..n `case` parts and the `default` part is mandatory.
 
 ## Statements
 
 ### If statements
 
-If statements are written like this:
+`if` statements are written like this:
 ```
 if expression (
     # code
@@ -188,11 +198,11 @@ if expression (
     # code
 )
 ```
-There can be 0..n elif (short for else if) parts and if not needed, the else part can be omitted.
+There can be 0..n `elif` (short for else if) parts and if not needed, the `else` part can be omitted.
 
 ### Switch statements
 
-Switch statements are written like this:
+`switch` statements are written like this:
 ```
 switch expression:
 case expression (
@@ -202,11 +212,11 @@ default (
     # code
 )
 ```
-There can be 0..n case parts and if not needed, the default part can be omitted.
+There can be 0..n `case` parts and if not needed, the `default` part can be omitted.
 
 ### Loop statements
 
-Loop statements are written like this:
+`loop` statements are written like this:
 ```
 loop (
     # code
@@ -214,17 +224,17 @@ loop (
     # code
 )
 ```
-If not needed, either the loop part or the while part can be omitted.
+If not needed, either the `loop` part or the `while` part can be omitted, but not both.
 
 ### For statements
 
-For statements are written like this (in this example iterating over the odd numbers from 1 to 100):
+`for` statements are written like this (in this example iterating over the odd numbers from 1 to 100):
 ```
 for i from 1 to 100 step 2 (
     # code
 )
 ```
-If not needed, the step part can be omitted, it will default to `step 1`.
+If not needed, the `step` part can be omitted, it will default to `step 1`.
 
 ### Read statements
 

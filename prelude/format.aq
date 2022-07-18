@@ -8,11 +8,12 @@ format := \s : String, d : Dictionary ->
     if s eq '' (
         ''
     ) elif s sw '%' (
-        # TODO code duplication: charat(s, 1) written three times:
-        (if isdigit(charat(s, 1)) (
-            d[str2int(charat(s, 1))]
-        ) else (
-            charat(s, 1)
+        (let nextchar = charat(s, 1) (
+            if isdigit(nextchar) (
+                d[str2int(nextchar)]
+            ) else (
+                nextchar
+            )
         ))
         & format(substring1(s, 2), d)
     ) else (

@@ -76,6 +76,7 @@ lhsPart
 
 expression
     : ifExpression
+    | letExpression
     | switchExpression
     | logicalOperation
     ;
@@ -84,6 +85,14 @@ ifExpression
     :   'if' condition+=expression '(' then+=expression ')'
      ('elif' condition+=expression '(' then+=expression ')')*
       'else' '(' elseExpression=expression ')'
+    ;
+
+letExpression
+    : 'let' letBindExpression (',' letBindExpression)* '(' expression ')'
+    ;
+
+letBindExpression
+    : lhs '=' rhs=expression
     ;
 
 switchExpression

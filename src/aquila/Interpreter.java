@@ -19,6 +19,8 @@ import aquila.antlr.AquilaParser.LhsContext;
 import aquila.antlr.AquilaParser.LhsPartContext;
 import aquila.antlr.AquilaParser.ExpressionContext;
 import aquila.antlr.AquilaParser.IfExpressionContext;
+import aquila.antlr.AquilaParser.LetExpressionContext;
+import aquila.antlr.AquilaParser.LetBindExpressionContext;
 import aquila.antlr.AquilaParser.SwitchExpressionContext;
 import aquila.antlr.AquilaParser.LogicalOperationContext;
 import aquila.antlr.AquilaParser.LogicalOperatorContext;
@@ -56,6 +58,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
@@ -91,26 +94,27 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     /* variables are shared between multiple instances
        to allow for function declarations to be used in different files */
-    private static Map variables = new TreeMap<>(DICT_COMPARATOR);
+    private static Stack<Map> variables = new Stack<>();
 
     private final File scriptRoot;
 
     public Interpreter(String[] args) {
         super();
         scriptRoot = args.length > 0 ? new File(args[0]).getParentFile() : null;
+        variables.push(new TreeMap<>(DICT_COMPARATOR));
         /* passing command line arguments */
         Map argsMap = new TreeMap<>(DICT_COMPARATOR);
         for (int i = 0; i < args.length; i++) {
             argsMap.put(BigInteger.valueOf(i), args[i]);
         }
-        variables.put("args", argsMap);
+        variables.peek().put("args", argsMap);
         /* passing environment variables */
         Map envMap = new TreeMap<>(DICT_COMPARATOR);
         final Map<String, String> env = System.getenv();
         for (String envName : env.keySet()) {
             envMap.put(envName, env.get(envName));
         }
-        variables.put("env", envMap);
+        variables.peek().put("env", envMap);
     }
 
     @Override
@@ -199,12 +203,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         final BigInteger fromInt = (BigInteger) from;
         final BigInteger toInt = (BigInteger) to;
         final BigInteger stepInt = (BigInteger) step;
-        final Object overriddenValue = variables.get(identifier);
+        final Object overriddenValue = variables.peek().get(identifier);
         for (BigInteger i = fromInt; stepInt.signum() >= 0 ? i.compareTo(toInt) <= 0 : i.compareTo(toInt) >= 0; i = i.add(stepInt)) {
-            variables.put(identifier, i);
+            variables.peek().put(identifier, i);
             visit(ctx.block());
         }
-        variables.put(identifier, overriddenValue);
+        variables.peek().put(identifier, overriddenValue);
         return null;
     }
 
@@ -261,13 +265,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private void handleLhs(LhsContext lhsc, BiConsumer<Map, Object> handler) {
         final String identifier = lhsc.Identifier().getText();
         if (lhsc.lhsPart().isEmpty()) {
-            handler.accept(variables, identifier);
+            handler.accept(variables.peek(), identifier);
             return;
         }
-        if (!variables.containsKey(identifier)) {
-            variables.put(identifier, new TreeMap<>(DICT_COMPARATOR));
+        if (!variables.peek().containsKey(identifier)) {
+            variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
         }
-        Object result = variables.get(identifier);
+        Object result = variables.peek().get(identifier);
         for (int i = 0; i < lhsc.lhsPart().size(); i++) {
             final LhsPartContext lhspc = lhsc.lhsPart(i);
             Object key;
@@ -359,6 +363,23 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
         }
         return visit(ctx.elseExpression);
+    }
+
+    @Override
+    public Object visitLetExpression(LetExpressionContext ctx) {
+        variables.push(new TreeMap<>(variables.peek()));
+        for (LetBindExpressionContext lbec : ctx.letBindExpression()) {
+            final Object rhs = visit(lbec.rhs);
+            handleLhs(lbec.lhs(), (map, key) -> assign(map, key, rhs, lbec));
+        }
+        final Object result = visit(ctx.expression());
+        variables.pop();
+        return result;
+    }
+
+    @Override
+    public Object visitLetBindExpression(LetBindExpressionContext ctx) {
+        throw new AssertionError();
     }
 
     @Override
@@ -1156,8 +1177,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             result = arg1.isEmpty() ? "" : arg1.substring(1);
         }   break;
         default:
-            if (variables.containsKey(identifier)) {
-                final Object object = variables.get(identifier);
+            if (variables.peek().containsKey(identifier)) {
+                final Object object = variables.peek().get(identifier);
                 if (object instanceof LambdaExpressionContext) {
                     final LambdaExpressionContext function = (LambdaExpressionContext) object;
                     result = callFunction(ctx, function, arguments);
@@ -1166,7 +1187,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     return null;
                 }
             } else {
-                missingKey(variables, identifier, ctx);
+                missingKey(variables.peek(), identifier, ctx);
                 return null;
             }
         }
@@ -1183,14 +1204,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (!checkArgs(callsite, arguments, types.toArray(new String[0]))) {
             return null;
         }
-        Map variablesBefore = variables;
-        variables = new TreeMap<>(DICT_COMPARATOR);
-        variables.putAll(variablesBefore);
+        variables.push(new TreeMap<>(variables.peek()));
         for (int i = 0; i < parameters.size(); i++) {
             final String parameter = parameters.get(i);
             final Object argument = arguments.get(i);
             // TODO does this have to be fully qualified?
-            variables.put(parameter, argument);
+            variables.peek().put(parameter, argument);
         }
         Object result;
         if (function.expression() != null) {
@@ -1201,8 +1220,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } else {
             throw new AssertionError();
         }
-        variables.clear();
-        variables = variablesBefore;
+        variables.pop();
         return result;
     }
 
@@ -1235,10 +1253,10 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitAccessExpression(AccessExpressionContext ctx) {
         final String identifier = ctx.Identifier().getText();
-        if (!variables.containsKey(identifier)) {
-            variables.put(identifier, new TreeMap<>(DICT_COMPARATOR));
+        if (!variables.peek().containsKey(identifier)) {
+            variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
         }
-        Object result = variables.get(identifier);
+        Object result = variables.peek().get(identifier);
         for (AccessExpressionPartContext aepc : ctx.accessExpressionPart()) {
             Object key;
             if (aepc.Identifier() != null) {

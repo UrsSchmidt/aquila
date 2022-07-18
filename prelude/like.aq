@@ -18,23 +18,21 @@ like := \s : String, p : String ->
     ) elif containsonly(p, '*') (
         true
     ) else (
-        # TODO code duplication:
-        # head(s) written two times
-        # tail(s) written three times
-        # head(p) written two times
-        # tail(p) written four times
-        switch head(p):
-        case '?' (
-            like(tail(s), tail(p))
-        )
-        case '*' (
-            likeh(s, tail(p))
-        )
-        case '#' (
-            isdigit(head(s)) and like(tail(s), tail(p))
-        )
-        default (
-            head(s) eq head(p) and like(tail(s), tail(p))
+        let hs = head(s), ts = tail(s),
+            hp = head(p), tp = tail(p) (
+            switch hp:
+            case '?' (
+                like(ts, tp)
+            )
+            case '*' (
+                likeh(s, tp)
+            )
+            case '#' (
+                isdigit(hs) and like(ts, tp)
+            )
+            default (
+                hp eq hs and like(ts, tp)
+            )
         )
     );
 

@@ -15,15 +15,14 @@ APOS := ord2char(0x27);
 
 ## Functions on characters (Strings with length = 1)
 
-# TODO code duplication: char2ord(c) written two times each:
 isprintableascii := \c : String ->
-    char2ord(' ') <= char2ord(c) and char2ord(c) <= char2ord('~');
+    let o = char2ord(c) (char2ord(' ') <= o and o <= char2ord('~'));
 isdigit := \c : String ->
-    char2ord('0') <= char2ord(c) and char2ord(c) <= char2ord('9');
+    let o = char2ord(c) (char2ord('0') <= o and o <= char2ord('9'));
 isuppercase := \c : String ->
-    char2ord('A') <= char2ord(c) and char2ord(c) <= char2ord('Z');
+    let o = char2ord(c) (char2ord('A') <= o and o <= char2ord('Z'));
 islowercase := \c : String ->
-    char2ord('a') <= char2ord(c) and char2ord(c) <= char2ord('z');
+    let o = char2ord(c) (char2ord('a') <= o and o <= char2ord('z'));
 
 ## Functions on Strings
 
