@@ -150,13 +150,12 @@ write bool2str(integer(a)); # true
 
 `if` expressions are written like this:
 ```
-if expression (
-    # expression
-) elif expression (
-    # expression
-) else (
-    # expression
-)
+if expression:
+    expression;
+elif expression:
+    expression;
+else:
+    expression;
 ```
 There can be 0..n `elif` (short for else if) parts and the `else` part is mandatory.
 
@@ -164,9 +163,8 @@ There can be 0..n `elif` (short for else if) parts and the `else` part is mandat
 
 `let` expressions are written like this:
 ```
-let a = 1 + 2, b = 3 * 4 (
-    # expression
-)
+let a = 1 + 2, b = 3 * 4:
+    expression;
 ```
 There can be 1..n bindings after the `let`.
 
@@ -175,12 +173,10 @@ There can be 1..n bindings after the `let`.
 `switch` expressions are written like this:
 ```
 switch expression:
-case expression1, expression2 (
-    # expression
-)
-default (
-    # expression
-)
+case expression1, expression2:
+    expression;
+default:
+    expression;
 ```
 There can be 0..n `case` parts and the `default` part is mandatory.
 

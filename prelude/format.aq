@@ -5,20 +5,18 @@ run 'stringfunctions.aq';
 # a very simplistic implementation of format()
 # handles %% and %0-%1
 format := \s : String, d : Dictionary ->
-    if s eq '' (
-        ''
-    ) elif s sw '%' (
-        (let nextchar = charat(s, 1) (
-            if isdigit(nextchar) (
-                d[str2int(nextchar)]
-            ) else (
-                nextchar
-            )
-        ))
-        & format(substring1(s, 2), d)
-    ) else (
-        head(s) & format(tail(s), d)
-    );
+    if s eq '':
+        '';
+    elif s sw '%':
+        (let nextchar = charat(s, 1):
+            if isdigit(nextchar):
+                d[str2int(nextchar)];
+            else:
+                nextchar;
+        ;)
+        & format(substring1(s, 2), d);
+    else:
+        head(s) & format(tail(s), d);;
 
 write 'abc % def:       ' & format('abc %% ghi', {});
 write 'abc def ghi:     ' & format('abc %0 ghi', { 'def'; });

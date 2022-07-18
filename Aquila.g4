@@ -86,13 +86,13 @@ expression
     ;
 
 ifExpression
-    :   'if' condition+=expression '(' then+=expression ')'
-     ('elif' condition+=expression '(' then+=expression ')')*
-      'else' '(' elseExpression=expression ')'
+    :   'if' condition+=expression ':' then+=expression ';'
+     ('elif' condition+=expression ':' then+=expression ';')*
+      'else' ':' elseExpression=expression ';'
     ;
 
 letExpression
-    : 'let' letBindExpression (',' letBindExpression)* '(' expression ')'
+    : 'let' letBindExpression (',' letBindExpression)* ':' expression ';'
     ;
 
 letBindExpression
@@ -101,8 +101,8 @@ letBindExpression
 
 switchExpression
     : 'switch' switchHeadExpression=expression ':'
-     ('case' labels+=switchExpressionLabels '(' then+=expression ')')*
-      'default' '(' defaultExpression=expression ')'
+     ('case' labels+=switchExpressionLabels ':' then+=expression ';')*
+      'default' ':' defaultExpression=expression ';'
     ;
 
 switchExpressionLabels
