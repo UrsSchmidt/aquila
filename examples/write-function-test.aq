@@ -1,0 +1,8 @@
+#!/usr/local/bin/aq
+
+d := { a: \x, y -> x * y; };
+sd := dict2str(d);
+write sd;
+dsd := str2dict(sd);
+sdsd := dict2str(dsd);
+write sdsd;

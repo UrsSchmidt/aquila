@@ -24,8 +24,12 @@ ifStatement
 
 switchStatement
     : 'switch' switchHeadExpression=expression ':'
-     ('case' condition+=expression then+=block)*
+     ('case' labels+=switchStatementLabels then+=block)*
      ('default' defaultBlock=block)?
+    ;
+
+switchStatementLabels
+    : expression (',' expression)*
     ;
 
 loopStatement
@@ -97,8 +101,12 @@ letBindExpression
 
 switchExpression
     : 'switch' switchHeadExpression=expression ':'
-     ('case' condition+=expression '(' then+=expression ')')*
+     ('case' labels+=switchExpressionLabels '(' then+=expression ')')*
       'default' '(' defaultExpression=expression ')'
+    ;
+
+switchExpressionLabels
+    : expression (',' expression)*
     ;
 
 logicalOperation

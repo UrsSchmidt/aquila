@@ -6,6 +6,7 @@ import aquila.antlr.AquilaParser.ProgramContext;
 import aquila.antlr.AquilaParser.StatementContext;
 import aquila.antlr.AquilaParser.IfStatementContext;
 import aquila.antlr.AquilaParser.SwitchStatementContext;
+import aquila.antlr.AquilaParser.SwitchStatementLabelsContext;
 import aquila.antlr.AquilaParser.LoopStatementContext;
 import aquila.antlr.AquilaParser.ForStatementContext;
 import aquila.antlr.AquilaParser.ReadStatementContext;
@@ -22,6 +23,7 @@ import aquila.antlr.AquilaParser.IfExpressionContext;
 import aquila.antlr.AquilaParser.LetExpressionContext;
 import aquila.antlr.AquilaParser.LetBindExpressionContext;
 import aquila.antlr.AquilaParser.SwitchExpressionContext;
+import aquila.antlr.AquilaParser.SwitchExpressionLabelsContext;
 import aquila.antlr.AquilaParser.LogicalOperationContext;
 import aquila.antlr.AquilaParser.LogicalOperatorContext;
 import aquila.antlr.AquilaParser.UnaryLogicalOperationContext;
@@ -153,17 +155,25 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitSwitchStatement(SwitchStatementContext ctx) {
         final Object switchHeadExpression = visit(ctx.switchHeadExpression);
-        for (int i = 0; i < ctx.condition.size(); i++) {
-            final Object condition = visit(ctx.condition.get(i));
-            if (switchHeadExpression.equals(condition)) {
-                visit(ctx.then.get(i));
-                return null;
+        for (int i = 0; i < ctx.labels.size(); i++) {
+            final SwitchStatementLabelsContext sslc = ctx.labels.get(i);
+            for (int j = 0; j < sslc.expression().size(); j++) {
+                final Object label = visit(sslc.expression(j));
+                if (switchHeadExpression.equals(label)) {
+                    visit(ctx.then.get(i));
+                    return null;
+                }
             }
         }
         if (ctx.defaultBlock != null) {
             visit(ctx.defaultBlock);
         }
         return null;
+    }
+
+    @Override
+    public Object visitSwitchStatementLabels(SwitchStatementLabelsContext ctx) {
+        throw new AssertionError();
     }
 
     @Override
@@ -385,13 +395,21 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitSwitchExpression(SwitchExpressionContext ctx) {
         final Object switchHeadExpression = visit(ctx.switchHeadExpression);
-        for (int i = 0; i < ctx.condition.size(); i++) {
-            final Object condition = visit(ctx.condition.get(i));
-            if (switchHeadExpression.equals(condition)) {
-                return visit(ctx.then.get(i));
+        for (int i = 0; i < ctx.labels.size(); i++) {
+            final SwitchExpressionLabelsContext selc = ctx.labels.get(i);
+            for (int j = 0; j < selc.expression().size(); j++) {
+                final Object label = visit(selc.expression(j));
+                if (switchHeadExpression.equals(label)) {
+                    return visit(ctx.then.get(i));
+                }
             }
         }
         return visit(ctx.defaultExpression);
+    }
+
+    @Override
+    public Object visitSwitchExpressionLabels(SwitchExpressionLabelsContext ctx) {
+        throw new AssertionError();
     }
 
     @Override
@@ -1361,7 +1379,10 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (o == null) {
             throw new NullPointerException();
         }
-        if (o instanceof Map) {
+        if (o instanceof LambdaExpressionContext) {
+            final LambdaExpressionContext lec = (LambdaExpressionContext) o;
+            return lec.getText();
+        } else if (o instanceof Map) {
             final Map map = (Map) o;
             StringBuilder result = new StringBuilder();
             result.append("{\n");
@@ -1376,7 +1397,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } else if (o instanceof BigInteger) {
             return o.toString();
         } else if (o instanceof Boolean) {
-            return ((Boolean) o) ? "true" : "false";
+            final Boolean b = (Boolean) o;
+            return b ? "true" : "false";
         } else {
             throw new AssertionError();
         }

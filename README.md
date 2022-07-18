@@ -175,7 +175,7 @@ There can be 1..n bindings after the `let`.
 `switch` expressions are written like this:
 ```
 switch expression:
-case expression (
+case expression1, expression2 (
     # expression
 )
 default (
@@ -205,7 +205,7 @@ There can be 0..n `elif` (short for else if) parts and if not needed, the `else`
 `switch` statements are written like this:
 ```
 switch expression:
-case expression (
+case expression1, expression2 (
     # code
 )
 default (

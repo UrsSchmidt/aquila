@@ -2,12 +2,6 @@
 
 run 'stringfunctions.aq';
 
-# TODO make this function local to like()
-likeh := \t : String, q : String ->
-    # TODO can't use `and` here because it does not short circuit (yet?)
-    #t ne '' and (like(t, q) or likeh(tail(t), q));
-    if t ne '' (like(t, q) or likeh(tail(t), q)) else (false);
-
 # a very simplistic implementation of like()
 # handles ?, * and #
 like := \s : String, p : String ->
@@ -19,9 +13,13 @@ like := \s : String, p : String ->
         true
     ) else (
         let hs = head(s), ts = tail(s),
-            hp = head(p), tp = tail(p) (
+            hp = head(p), tp = tail(p),
+            likeh = \t : String, q : String ->
+                # TODO can't use `and` here because it does not short circuit (yet?)
+                #t ne '' and (like(t, q) or likeh(tail(t), q));
+                if t ne '' (like(t, q) or likeh(tail(t), q)) else (false) (
             switch hp:
-            case '?' (
+            case '?', hs (
                 like(ts, tp)
             )
             case '*' (
@@ -31,7 +29,7 @@ like := \s : String, p : String ->
                 isdigit(hs) and like(ts, tp)
             )
             default (
-                hp eq hs and like(ts, tp)
+                false
             )
         )
     );
