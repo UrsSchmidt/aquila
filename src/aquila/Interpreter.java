@@ -382,7 +382,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final Object rhs = visit(lbec.rhs);
             handleLhs(lbec.lhs(), (map, key) -> assign(map, key, rhs, lbec));
         }
-        final Object result = visit(ctx.expression());
+        final Object result = visit(ctx.body);
         variables.pop();
         return result;
     }
@@ -1388,7 +1388,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             result.append("{\n");
             for (Object key : map.keySet()) {
                 final Object value = map.get(key);
-                result.append(toString(key) + ": " + toString(value) + ";\n");
+                result.append(toString(key) + ": " + toString(value) + ",\n");
             }
             result.append("}");
             return result.toString();

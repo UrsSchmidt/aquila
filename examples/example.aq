@@ -7,9 +7,9 @@ abc.def := 2;
 write 'abc.def = 2: ' & int2str(abc.def);
 
 a := {
-    mykey: 'myvalue';
-    ['mystringkey']: 'myvalue2';
-    [2 + 3 * 4]: 42 * 69;
+    mykey: 'myvalue',
+    ['mystringkey']: 'myvalue2',
+    [2 + 3 * 4]: 42 * 69,
 };
 write 'size(a) = 3: ' & int2str(size(a));
 write 'a: ' & dict2str(a);
@@ -29,9 +29,9 @@ for i from 10 to 1 step -3 (
 remove a[2 + 3 * 4];
 call foreach(a, \k, v -> (
     if integer(k) and integer(v) (
-        write int2str(k) & ' : ' & int2str(v);
+        write int2str(k) & ': ' & int2str(v);
     ) elif string(k) and string(v) (
-        write k & ' : ' & v;
+        write k & ': ' & v;
     )
 ));
 
@@ -39,7 +39,7 @@ x := 'abc';
 write 'length(x) = 3: ' & int2str(length(x));
 
 # array example
-array := { 5; 4; 3; 2; 1; };
+array := { 5, 4, 3, 2, 1 };
 array[4] := 42;
 remove array[2];
 write 'array: ' & dict2str(array);
@@ -48,7 +48,7 @@ call foreach(array, \k, v -> (
 ));
 
 write 'true: ' & bool2str(str2bool('true'));
-write '{a:42;}: ' & dict2str(str2dict('{a:42;}'));
+write '{a:42}: ' & dict2str(str2dict('{a:42}'));
 write '42: ' & int2str(str2int('42'));
 
 y := 123;

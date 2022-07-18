@@ -6,23 +6,25 @@ run 'stringfunctions.aq';
 # handles ?, * and #
 like := \s : String, p : String ->
     if s eq '':
-        containsonly(p, '*');
+        containsonly(p, '*')
     elif p eq '':
-        false;
+        false
     elif containsonly(p, '*'):
-        true;
-    else:
+        true
+    else: (
         let hs = head(s), ts = tail(s),
             hp = head(p), tp = tail(p),
             likeh = \t : String, q : String ->
                 # TODO can't use `and` here because it does not short circuit (yet?)
                 #t ne '' and (like(t, q) or likeh(tail(t), q));
-                if t ne '': like(t, q) or likeh(tail(t), q); else: false;:
+                if t ne '': like(t, q) or likeh(tail(t), q) else: false: (
             switch hp:
-            case '?', hs: like(ts, tp);
-            case '*': likeh(s, tp);
-            case '#': isdigit(hs) and like(ts, tp);
-            default: false;;;;
+            case '?', hs: like(ts, tp)
+            case '*': likeh(s, tp)
+            case '#': isdigit(hs) and like(ts, tp)
+            default: false
+        )
+    );
 
 write 'true:  ' & bool2str(like('abc', '*'));
 write 'true:  ' & bool2str(like('abc', '**'));

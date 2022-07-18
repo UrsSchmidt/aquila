@@ -86,13 +86,13 @@ expression
     ;
 
 ifExpression
-    :   'if' condition+=expression ':' then+=expression ';'
-     ('elif' condition+=expression ':' then+=expression ';')*
-      'else' ':' elseExpression=expression ';'
+    :   'if' condition+=expression ':' then+=expression
+     ('elif' condition+=expression ':' then+=expression)*
+      'else' ':' elseExpression=logicalOperation
     ;
 
 letExpression
-    : 'let' letBindExpression (',' letBindExpression)* ':' expression ';'
+    : 'let' letBindExpression (',' letBindExpression)* ':' body=logicalOperation
     ;
 
 letBindExpression
@@ -101,8 +101,8 @@ letBindExpression
 
 switchExpression
     : 'switch' switchHeadExpression=expression ':'
-     ('case' labels+=switchExpressionLabels ':' then+=expression ';')*
-      'default' ':' defaultExpression=expression ';'
+     ('case' labels+=switchExpressionLabels ':' then+=expression)*
+      'default' ':' defaultExpression=logicalOperation
     ;
 
 switchExpressionLabels
@@ -203,11 +203,11 @@ absExpression
     ;
 
 dictAggregate
-    : '{' dictAggregatePair* '}'
+    : '{' (dictAggregatePair (',' dictAggregatePair)* ','?)? '}'
     ;
 
 dictAggregatePair
-    : (key=dictAggregateKey ':')? value=expression ';'
+    : (key=dictAggregateKey ':')? value=expression
     ;
 
 dictAggregateKey

@@ -16,59 +16,59 @@ APOS := ord2char(0x27);
 ## Functions on characters (Strings with length = 1)
 
 isprintableascii := \c : String ->
-    let o = char2ord(c): char2ord(' ') <= o and o <= char2ord('~');;
+    let o = char2ord(c): char2ord(' ') <= o and o <= char2ord('~');
 isdigit := \c : String ->
-    let o = char2ord(c): char2ord('0') <= o and o <= char2ord('9');;
+    let o = char2ord(c): char2ord('0') <= o and o <= char2ord('9');
 isuppercase := \c : String ->
-    let o = char2ord(c): char2ord('A') <= o and o <= char2ord('Z');;
+    let o = char2ord(c): char2ord('A') <= o and o <= char2ord('Z');
 islowercase := \c : String ->
-    let o = char2ord(c): char2ord('a') <= o and o <= char2ord('z');;
+    let o = char2ord(c): char2ord('a') <= o and o <= char2ord('z');
 
 ## Functions on Strings
 
 isblank := \s : String ->
-    if s eq '': true;
-    elif char2ord(s) <= ' ': isblank(tail(s));
-    else: false;;
+    if s eq '': true
+    elif char2ord(s) <= ' ': isblank(tail(s))
+    else: false;
 
 containsonly := \s : String, t : String ->
-    if s eq '': true;
-    elif s sw t: containsonly(substring1(s, length(t)), t);
-    else: false;;
+    if s eq '': true
+    elif s sw t: containsonly(substring1(s, length(t)), t)
+    else: false;
 
 lines := \s : String ->
     split(LF, replace(replace(s, CRLF, LF), CR, LF));
 
 # can't name this `reverse` because that is already reserved for reversing Dictionaries
 strreverse := \s : String ->
-    if s eq '': '';
-    else: strreverse(tail(s)) & head(s);;
+    if s eq '': ''
+    else: strreverse(tail(s)) & head(s);
 
 space := \n : Integer ->
     repeat(' ', n);
 
 tolowercase := \s : String ->
-    if s eq '': '';
+    if s eq '': ''
     else:
-        (if isuppercase(s): ord2char(char2ord(head(s)) + 0x20);
-         else: head(s);)
-        & tolowercase(tail(s));;
+        (if isuppercase(s): ord2char(char2ord(head(s)) + 0x20)
+         else: head(s))
+        & tolowercase(tail(s));
 touppercase := \s : String ->
-    if s eq '': '';
+    if s eq '': ''
     else:
-        (if islowercase(s): ord2char(char2ord(head(s)) - 0x20);
-         else: head(s);)
-        & touppercase(tail(s));;
+        (if islowercase(s): ord2char(char2ord(head(s)) - 0x20)
+         else: head(s))
+        & touppercase(tail(s));
 
 trimleft := \s : String ->
-    if s eq '': '';
+    if s eq '': ''
     # the left(s, 1) is implied by char2ord():
-    elif char2ord(s) <= ' ': trimleft(tail(s));
-    else: s;;
+    elif char2ord(s) <= ' ': trimleft(tail(s))
+    else: s;
 trimright := \s : String ->
-    if s eq '': '';
-    elif char2ord(right(s, 1)) <= ' ': trimright(tail(s));
-    else: s;;
+    if s eq '': ''
+    elif char2ord(right(s, 1)) <= ' ': trimright(tail(s))
+    else: s;
 trim := \s : String ->
     trimright(trimleft(s));
 

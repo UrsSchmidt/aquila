@@ -34,7 +34,7 @@ There are five types as of now: Functions, Dictionaries, Strings, Integers and B
 
 Functions are always written as lambdas: `\x, y -> x + y`
 You can assign Functions to variables like any other value: `a := \x -> 2 * x;`
-You can also write recursive Functions by using the variable that you assign the Function to: `factorial := \n -> if n = 0 (1) else (n * factorial(n - 1));`
+You can also write recursive Functions by using the variable that you assign the Function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
 You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 Here you can also use `Any` to explicitly state, that the argument can take any type.
 
@@ -56,8 +56,8 @@ The following predefined functions are available on Functions:
 
 ### Dictionaries
 
-Dictionary aggregates are written like this: `{ key : value; }`
-If you do not care about the keys, you can also use `{ v1; v2; v3; }` as a shorthand for `{ 0 : v1; 1 : v2; 2 : v3; }`.
+Dictionary aggregates are written like this: `{ key: value }`
+If you do not care about the keys, you can also use `{ v1, v2, v3 }` as a shorthand for `{ 0: v1, 1: v2, 2: v3 }`.
 
 You can use either `.key` or `[keyExpression]` to access the values of the Dictionary.
 
@@ -151,11 +151,11 @@ write bool2str(integer(a)); # true
 `if` expressions are written like this:
 ```
 if expression:
-    expression;
+    # expression
 elif expression:
-    expression;
+    # expression
 else:
-    expression;
+    # expression
 ```
 There can be 0..n `elif` (short for else if) parts and the `else` part is mandatory.
 
@@ -164,7 +164,7 @@ There can be 0..n `elif` (short for else if) parts and the `else` part is mandat
 `let` expressions are written like this:
 ```
 let a = 1 + 2, b = 3 * 4:
-    expression;
+    # expression
 ```
 There can be 1..n bindings after the `let`.
 
@@ -174,9 +174,9 @@ There can be 1..n bindings after the `let`.
 ```
 switch expression:
 case expression1, expression2:
-    expression;
+    # expression
 default:
-    expression;
+    # expression
 ```
 There can be 0..n `case` parts and the `default` part is mandatory.
 

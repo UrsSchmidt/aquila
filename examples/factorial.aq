@@ -4,8 +4,8 @@
 # this file only serves as an examples as to how to implement it on your own
 
 factorial := \n : Integer ->
-    if n < 1: 0; # TODO error
-    elif n = 1: 1;
-    else: n * factorial(n - 1);;
+    if n < 1: 0 # TODO error
+    elif n = 1: 1
+    else: n * factorial(n - 1);
 
 write int2str(factorial(4)); # 24
