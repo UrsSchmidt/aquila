@@ -1,9 +1,28 @@
+
 HeLlO, WoRlD!
+abc
+abc
+abcdef
+true
+false
+false
+true
+true
+false
+true
+false
+true
+false
+13
+72
+e
+, WoRlD!
+eLlO,
+HeLlO
+eLlO,
+oRlD!
 H
 eLlO, WoRlD!
-!DlRoW ,OlLeH
-hello, world!
-HELLO, WORLD!
 0
 3
 0
@@ -15,3 +34,11 @@ HELLO, WORLD!
 2: '3',
 }
 1,2,3
+          
+
+abcabcabc
+a_e
+abcde
+!DlRoW ,OlLeH
+hello, world!
+HELLO, WORLD!

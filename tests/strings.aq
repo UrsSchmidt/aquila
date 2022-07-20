@@ -4,14 +4,40 @@ run '../prelude/stringfunctions.aq';
 
 str := 'HeLlO, WoRlD!';
 
+# literals
+write '';
 write str;
+
+# operations
+write '' & 'abc';
+write 'abc' & '';
+write 'abc' & 'def';
+write bool2str('abc' eq 'abc');
+write bool2str('abc' eq 'def');
+write bool2str('abc' ne 'abc');
+write bool2str('abc' ne 'def');
+write bool2str('abc' in 'abcde');
+write bool2str('def' in 'abcde');
+write bool2str('abcde' sw 'abc');
+write bool2str('abcde' sw 'bcd');
+write bool2str('abcde' ew 'cde');
+write bool2str('abcde' ew 'bcd');
+
+# functions
+write int2str(length(str));
+
+write int2str(char2ord(str));
+
+write charat(str, 1);
+write substring1(str, 5);
+write substring2(str, 1, 6);
+
+write left(str, 5);
+write mid(str, 1, 5);
+write right(str, 5);
 
 write head(str);
 write tail(str);
-
-write strreverse(str);
-write tolowercase(str);
-write touppercase(str);
 
 write int2str(findleft(str, 'He', 0));
 write int2str(findleft(str, 'lO', 0));
@@ -24,3 +50,15 @@ p := split(';', s);
 write dict2str(p);
 t := join(',', p);
 write t;
+
+write repeat(' ', 10);
+write repeat('abc', 0);
+write repeat('abc', 3);
+
+write replace('abcde', 'bcd', '_');
+write replace('abcde', '.', '_');
+
+# prelude functions
+write strreverse(str);
+write tolowercase(str);
+write touppercase(str);
