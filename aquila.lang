@@ -41,6 +41,7 @@
           <keyword>dict2str</keyword>
           <keyword>dictionary</keyword>
           <keyword>env</keyword>        <!-- variable -->
+          <keyword>error</keyword>
           <keyword>exists</keyword>
           <keyword>exit</keyword>
           <keyword>filter</keyword>

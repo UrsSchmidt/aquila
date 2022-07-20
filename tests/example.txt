@@ -1,0 +1,33 @@
+2
+3
+{
+14: 126,
+mykey: 'myvalue',
+mystringkey: 'myvalue2',
+}
+myvalue
+true
+OK
+10
+7
+4
+1
+14: 126
+mykey: myvalue
+3
+{
+0: 5,
+1: 4,
+3: 2,
+4: 42,
+}
+5
+4
+2
+42
+true
+{
+a: 42,
+}
+42
+123

@@ -4,11 +4,18 @@
 
 for i from 2 to 100 (
     numbers[i] := true;
-    for j from 2 to sqrt(i) (
-        if i mod j = 0 (
+    f := \i, j -> (
+        if j < 2 (
+            call error('Illegal argument');
+        ) elif i mod j = 0 (
             numbers[i] := false;
-            # TODO break;
+        ) elif j > 2 (
+            call f(i, j - 1);
         )
+    );
+    sq := sqrt(i);
+    if sq >= 2 (
+        call f(i, sq);
     )
 )
 

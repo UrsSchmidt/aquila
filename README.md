@@ -4,7 +4,8 @@ Aquila is a small scripting language that is run by an interpreter written in Ja
 
 ## Building the interpreter
 
-You will need `ant` to build the interpreter.
+You will need `ant 1.10.7` and `antlr 4.10.1` to build the interpreter.
+Make sure to put the `antlr-4.10.1-complete.jar` file into the parent directory of this directory.
 Then simply run `ant package` to build the `aquila.jar` file.
 
 ## Installing the interpreter on Ubuntu
@@ -12,6 +13,11 @@ Then simply run `ant package` to build the `aquila.jar` file.
 Change the path in `aq.sh` to point to your `aquila.jar` file.
 Then run `cp aq.sh /usr/local/bin/aq`. You might need sudo rights.
 You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the `aq.sh` script and in turn call the interpreter.
+
+## Running the test suite on Ubuntu
+
+Make sure that you have already built the project.
+Then you can simply run `./run-tests.sh` and the whole test suite will be executed.
 
 ## Syntax highlighting for gedit
 
@@ -99,6 +105,8 @@ The following predefined functions are available on Strings:
 
  * `findleft(a, b, c)` returns the first occurrence of b in a starting from the left at c
  * `findright(a, b, c)` returns the first occurrence of b in a starting from the right at c
+ * `split(a, b)` returns the String b splitted at String a as a Dictionary
+ * `join(a, b)` returns the Dictionary b joined with String a as a String
  * `repeat(a, b)` returns a repeated b times
  * `replace(a, b, c)` replace all occurrences of b in a with c
 
@@ -179,6 +187,12 @@ default:
     # expression
 ```
 There can be 0..n `case` parts and the `default` part is mandatory.
+
+### Misc. built-in functions
+
+ * `error(a)` exits the current script with the error message a and exit code 1
+ * `exit(a)` exits the current script with exit code a
+ * `sleep(a)` sleeps/waits for a milliseconds
 
 ## Statements
 

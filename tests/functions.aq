@@ -1,25 +1,25 @@
 #!/usr/local/bin/aq
 
-dictForeach := { 'Hello, world!'; 'abc'; };
+dictForeach := { 'Hello, world!', 'abc' };
 funcForeach := \k, v -> (if string(v) (write v;));
 call foreach(dictForeach, funcForeach);
 
-dictForall := { 'Hello, world!'; 'abc'; };
+dictForall := { 'Hello, world!', 'abc' };
 funcForall := \k, v : String -> length(v) > 3;
 write bool2str(forall(dictForall, funcForall));
 
-dictExists := { 'Hello, world!'; 'abc'; };
+dictExists := { 'Hello, world!', 'abc' };
 funcExists := \k, v : String -> length(v) > 3;
 write bool2str(exists(dictExists, funcExists));
 
-dictFilter := { 'Hello, world!'; 'abc'; };
+dictFilter := { 'Hello, world!', 'abc' };
 funcFilter := \k, v : String -> length(v) > 3;
 write dict2str(filter(dictFilter, funcFilter));
 
-dictMap := { 'Hello, world!'; 'abc'; };
+dictMap := { 'Hello, world!', 'abc' };
 funcMap := \k, v : String -> length(v);
 write dict2str(map(dictMap, funcMap));
 
-dictFold := { 'Hello, world!'; 'abc'; };
+dictFold := { 'Hello, world!', 'abc' };
 funcFold := \l : String, r : String -> l & r;
 write fold(dictFold, '', funcFold);

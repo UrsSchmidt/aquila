@@ -17,7 +17,3 @@ format := \s : String, d : Dictionary ->
         & format(substring1(s, 2), d)
     else:
         head(s) & format(tail(s), d);
-
-write 'abc % def:       ' & format('abc %% ghi', {});
-write 'abc def ghi:     ' & format('abc %0 ghi', { 'def' });
-write 'abc def ghi jkl: ' & format('abc %0 %1 jkl', { 'def', 'ghi' });

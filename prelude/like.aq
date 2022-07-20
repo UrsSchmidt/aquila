@@ -25,20 +25,3 @@ like := \s : String, p : String ->
             default: false
         )
     );
-
-write 'true:  ' & bool2str(like('abc', '*'));
-write 'true:  ' & bool2str(like('abc', '**'));
-write 'false: ' & bool2str(like('abc', '??'));
-write 'true:  ' & bool2str(like('abc', '???'));
-write 'true:  ' & bool2str(like('abc', 'a*'));
-write 'true:  ' & bool2str(like('abc', 'a*c'));
-write 'true:  ' & bool2str(like('abc', 'a??'));
-write 'true:  ' & bool2str(like('abc', 'a?c'));
-write 'false: ' & bool2str(like('abc', 'abx'));
-write 'false: ' & bool2str(like('abc', 'x*'));
-write 'false: ' & bool2str(like('abc', 'x??'));
-write 'false: ' & bool2str(like('abc', 'xyz'));
-write 'false: ' & bool2str(like('abc', '###'));
-write 'false: ' & bool2str(like('123', '##'));
-write 'true:  ' & bool2str(like('123', '###'));
-# TODO add more test cases

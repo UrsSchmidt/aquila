@@ -268,7 +268,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitRemoveStatement(RemoveStatementContext ctx) {
-        handleLhs(ctx.lhs(), (map, key) -> map.remove(key));
+        handleLhs(ctx.lhs(), (map, key) -> {
+            if (map.containsKey(key)) {
+                map.remove(key);
+            } else {
+                missingKey(map, key, ctx);
+            }
+        });
         return null;
     }
 
@@ -866,6 +872,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "dictionary":
             result = checkArgsNoFail(ctx, arguments, TYPE_DICT);
             break;
+        case "error": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            error(arg1, ctx);
+            result = arg1;
+        }   break;
         case "exists": {
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
@@ -1388,7 +1402,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             result.append("{\n");
             for (Object key : map.keySet()) {
                 final Object value = map.get(key);
-                result.append(toString(key) + ": " + toString(value) + ",\n");
+                result.append(toString(key) + ": ");
+                if (value instanceof String) {
+                    result.append("'").append(toString(value)).append("'");
+                } else {
+                    result.append(toString(value));
+                }
+                result.append(",\n");
             }
             result.append("}");
             return result.toString();

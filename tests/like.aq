@@ -1,0 +1,20 @@
+#!/usr/local/bin/aq
+
+run '../prelude/like.aq';
+
+write bool2str(like('abc', '*'));
+write bool2str(like('abc', '**'));
+write bool2str(like('abc', '??'));
+write bool2str(like('abc', '???'));
+write bool2str(like('abc', 'a*'));
+write bool2str(like('abc', 'a*c'));
+write bool2str(like('abc', 'a??'));
+write bool2str(like('abc', 'a?c'));
+write bool2str(like('abc', 'abx'));
+write bool2str(like('abc', 'x*'));
+write bool2str(like('abc', 'x??'));
+write bool2str(like('abc', 'xyz'));
+write bool2str(like('abc', '###'));
+write bool2str(like('123', '##'));
+write bool2str(like('123', '###'));
+# TODO add more test cases

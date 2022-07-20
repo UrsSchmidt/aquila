@@ -1,0 +1,12 @@
+Hello, world!
+abc
+false
+true
+{
+0: 'Hello, world!',
+}
+{
+0: 13,
+1: 3,
+}
+Hello, world!abc

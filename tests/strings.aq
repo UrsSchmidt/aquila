@@ -1,0 +1,26 @@
+#!/usr/local/bin/aq
+
+run '../prelude/stringfunctions.aq';
+
+str := 'HeLlO, WoRlD!';
+
+write str;
+
+write head(str);
+write tail(str);
+
+write strreverse(str);
+write tolowercase(str);
+write touppercase(str);
+
+write int2str(findleft(str, 'He', 0));
+write int2str(findleft(str, 'lO', 0));
+write int2str(findright(str, 'He', length(str)));
+write int2str(findright(str, 'lO', length(str)));
+
+s := '1;2;3';
+write s;
+p := split(';', s);
+write dict2str(p);
+t := join(',', p);
+write t;

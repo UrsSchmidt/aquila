@@ -1,6 +1,6 @@
 fix all TODOs/FIXMEs
 
-write a test-suite?
+add way more test cases in general
 
 predefined functions:
     on strings:

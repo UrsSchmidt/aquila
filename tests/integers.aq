@@ -1,0 +1,34 @@
+#!/usr/local/bin/aq
+
+# literals
+write int2str(12345);
+write int2str(0b10101010);
+write int2str(0o755);
+write int2str(0xabcd);
+
+# operations
+write int2str(1 + 2 * 3);
+write int2str(+72);
+write int2str(-72);
+write int2str(2 + 3);
+write int2str(2 - 3);
+write int2str(2 * 3);
+write int2str(3 / 2);
+write int2str(3 mod 2);
+write bool2str(2 = 2);
+write bool2str(2 = 3);
+write bool2str(2 <> 2);
+write bool2str(2 <> 3);
+write int2str(6!);
+write int2str(|72|);
+write int2str(|-72|);
+
+# functions
+write int2str(gcd(8, 4));
+write int2str(pow(0, 1));
+write int2str(pow(1, 0));
+write int2str(pow(2, 3));
+write int2str(sgn(72));
+write int2str(sgn(-72));
+write int2str(sqrt(0));
+write int2str(sqrt(49));
