@@ -59,6 +59,16 @@ write replace('abcde', 'bcd', '_');
 write replace('abcde', '.', '_');
 
 # prelude functions
+write bool2str(isblank(''));
+write bool2str(isblank(str));
+write chop('abc');
+write bool2str(containsonly('***', '*'));
+write bool2str(containsonly('*+*', '*'));
 write strreverse(str);
+write space(5);
 write tolowercase(str);
 write touppercase(str);
+write trimleft(' abc ');
+write trimright(' abc ');
+write trim(' abc ');
+call foreachchar('abc', \c -> (write '>' & c;));

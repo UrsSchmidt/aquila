@@ -65,9 +65,7 @@ The following predefined functions are available on Functions:
 Dictionary aggregates are written like this: `{ key: value }`
 If you do not care about the keys, you can also use `{ v1, v2, v3 }` as a shorthand for `{ 0: v1, 1: v2, 2: v3 }`.
 
-You can use either `.key` or `[keyExpression]` to access the values of the Dictionary.
-
-The following operations are available on Dictionaries: `:` (contains).
+The following operations are available on Dictionaries: `.key` (value access via key name), `[keyExpression]` (value access via expression) and `:` (contains).
 
 The following predefined functions are available on Dictionaries:
 
@@ -109,6 +107,8 @@ The following predefined functions are available on Strings:
  * `join(a, b)` returns the Dictionary b joined with String a as a String
  * `repeat(a, b)` returns a repeated b times
  * `replace(a, b, c)` replace all occurrences of b in a with c
+
+There are also a lot of predefined String functions under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
 
 Since the interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
 

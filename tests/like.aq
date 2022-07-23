@@ -17,5 +17,3 @@ write bool2str(like('abc', 'xyz'));
 write bool2str(like('abc', '###'));
 write bool2str(like('123', '##'));
 write bool2str(like('123', '###'));
-# TODO add more test cases
-# see https://github.com/UrsSchmidt/like/blob/master/tests.txt

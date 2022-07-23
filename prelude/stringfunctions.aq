@@ -28,8 +28,12 @@ islowercase := \c : String ->
 
 isblank := \s : String ->
     if s eq '': true
-    elif char2ord(s) <= ' ': isblank(tail(s))
+    elif char2ord(s) <= char2ord(' '): isblank(tail(s))
     else: false;
+
+chop := \s : String ->
+    if s eq '': ''
+    else: left(s, length(s) - 1);
 
 containsonly := \s : String, t : String ->
     if s eq '': true
@@ -63,11 +67,11 @@ touppercase := \s : String ->
 trimleft := \s : String ->
     if s eq '': ''
     # the left(s, 1) is implied by char2ord():
-    elif char2ord(s) <= ' ': trimleft(tail(s))
+    elif char2ord(s) <= char2ord(' '): trimleft(tail(s))
     else: s;
 trimright := \s : String ->
     if s eq '': ''
-    elif char2ord(right(s, 1)) <= ' ': trimright(tail(s))
+    elif char2ord(right(s, 1)) <= char2ord(' '): trimright(chop(s))
     else: s;
 trim := \s : String ->
     trimright(trimleft(s));

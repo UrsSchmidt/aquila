@@ -1,5 +1,24 @@
 #!/usr/local/bin/aq
 
+# literals
+write dict2str({});
+write dict2str({ 1, 2, 3 });
+write dict2str({ a: 1, b: 2, c: 3 });
+write dict2str({ ['a']: 1, ['b']: 2, ['c']: 3 });
+
+# operations
+a := { a: 1, b: 2, c: 3 };
+write int2str(a.b);
+b := { 1, 2, 3 };
+write int2str(b[1]);
+write bool2str(2 : { 1, 2, 3 });
+write bool2str(4 : { 1, 2, 3 });
+
+# functions
+write int2str(size({}));
+write int2str(size({ 1, 2, 3 }));
+
+# dict2str
 d := { a: \x, y -> x * y };
 sd := dict2str(d);
 write sd;

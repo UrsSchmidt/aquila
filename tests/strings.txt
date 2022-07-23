@@ -39,6 +39,18 @@ eLlO, WoRlD!
 abcabcabc
 a_e
 abcde
+true
+false
+ab
+true
+false
 !DlRoW ,OlLeH
+     
 hello, world!
 HELLO, WORLD!
+abc 
+ abc
+abc
+>a
+>b
+>c

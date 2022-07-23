@@ -37,6 +37,7 @@ predefined functions:
             copy('/src/dir/', '/dst/dir/');
             delete('/path/to/file');
             delete('/path/to/dir/');
+            for each file in directory do ...
         content operations:
             read/write file line-by-line
 
