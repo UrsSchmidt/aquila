@@ -1,22 +1,14 @@
 # Aquila
 
-Aquila is a small scripting language that is run by an interpreter written in Java 11. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Haskell, Perl, Python, Ruby and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
+Aquila is a small scripting language that is run on an interpreter. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Haskell, Perl, Python, Ruby and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
 
-## Building the interpreter
+## aquila4j
 
-You will need `ant 1.10.7` and `antlr 4.10.1` to build the interpreter.
-Make sure to put the `antlr-4.10.1-complete.jar` file into the parent directory of this directory.
-Then simply run `ant package` to build the `aquila.jar` file.
-
-## Installing the interpreter on Ubuntu
-
-Change the path in `aq.sh` to point to your `aquila.jar` file.
-Then run `cp aq.sh /usr/local/bin/aq`. You might need sudo rights.
-You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the `aq.sh` script and in turn call the interpreter.
+This is the Java 11 implementation of Aquila. See [here](aquila4j/README.md) for details on how to build `aquila4j`.
 
 ## Running the test suite on Ubuntu
 
-Make sure that you have already built the project.
+Make sure that you have already installed an Aquila interpreter as `aq`.
 Then you can simply run `./run-tests.sh` and the whole test suite will be executed.
 
 ## Syntax highlighting for gedit

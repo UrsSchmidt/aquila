@@ -1,12 +1,12 @@
-package aquila;
+package aquila4j;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import aquila.antlr.AquilaLexer;
-import aquila.antlr.AquilaParser;
-import aquila.antlr.AquilaParser.ProgramContext;
+import aquila4j.antlr.AquilaLexer;
+import aquila4j.antlr.AquilaParser;
+import aquila4j.antlr.AquilaParser.ProgramContext;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -19,7 +19,7 @@ public class Main {
 
     public static void run(String[] args) throws IOException {
         if (args == null || args.length < 1) {
-            System.err.println("ERROR: Usage: aquila <file> arguments...");
+            System.err.println("ERROR: Usage: java -jar aquila4j.jar <file> arguments...");
             System.exit(1);
             return;
         }

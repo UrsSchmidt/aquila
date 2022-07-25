@@ -1,5 +1,5 @@
-/bin/
+/aquila4j/bin/
+/aquila4j/src/aquila4j/antlr/
 /etc/
-/src/aquila/antlr/
 *.class
 *.jar

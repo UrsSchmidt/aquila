@@ -1,29 +1,30 @@
-<project name="aquila" basedir="." default="package">
+<project name="aquila4j" basedir="." default="package">
 
-    <property name="main.class" value="aquila.Main" />
+    <property name="main.class" value="aquila4j.Main" />
     <property name="bin.dir"    value="bin" />
     <property name="src.dir"    value="src" />
-    <property name="antlr.file" value="../antlr-4.10.1-complete.jar" />
+    <property name="antlr.file" value="../../antlr-4.10.1-complete.jar" />
     <property name="jar.file"   value="${ant.project.name}.jar" />
+    <property name="parent.dir" location=".." />
 
     <target name="clean">
         <delete dir="${bin.dir}" />
-        <delete dir="${src.dir}/aquila/antlr/" />
+        <delete dir="${src.dir}/aquila4j/antlr/" />
         <delete file="${jar.file}" />
     </target>
 
     <target name="build" depends="clean">
         <mkdir dir="${bin.dir}" />
         <java jar="${antlr.file}" failonerror="true" fork="true">
-            <arg value="Aquila.g4" />
+            <arg value="${parent.dir}/Aquila.g4" />
             <arg value="-visitor" />
             <arg value="-no-listener" />
             <arg value="-encoding" />
             <arg value="utf8" />
             <arg value="-o" />
-            <arg value="src/aquila/antlr" />
+            <arg value="src/aquila4j/antlr" />
             <arg value="-package" />
-            <arg value="aquila.antlr" />
+            <arg value="aquila4j.antlr" />
         </java>
         <javac srcdir="${src.dir}" destdir="${bin.dir}" classpath="${antlr.file}" debug="on" includeantruntime="false">
             <compilerarg line="-encoding utf8" />
