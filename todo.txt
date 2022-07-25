@@ -1,10 +1,8 @@
 fix all TODOs/FIXMEs
 
-add way more test cases in general
-
 predefined functions:
     on strings:
-        implement in Aquila as part of the prelude: format, matches (regex), like (glob)
+        implement in Aquila as part of the prelude: matches (regex)
     on maps (do these manipulate the map directly or return a new map?)
         normalize([]) # fixes array indices to go from 0..length-1
         reverse([])
@@ -40,6 +38,8 @@ predefined functions:
             for each file in directory do ...
         content operations:
             read/write file line-by-line
+
+look at older projects and merge with them
 
 look at other languages for further ideas (python, perl, ruby, groovy, actionscript)
 
