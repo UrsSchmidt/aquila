@@ -65,8 +65,6 @@ The following predefined functions are available on Dictionaries:
 
  * `dict2str(a)` returns a as a String
 
-Dictionaries are implemented as `TreeMap`.
-
 ### Strings
 
 Strings are written like this: `'Hello, world!'`
@@ -102,8 +100,6 @@ The following predefined functions are available on Strings:
 
 There are also a lot of predefined String functions under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
 
-Since the interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
-
 ### Integers
 
 Integers are written like this:
@@ -123,8 +119,6 @@ The following predefined functions are available on Integers:
  * `pow(a, b)` returns the a to the power of b
  * `sgn(a)` returns the sign of a
  * `sqrt(a)` returns the square root of a
-
-Integers are implemented as `BigInteger`.
 
 ### Booleans
 

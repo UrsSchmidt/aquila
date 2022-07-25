@@ -13,3 +13,17 @@ Then simply run `ant package` to build the `aquila4j.jar` file.
 Change the path in `aq.sh` to point to your `aquila4j.jar` file.
 Then run `cp aq.sh /usr/local/bin/aq`. You might need sudo rights.
 You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the `aq.sh` script and in turn call the interpreter.
+
+## Implementation details
+
+Types are implemented using the following Java types:
+
+| Aquila     | Java                                                |
+|------------|-----------------------------------------------------|
+| Function   | aquila4j.antlr.AquilaParser.LambdaExpressionContext |
+| Dictionary | java.util.TreeMap                                   |
+| String     | java.lang.String\*                                  |
+| Integer    | java.math.BigInteger                                |
+| Boolean    | java.lang.Boolean                                   |
+
+\* Since this interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
