@@ -1,30 +1,41 @@
 <project name="aquila4j" basedir="." default="package">
 
-    <property name="main.class" value="aquila4j.Main" />
-    <property name="bin.dir"    value="bin" />
-    <property name="src.dir"    value="src" />
-    <property name="antlr.file" value="../../antlr-4.10.1-complete.jar" />
-    <property name="jar.file"   value="${ant.project.name}.jar" />
-    <property name="parent.dir" location=".." />
+    <property name="parent.dir"       location=".." />
+    <property name="grand.parent.dir" location="../.." />
+
+    <!-- packages and classes -->
+    <property name="main.package"    value="${ant.project.name}" />
+    <property name="main.class"      value="${main.package}.Main" />
+    <property name="src.gen.package" value="${main.package}.antlr" />
+
+    <!-- directories -->
+    <property name="bin.dir"     value="bin" />
+    <property name="src.dir"     value="src" />
+    <property name="src.gen.dir" value="${src.dir}/${main.package}/antlr" />
+
+    <!-- specific files -->
+    <property name="antlr.file"   value="${grand.parent.dir}/antlr-4.10.1-complete.jar" />
+    <property name="grammar.file" value="${parent.dir}/Aquila.g4" />
+    <property name="jar.file"     value="${ant.project.name}.jar" />
 
     <target name="clean">
         <delete dir="${bin.dir}" />
-        <delete dir="${src.dir}/aquila4j/antlr/" />
+        <delete dir="${src.gen.dir}" />
         <delete file="${jar.file}" />
     </target>
 
     <target name="build" depends="clean">
         <mkdir dir="${bin.dir}" />
         <java jar="${antlr.file}" failonerror="true" fork="true">
-            <arg value="${parent.dir}/Aquila.g4" />
+            <arg value="${grammar.file}" />
             <arg value="-visitor" />
             <arg value="-no-listener" />
             <arg value="-encoding" />
             <arg value="utf8" />
             <arg value="-o" />
-            <arg value="src/aquila4j/antlr" />
+            <arg value="${src.gen.dir}" />
             <arg value="-package" />
-            <arg value="aquila4j.antlr" />
+            <arg value="${src.gen.package}" />
         </java>
         <javac srcdir="${src.dir}" destdir="${bin.dir}" classpath="${antlr.file}" debug="on" includeantruntime="false">
             <compilerarg line="-encoding utf8" />

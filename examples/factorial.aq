@@ -8,4 +8,4 @@ factorial := \n : Integer ->
     elif n = 1: 1
     else: n * factorial(n - 1);
 
-write int2str(factorial(4)); # 24
+write int2str(factorial(5)); # 120

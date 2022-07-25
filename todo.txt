@@ -43,4 +43,4 @@ look at older projects and merge with them
 
 look at other languages for further ideas (python, perl, ruby, groovy, actionscript)
 
-rewrite the Interpreter in C++ (using ANTLRs C++ backend with CMake and libgmp)
+rewrite the Interpreter in C++ as aquila4c (using ANTLRs C++ backend with CMake and libgmp)

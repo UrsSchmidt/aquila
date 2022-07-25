@@ -2,7 +2,7 @@
 
 # TODO rewrite in Aquila once file access is implemented
 
-# run `ant package` first!
+command -v aq >/dev/null 2>&1 || { echo >&2 "Install Aquila first!"; exit 1; }
 
 root='tests/'
 temp="$root/~temp.txt"
