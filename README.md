@@ -2,6 +2,10 @@
 
 Aquila is a small scripting language that is run on an interpreter. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Haskell, Perl, Python, Ruby and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
 
+## aquila4c
+
+This is the C++ implementation of Aquila. See [here](aquila4c/README.md) for details on how to build `aquila4c`. **This is a work in progress.**
+
 ## aquila4j
 
 This is the Java 11 implementation of Aquila. See [here](aquila4j/README.md) for details on how to build `aquila4j`.
@@ -221,6 +225,20 @@ loop (
 )
 ```
 If not needed, either the `loop` part or the `while` part can be omitted, but not both.
+
+Omitting the loop part:
+```
+while expression (
+    # code
+)
+```
+
+Omitting the while part:
+```
+loop (
+    # code
+) while expression;
+```
 
 ### For statements
 

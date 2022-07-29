@@ -14,6 +14,8 @@ predefined functions:
             sum([])
             product([])
     files and directories:
+        pwd()
+        chdir/cd()
         paths:
             parent('/path/to/file') : String # returns '/path/to/'
             parent('/path/to/dir/') : String # returns '/path/to/'
