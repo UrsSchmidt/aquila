@@ -41,8 +41,9 @@ predefined functions:
         content operations:
             read/write file line-by-line
 
+rewrite the Interpreter in C++ as aquila4c (using ANTLRs C++ backend with CMake and libgmp)
+rewrite the bashscripts used in aquila4c as Makefiles
+
 look at older projects and merge with them
 
 look at other languages for further ideas (python, perl, ruby, groovy, actionscript)
-
-rewrite the Interpreter in C++ as aquila4c (using ANTLRs C++ backend with CMake and libgmp)

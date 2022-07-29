@@ -11,5 +11,5 @@ Then simply run `./build.sh` to build the `aquila4c` file.
 
 ## Installing the interpreter on Ubuntu
 
-Then run `cp aquila4c /usr/local/bin/aq`. You might need sudo rights.
+Run `cp aquila4c /usr/local/bin/aq`. You might need sudo rights.
 You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the interpreter.
