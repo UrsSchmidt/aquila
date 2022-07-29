@@ -1,5 +1,10 @@
+/aquila4c/gen/
+/aquila4c/obj/
+/aquila4c/aquila4c
 /aquila4j/bin/
 /aquila4j/src/aquila4j/antlr/
+/aquila4j/aquila4j.jar
 /etc/
 *.class
 *.jar
+*.o
