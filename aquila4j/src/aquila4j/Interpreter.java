@@ -75,17 +75,17 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static final boolean STRICT = true; // XXX make this an option
 
     private static final String TYPE_ANY  = "Any";
+    private static final String TYPE_BOOL = "Boolean";
+    private static final String TYPE_INT  = "Integer";
+    private static final String TYPE_STR  = "String";
     private static final String TYPE_FUNC = "Function";
     private static final String TYPE_DICT = "Dictionary";
-    private static final String TYPE_STR  = "String";
-    private static final String TYPE_INT  = "Integer";
-    private static final String TYPE_BOOL = "Boolean";
 
     private static final Comparator<Object> DICT_COMPARATOR = new Comparator<>() {
         @Override
-        public int compare(Object o1, Object o2) {
-            final String s1 = Interpreter.toString(o1);
-            final String s2 = Interpreter.toString(o2);
+        public int compare(Object a1, Object a2) {
+            final String s1 = Interpreter.toString(a1);
+            final String s2 = Interpreter.toString(a2);
             if (s1.matches("[0-9]+") && s2.matches("[0-9]+")) {
                 return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
             } else {
@@ -195,24 +195,32 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitForStatement(ForStatementContext ctx) {
         final String identifier = ctx.Identifier().getText();
+        /* from */
         final Object from = visit(ctx.from);
         if (!(from instanceof BigInteger)) {
             typeMismatch(TYPE_INT, typeOf(from), ctx.from);
             return null;
         }
+        final BigInteger fromInt = (BigInteger) from;
+        /* to */
         final Object to = visit(ctx.to);
         if (!(to instanceof BigInteger)) {
             typeMismatch(TYPE_INT, typeOf(to), ctx.to);
             return null;
         }
-        final Object step = ctx.step != null ? visit(ctx.step) : BigInteger.ONE;
-        if (!(step instanceof BigInteger)) {
-            typeMismatch(TYPE_INT, typeOf(step), ctx.step);
-            return null;
-        }
-        final BigInteger fromInt = (BigInteger) from;
         final BigInteger toInt = (BigInteger) to;
-        final BigInteger stepInt = (BigInteger) step;
+        /* step */
+        final BigInteger stepInt;
+        if (ctx.step != null) {
+            final Object step = visit(ctx.step);
+            if (!(step instanceof BigInteger)) {
+                typeMismatch(TYPE_INT, typeOf(step), ctx.step);
+                return null;
+            }
+            stepInt = (BigInteger) step;
+        } else {
+            stepInt = BigInteger.ONE;
+        }
         final Object overriddenValue = variables.peek().get(identifier);
         for (BigInteger i = fromInt; stepInt.signum() >= 0 ? i.compareTo(toInt) <= 0 : i.compareTo(toInt) >= 0; i = i.add(stepInt)) {
             variables.peek().put(identifier, i);
@@ -763,14 +771,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitDictAggregate(DictAggregateContext ctx) {
-        Map map = new TreeMap<>(DICT_COMPARATOR);
+        Map d = new TreeMap<>(DICT_COMPARATOR);
         for (int i = 0; i < ctx.dictAggregatePair().size(); i++) {
             final DictAggregatePairContext mapc = ctx.dictAggregatePair(i);
             final Object key = mapc.key != null ? visit(mapc.key) : BigInteger.valueOf(i);
             final Object value = visit(mapc.value);
-            map.put(key, value);
+            d.put(key, value);
         }
-        return map;
+        return d;
     }
 
     @Override
@@ -1330,16 +1338,16 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (o == null) {
             throw new NullPointerException();
         }
-        if (o instanceof LambdaExpressionContext) {
+        if (o instanceof Boolean) {
+            return TYPE_BOOL;
+        } else if (o instanceof BigInteger) {
+            return TYPE_INT;
+        } else if (o instanceof String) {
+            return TYPE_STR;
+        } else if (o instanceof LambdaExpressionContext) {
             return TYPE_FUNC;
         } else if (o instanceof Map) {
             return TYPE_DICT;
-        } else if (o instanceof String) {
-            return TYPE_STR;
-        } else if (o instanceof BigInteger) {
-            return TYPE_INT;
-        } else if (o instanceof Boolean) {
-            return TYPE_BOOL;
         } else {
             throw new AssertionError();
         }
@@ -1356,6 +1364,55 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } else {
             parsingError(TYPE_BOOL, s, ctx);
             return null;
+        }
+    }
+
+    private static BigInteger toInteger(String s, ParserRuleContext ctx) {
+        if (s == null) {
+            throw new NullPointerException();
+        }
+        if (s.matches("[0-9]+")) {
+            return new BigInteger(s);
+        } else {
+            parsingError(TYPE_INT, s, ctx);
+            return null;
+        }
+    }
+
+    private static String toString(Object o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        if (o instanceof Boolean) {
+            final Boolean b = (Boolean) o;
+            return b ? "true" : "false";
+        } else if (o instanceof BigInteger) {
+            final BigInteger i = (BigInteger) o;
+            return i.toString();
+        } else if (o instanceof String) {
+            final String s = (String) o;
+            return s.toString();
+        } else if (o instanceof LambdaExpressionContext) {
+            final LambdaExpressionContext f = (LambdaExpressionContext) o;
+            return f.getText();
+        } else if (o instanceof Map) {
+            final Map d = (Map) o;
+            StringBuilder result = new StringBuilder();
+            result.append("{\n");
+            for (Object key : d.keySet()) {
+                final Object value = d.get(key);
+                result.append(toString(key)).append(": ");
+                if (value instanceof String) {
+                    result.append("'").append(toString(value)).append("'");
+                } else {
+                    result.append(toString(value));
+                }
+                result.append(",\n");
+            }
+            result.append("}");
+            return result.toString();
+        } else {
+            throw new AssertionError();
         }
     }
 
@@ -1377,53 +1434,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         return null;
     }
 
-    private static BigInteger toInteger(String s, ParserRuleContext ctx) {
-        if (s == null) {
-            throw new NullPointerException();
-        }
-        if (s.matches("[0-9]+")) {
-            return new BigInteger(s);
-        } else {
-            parsingError(TYPE_INT, s, ctx);
-            return null;
-        }
-    }
-
-    private static String toString(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        if (o instanceof LambdaExpressionContext) {
-            final LambdaExpressionContext lec = (LambdaExpressionContext) o;
-            return lec.getText();
-        } else if (o instanceof Map) {
-            final Map map = (Map) o;
-            StringBuilder result = new StringBuilder();
-            result.append("{\n");
-            for (Object key : map.keySet()) {
-                final Object value = map.get(key);
-                result.append(toString(key) + ": ");
-                if (value instanceof String) {
-                    result.append("'").append(toString(value)).append("'");
-                } else {
-                    result.append(toString(value));
-                }
-                result.append(",\n");
-            }
-            result.append("}");
-            return result.toString();
-        } else if (o instanceof String) {
-            return o.toString();
-        } else if (o instanceof BigInteger) {
-            return o.toString();
-        } else if (o instanceof Boolean) {
-            final Boolean b = (Boolean) o;
-            return b ? "true" : "false";
-        } else {
-            throw new AssertionError();
-        }
-    }
-
     private static void exception(Exception e, ParserRuleContext ctx) {
         error("An exception occurred: " + e.getClass().getSimpleName() + ": `" + e.getMessage() + "`", ctx);
     }
@@ -1437,7 +1447,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     }
 
     private static void expectedNonVoidFunction(ParserRuleContext ctx) {
-        error("Expected non-void Function!", ctx);
+        error("Expected non-void " + TYPE_FUNC + "!", ctx);
     }
 
     private static void parsingError(String expectedType, String wasValue, ParserRuleContext ctx) {

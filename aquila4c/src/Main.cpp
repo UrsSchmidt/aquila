@@ -1,8 +1,9 @@
 #include <iostream>
 
-#include "antlr4-runtime/antlr4-runtime.h"
+#include "antlr4-runtime.h"
 #include "../gen/AquilaLexer.h"
 #include "../gen/AquilaParser.h"
+#include "Interpreter.h"
 
 using namespace antlr4;
 
@@ -25,8 +26,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // TODO
-    std::cout << tree->toStringTree(&parser) << std::endl << std::endl;
-
+    Interpreter interpreter;
+    interpreter.visit(tree);
     return 0;
 }
