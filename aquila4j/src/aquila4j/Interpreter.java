@@ -1363,14 +1363,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (s == null) {
             throw new NullPointerException();
         }
-        if (s.equals("false")) {
-            return false;
-        } else if (s.equals("true")) {
-            return true;
-        } else {
-            parsingError(TYPE_BOOL, s, ctx);
-            return null;
-        }
+        return s.equals("true");
     }
 
     private static BigInteger toInteger(String s, ParserRuleContext ctx) {
@@ -1380,8 +1373,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (s.matches("[0-9]+")) {
             return new BigInteger(s);
         } else {
-            parsingError(TYPE_INT, s, ctx);
-            return null;
+            return BigInteger.ZERO;
         }
     }
 
@@ -1436,8 +1428,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         } catch (Exception e) {
             /* do nothing */
         }
-        parsingError(TYPE_DICT, s, ctx);
-        return null;
+        return new TreeMap<>(DICT_COMPARATOR);
     }
 
     private static void exception(Exception e, ParserRuleContext ctx) {
@@ -1454,10 +1445,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     private static void expectedNonVoidFunction(ParserRuleContext ctx) {
         error("Expected non-void " + TYPE_FUNC + "!", ctx);
-    }
-
-    private static void parsingError(String expectedType, String wasValue, ParserRuleContext ctx) {
-        error("Parsing error! Expected type `" + expectedType + "`, but was value `" + wasValue + "`!", ctx);
     }
 
     private static void typeMismatch(String expectedType, String wasType, ParserRuleContext ctx) {

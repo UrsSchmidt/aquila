@@ -2,9 +2,7 @@
 #include "Helper.h"
 #include "Interpreter.h"
 
-#include <gmp.h>
 #include <sstream>
-#include <string>
 
 // XXX make this an option
 #define STRICT true
@@ -17,27 +15,6 @@
 #define TYPE_STR  "String"
 #define TYPE_FUNC "Function"
 #define TYPE_DICT "Dictionary"
-
-struct DictComparator;
-
-typedef
-    std::any
-    Any;
-typedef
-    bool
-    Boolean;
-typedef
-    mpz_t
-    Integer;
-typedef
-    std::string
-    String;
-typedef
-    AquilaParser::LambdaExpressionContext
-    Function;
-typedef
-    std::map<Any, Any, DictComparator>
-    Dictionary;
 
 #define isBool(x) ((x).has_value() && ((x).type() == typeid(Boolean)))
 #define isInt(x)  ((x).has_value() && ((x).type() == typeid(Integer)))
@@ -55,35 +32,149 @@ typedef
    to allow for function declarations to be used in different files */
 std::stack<Dictionary*> variables;
 
-void assign(Dictionary* map, Any key, Any value, antlr4::ParserRuleContext* ctx);
+std::string typeOf(Any o) {
+    if (isBool(o)) {
+        return TYPE_BOOL;
+    } else if (isInt(o)) {
+        return TYPE_INT;
+    } else if (isStr(o)) {
+        return TYPE_STR;
+    } else if (isFunc(o)) {
+        return TYPE_FUNC;
+    } else if (isDict(o)) {
+        return TYPE_DICT;
+    } else {
+        assert(0);
+    }
+}
 
-void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Any)> handler);
+void toBoolean(Boolean& result, String s, antlr4::ParserRuleContext* ctx) {
+    result = strEquals(s, "true");
+}
 
-Any callFunction(AquilaParser::FunctionCallContext* callsite, Function* function, std::vector<Any> arguments);
+void toInteger(Integer& result, String s, antlr4::ParserRuleContext* ctx) {
+    if (strIsNumeric(s)) {
+        mpz_init_set_str(result, s.c_str(), 10);
+    } else {
+        mpz_init(result);
+    }
+    // FIXME when to call mpz_clear()?
+}
+
+void toString(String& result, Any o) {
+    if (isBool(o)) {
+        Boolean b = *toBool(o);
+        result = b ? "true" : "false";
+    } else if (isInt(o)) {
+        String s(mpz_get_str(NULL, 10, *toInt(o)));
+        result = s;
+    } else if (isStr(o)) {
+        String s = *toStr(o);
+        result = s;
+    } else if (isFunc(o)) {
+        Function* f = toFunc(o);
+        result = f->getText();
+    } else if (isDict(o)) {
+        Dictionary* d = toDict(o);
+        std::stringstream ss;
+        ss << "{" << std::endl;
+        for (const auto& [key, value] : *d) {
+            String keystr, valuestr;
+            toString(keystr, key);
+            ss << keystr << ": ";
+            if (isStr(value)) {
+                ss << "'" << *toStr(value) << "'";
+            } else {
+                toString(valuestr, value);
+                ss << valuestr;
+            }
+            ss << "," << std::endl;
+        }
+        ss << "}";
+        result = ss.str();
+    } else {
+        assert(0);
+    }
+}
+
+void toDictionary(Dictionary& result, String s, antlr4::ParserRuleContext* ctx) {
+    try {
+        /* TODO
+        AquilaLexer lexer = new AquilaLexer(CharStreams.fromString(s));
+        AquilaParser parser = new AquilaParser(new CommonTokenStream(lexer));
+        DictAggregateContext dictAggregate = parser.dictAggregate();
+        if (parser.getNumberOfSyntaxErrors() == 0) {
+            result = (Map) new Interpreter(new std::string[0]).visit(dictAggregate);
+        }
+        */
+    } catch (...) {
+        /* do nothing */
+    }
+    Dictionary d;
+    result = d;
+}
+
+void error(std::string msg, antlr4::ParserRuleContext* ctx) {
+    const auto token = ctx->getStart();
+    std::cerr << "ERROR: " << msg << " @L" << token->getLine() << ":C" << token->getCharPositionInLine() << ":`" << ctx->getText() << "`" << std::endl;
+    exit(1);
+}
+
+void exception(std::exception e, antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    ss << "An exception occurred: `" << e.what() << "`";
+    error(ss.str(), ctx);
+}
+
 /* TODO
-bool checkArgs(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types);
-bool checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types);
-bool checkArgsHelper(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, bool failOnTypeMismatch, std::string... types);
+void fileNotFound(File file, antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    ss << "File not found! Expected: " << file;
+    error(ss.str(), ctx);
+}
 */
 
-std::string typeOf(Any o);
+void missingKey(Dictionary* expectedMap, Any wasKey, antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    ss << "Missing key! Expected one of: ";
+    for (Dictionary::iterator i = expectedMap->begin(); i != expectedMap->end(); i++) {
+        String keystr;
+        toString(keystr, i->first);
+        ss << keystr << ", ";
+    }
+    String wasKeyStr;
+    toString(wasKeyStr, wasKey);
+    ss << "but was key `" << wasKeyStr << "`!";
+    error(ss.str(), ctx);
+}
 
-void toBoolean(Boolean& result, String s, antlr4::ParserRuleContext* ctx);
-void toInteger(Integer& result, String s, antlr4::ParserRuleContext* ctx);
-void toString(String& result, Any o);
-void toDictionary(Dictionary& result, String s, antlr4::ParserRuleContext* ctx);
+void expectedNonVoidFunction(antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    ss << "Expected non-void " << TYPE_FUNC << "!";
+    error(ss.str(), ctx);
+}
 
-void exception(std::exception e, antlr4::ParserRuleContext* ctx);
-// TODO void fileNotFound(File file, antlr4::ParserRuleContext* ctx);
-void missingKey(Dictionary* expectedMap, Any wasKey, antlr4::ParserRuleContext* ctx);
-void expectedNonVoidFunction(antlr4::ParserRuleContext* ctx);
-void parsingError(std::string expectedType, std::string wasValue, antlr4::ParserRuleContext* ctx);
-void typeMismatch(std::string expectedType, std::string wasType, antlr4::ParserRuleContext* ctx);
-void wrongKey(std::string expectedKey, Any wasKey, antlr4::ParserRuleContext* ctx);
-void wrongNumberOfArguments(int expected, int was, antlr4::ParserRuleContext* ctx);
-void error(std::string msg, antlr4::ParserRuleContext* ctx);
+void typeMismatch(std::string expectedType, std::string wasType, antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    ss << "Type mismatch! Expected type `" << expectedType << "`, but was type `" << wasType << "`!";
+    error(ss.str(), ctx);
+}
 
-struct DictComparator {
+void wrongKey(std::string expectedKey, Any wasKey, antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    String wasKeyStr;
+    toString(wasKeyStr, wasKey);
+    ss << "Wrong key! Expected key `" << expectedKey << "`, but was key `" << wasKeyStr << "`!";
+    error(ss.str(), ctx);
+}
+
+void wrongNumberOfArguments(int expected, int was, antlr4::ParserRuleContext* ctx) {
+    std::stringstream ss;
+    ss << "Wrong number of arguments! Expected " << expected << ", but was " << was << "!";
+    error(ss.str(), ctx);
+}
+
+/* TODO struct DictComparator {
     bool operator() (const Any& a1, const Any& a2) const {
         if (isInt(a1) && isInt(a2)) {
             return *toInt(a1) < *toInt(a2);
@@ -98,7 +189,7 @@ struct DictComparator {
             }
         }
     }
-};
+}; */
 
 bool anyEquals(Any a, Any b) {
     return (isBool(a) && isBool(b) && *toBool(a) == *toBool(b))
@@ -107,6 +198,127 @@ bool anyEquals(Any a, Any b) {
         || (isFunc(a) && isFunc(b) && toFunc(a) == toFunc(b))
         || (isDict(a) && isDict(b) && toDict(a) == toDict(b));
 }
+
+void Interpreter::assign(Dictionary* map, Any key, Any value, antlr4::ParserRuleContext* ctx) {
+#ifdef STRICT
+    if (map->count(key)) {
+        const std::string expected = typeOf(map->at(key));
+        const std::string was = typeOf(value);
+        if (!strEquals(expected, was)) {
+            typeMismatch(expected, was, ctx);
+            return;
+        }
+    }
+#endif
+    map->at(key) = value;
+}
+
+void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Any)> handler) {
+    const std::string identifier = lhsc->Identifier()->getText();
+    if (lhsc->lhsPart().empty()) {
+        handler(variables.top(), identifier);
+        return;
+    }
+    if (!variables.top()->count(identifier)) {
+        Dictionary d;
+        variables.top()->at(identifier) = d;
+    }
+    Any result = variables.top()->at(identifier);
+    for (size_t i = 0; i < lhsc->lhsPart().size(); i++) {
+        AquilaParser::LhsPartContext* lhspc = lhsc->lhsPart()[i];
+        Any key;
+        if (lhspc->Identifier()) {
+            key = lhspc->Identifier()->getText();
+        } else if (lhspc->expression()) {
+            key = visit(lhspc->expression());
+        } else {
+            assert(0);
+        }
+        if (i < lhsc->lhsPart().size() - 1) {
+            if (isDict(result)) {
+                Dictionary* map = toDict(result);
+                if (map->count(key)) {
+                    result = map->at(key);
+                } else {
+                    missingKey(map, key, lhspc);
+                    return;
+                }
+            } else {
+                typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                return;
+            }
+        } else {
+            if (isDict(result)) {
+                Dictionary* map = toDict(result);
+                handler(map, key);
+            } else {
+                typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                return;
+            }
+        }
+    }
+}
+
+Any Interpreter::callFunction(AquilaParser::FunctionCallContext* callsite, Function* function, std::vector<Any> arguments) {
+    std::vector<std::string> parameters;
+    std::vector<std::string> types;
+    for (AquilaParser::LambdaExpressionParameterContext* lepc : function->lambdaExpressionParameter()) {
+        parameters.push_back(lepc->Identifier()->getText());
+        types.push_back(lepc->Type() ? lepc->Type()->getText() : TYPE_ANY);
+    }
+    /* TODO
+    if (!checkArgs(callsite, arguments, types.toArray(new std::string[0]))) {
+        assert(0);
+    }
+    */
+    Dictionary d(*variables.top());
+    variables.push(&d);
+    for (size_t i = 0; i < parameters.size(); i++) {
+        const std::string parameter = parameters[i];
+        Any argument = arguments[i];
+        // TODO does this have to be fully qualified?
+        variables.top()->at(parameter) = argument;
+    }
+    Any result;
+    if (function->expression()) {
+        result = visit(function->expression());
+    } else if (function->block()) {
+        visit(function->block());
+        result = 0;
+    } else {
+        assert(0);
+    }
+    variables.pop();
+    return result;
+}
+
+/* TODO
+bool Interpreter::checkArgs(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types) {
+    return checkArgsHelper(callsite, arguments, true, types);
+}
+
+bool Interpreter::checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types) {
+    return checkArgsHelper(callsite, arguments, false, types);
+}
+
+bool Interpreter::checkArgsHelper(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, bool failOnTypeMismatch, std::string... types) {
+    if (arguments.size() != types.length) {
+        wrongNumberOfArguments(types.length, arguments.size(), callsite);
+        return false;
+    }
+    for (size_t i = 0; i < types.length; i++) {
+        const std::string type = types[i];
+        Any argument = arguments[i];
+        if (!type.equals(TYPE_ANY) && !typeOf(argument).equals(type)) {
+            if (failOnTypeMismatch) {
+                typeMismatch(type, typeOf(argument), callsite->arguments[i]);
+            }
+            return false;
+        }
+    }
+    return true;
+}
+*/
 
 Any Interpreter::visitProgram(AquilaParser::ProgramContext *ctx) {
     for (AquilaParser::StatementContext* sc : ctx->statement()) {
@@ -218,7 +430,7 @@ Any Interpreter::visitForStatement(AquilaParser::ForStatementContext *ctx) {
 Any Interpreter::visitReadStatement(AquilaParser::ReadStatementContext *ctx) {
     std::string line;
     std::getline(std::cin, line);
-    handleLhs(ctx->lhs(), [line, ctx](Dictionary* map, Any key) { assign(map, key, line, ctx); });
+    handleLhs(ctx->lhs(), [this, line, ctx](Dictionary* map, Any key) { assign(map, key, line, ctx); });
     return POISON;
 }
 
@@ -235,22 +447,8 @@ Any Interpreter::visitWriteStatement(AquilaParser::WriteStatementContext *ctx) {
 
 Any Interpreter::visitAssignStatement(AquilaParser::AssignStatementContext *ctx) {
     Any rhs = visit(ctx->rhs);
-    handleLhs(ctx->lhs(), [rhs, ctx](Dictionary* map, Any key) { assign(map, key, rhs, ctx->rhs); });
+    handleLhs(ctx->lhs(), [this, rhs, ctx](Dictionary* map, Any key) { assign(map, key, rhs, ctx->rhs); });
     return POISON;
-}
-
-void assign(Dictionary* map, Any key, Any value, antlr4::ParserRuleContext* ctx) {
-#ifdef STRICT
-    if (map->count(key)) {
-        const std::string expected = typeOf(map->at(key));
-        const std::string was = typeOf(value);
-        if (!strEquals(expected, was)) {
-            typeMismatch(expected, was, ctx);
-            return;
-        }
-    }
-#endif
-    map->at(key) = value;
 }
 
 Any Interpreter::visitCallStatement(AquilaParser::CallStatementContext *ctx) {
@@ -259,7 +457,7 @@ Any Interpreter::visitCallStatement(AquilaParser::CallStatementContext *ctx) {
 }
 
 Any Interpreter::visitRemoveStatement(AquilaParser::RemoveStatementContext *ctx) {
-    handleLhs(ctx->lhs(), [ctx](Dictionary* map, Any key) {
+    handleLhs(ctx->lhs(), [this, ctx](Dictionary* map, Any key) {
         if (map->count(key)) {
             map->erase(key);
         } else {
@@ -267,52 +465,6 @@ Any Interpreter::visitRemoveStatement(AquilaParser::RemoveStatementContext *ctx)
         }
     });
     return POISON;
-}
-
-void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Any)> handler) {
-    const std::string identifier = lhsc->Identifier()->getText();
-    if (lhsc->lhsPart().empty()) {
-        handler(variables.top(), identifier);
-        return;
-    }
-    if (!variables.top()->count(identifier)) {
-        Dictionary d;
-        variables.top()->at(identifier) = d;
-    }
-    Any result = variables.top()->at(identifier);
-    for (size_t i = 0; i < lhsc->lhsPart().size(); i++) {
-        AquilaParser::LhsPartContext* lhspc = lhsc->lhsPart()[i];
-        Any key;
-        if (lhspc->Identifier()) {
-            key = lhspc->Identifier()->getText();
-        } else if (lhspc->expression()) {
-            key = visit(lhspc->expression());
-        } else {
-            assert(0);
-        }
-        if (i < lhsc->lhsPart().size() - 1) {
-            if (isDict(result)) {
-                Dictionary* map = toDict(result);
-                if (map->count(key)) {
-                    result = map->at(key);
-                } else {
-                    missingKey(map, key, lhspc);
-                    return;
-                }
-            } else {
-                typeMismatch(TYPE_DICT, typeOf(result), lhspc);
-                return;
-            }
-        } else {
-            if (isDict(result)) {
-                Dictionary* map = toDict(result);
-                handler(map, key);
-            } else {
-                typeMismatch(TYPE_DICT, typeOf(result), lhspc);
-                return;
-            }
-        }
-    }
 }
 
 Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
@@ -374,7 +526,7 @@ Any Interpreter::visitLetExpression(AquilaParser::LetExpressionContext *ctx) {
     variables.push(&d);
     for (AquilaParser::LetBindExpressionContext* lbec : ctx->letBindExpression()) {
         Any rhs = visit(lbec->rhs);
-        handleLhs(lbec->lhs(), [rhs, lbec](Dictionary* map, Any key) { assign(map, key, rhs, lbec); });
+        handleLhs(lbec->lhs(), [this, rhs, lbec](Dictionary* map, Any key) { assign(map, key, rhs, lbec); });
     }
     Any result = visit(ctx->body);
     variables.pop();
@@ -692,7 +844,7 @@ Any Interpreter::visitFactor(AquilaParser::FactorContext *ctx) {
         return visit(ctx->literal());
     } else if (ctx->functionCall()) {
         Any result = visit(ctx->functionCall());
-        /* TODO if (result == null) {
+        /* TODO if (result == POISON) {
             expectedNonVoidFunction(ctx->functionCall());
             assert(0);
         } */
@@ -737,7 +889,7 @@ Any Interpreter::visitDictAggregate(AquilaParser::DictAggregateContext *ctx) {
             // FIXME when to call mpz_clear()?
         }
         Any value = visit(mapc->value);
-        d[key] = value;
+        d.at(key) = value;
     }
     return d;
 }
@@ -1194,67 +1346,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
     return result;
 }
 
-Any callFunction(AquilaParser::FunctionCallContext* callsite, Function* function, std::vector<Any> arguments) {
-    std::vector<std::string> parameters;
-    std::vector<std::string> types;
-    for (AquilaParser::LambdaExpressionParameterContext* lepc : function->lambdaExpressionParameter()) {
-        parameters.push_back(lepc->Identifier()->getText());
-        types.push_back(lepc->Type() ? lepc->Type()->getText() : TYPE_ANY);
-    }
-    /* TODO
-    if (!checkArgs(callsite, arguments, types.toArray(new std::string[0]))) {
-        assert(0);
-    }
-    */
-    Dictionary d(*variables.top());
-    variables.push(&d);
-    for (size_t i = 0; i < parameters.size(); i++) {
-        const std::string parameter = parameters[i];
-        Any argument = arguments[i];
-        // TODO does this have to be fully qualified?
-        variables.top()->at(parameter) = argument;
-    }
-    Any result;
-    if (function->expression()) {
-        result = visit(function->expression());
-    } else if (function->block()) {
-        visit(function->block());
-        result = 0;
-    } else {
-        assert(0);
-    }
-    variables.pop();
-    return result;
-}
-
-/* TODO
-bool checkArgs(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types) {
-    return checkArgsHelper(callsite, arguments, true, types);
-}
-
-bool checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types) {
-    return checkArgsHelper(callsite, arguments, false, types);
-}
-
-bool checkArgsHelper(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, bool failOnTypeMismatch, std::string... types) {
-    if (arguments.size() != types.length) {
-        wrongNumberOfArguments(types.length, arguments.size(), callsite);
-        return false;
-    }
-    for (size_t i = 0; i < types.length; i++) {
-        const std::string type = types[i];
-        Any argument = arguments[i];
-        if (!type.equals(TYPE_ANY) && !typeOf(argument).equals(type)) {
-            if (failOnTypeMismatch) {
-                typeMismatch(type, typeOf(argument), callsite->arguments[i]);
-            }
-            return false;
-        }
-    }
-    return true;
-}
-*/
-
 Any Interpreter::visitAccessExpression(AquilaParser::AccessExpressionContext *ctx) {
     const std::string identifier = ctx->Identifier()->getText();
     if (!variables.top()->count(identifier)) {
@@ -1289,158 +1380,4 @@ Any Interpreter::visitAccessExpression(AquilaParser::AccessExpressionContext *ct
 
 Any Interpreter::visitAccessExpressionPart(AquilaParser::AccessExpressionPartContext *ctx) {
     assert(0);
-}
-
-std::string typeOf(Any o) {
-    if (isBool(o)) {
-        return TYPE_BOOL;
-    } else if (isInt(o)) {
-        return TYPE_INT;
-    } else if (isStr(o)) {
-        return TYPE_STR;
-    } else if (isFunc(o)) {
-        return TYPE_FUNC;
-    } else if (isDict(o)) {
-        return TYPE_DICT;
-    } else {
-        assert(0);
-    }
-}
-
-void toBoolean(Boolean& result, String s, antlr4::ParserRuleContext* ctx) {
-    if (strEquals(s, "false")) {
-        result = false;
-    } else if (strEquals(s, "true")) {
-        result = true;
-    } else {
-        parsingError(TYPE_BOOL, s, ctx);
-    }
-}
-
-void toInteger(Integer& result, String s, antlr4::ParserRuleContext* ctx) {
-    if (strIsNumeric(s)) {
-        mpz_init_set_str(result, s.c_str(), 10);
-        // FIXME when to call mpz_clear()?
-    } else {
-        parsingError(TYPE_INT, s, ctx);
-    }
-}
-
-void toString(String& result, Any o) {
-    if (isBool(o)) {
-        Boolean b = *toBool(o);
-        result = b ? "true" : "false";
-    } else if (isInt(o)) {
-        String s(mpz_get_str(NULL, 10, *toInt(o)));
-        result = s;
-    } else if (isStr(o)) {
-        String s = *toStr(o);
-        result = s;
-    } else if (isFunc(o)) {
-        Function* f = toFunc(o);
-        result = f->getText();
-    } else if (isDict(o)) {
-        Dictionary* d = toDict(o);
-        std::stringstream ss;
-        ss << "{" << std::endl;
-        for (const auto& [key, value] : *d) {
-            String keystr, valuestr;
-            toString(keystr, key);
-            ss << keystr << ": ";
-            if (isStr(value)) {
-                ss << "'" << *toStr(value) << "'";
-            } else {
-                toString(valuestr, value);
-                ss << valuestr;
-            }
-            ss << "," << std::endl;
-        }
-        ss << "}";
-        result = ss.str();
-    } else {
-        assert(0);
-    }
-}
-
-void toDictionary(Dictionary& result, String s, antlr4::ParserRuleContext* ctx) {
-    try {
-        /* TODO
-        AquilaLexer lexer = new AquilaLexer(CharStreams.fromString(s));
-        AquilaParser parser = new AquilaParser(new CommonTokenStream(lexer));
-        DictAggregateContext dictAggregate = parser.dictAggregate();
-        if (parser.getNumberOfSyntaxErrors() == 0) {
-            result = (Map) new Interpreter(new std::string[0]).visit(dictAggregate);
-        }
-        */
-    } catch (...) {
-        /* do nothing */
-    }
-    parsingError(TYPE_DICT, s, ctx);
-    assert(0);
-}
-
-void exception(std::exception e, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "An exception occurred: `" << e.what() << "`";
-    error(ss.str(), ctx);
-}
-
-/* TODO
-void fileNotFound(File file, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "File not found! Expected: " << file;
-    error(ss.str(), ctx);
-}
-*/
-
-void missingKey(Dictionary* expectedMap, Any wasKey, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "Missing key! Expected one of: ";
-    for (Dictionary::iterator i = expectedMap->begin(); i != expectedMap->end(); i++) {
-        String keystr;
-        toString(keystr, i->first);
-        ss << keystr << ", ";
-    }
-    String wasKeyStr;
-    toString(wasKeyStr, wasKey);
-    ss << "but was key `" << wasKeyStr << "`!";
-    error(ss.str(), ctx);
-}
-
-void expectedNonVoidFunction(antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "Expected non-void " << TYPE_FUNC << "!";
-    error(ss.str(), ctx);
-}
-
-void parsingError(std::string expectedType, std::string wasValue, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "Parsing error! Expected type `" << expectedType << "`, but was value `" << wasValue << "`!";
-    error(ss.str(), ctx);
-}
-
-void typeMismatch(std::string expectedType, std::string wasType, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "Type mismatch! Expected type `" << expectedType << "`, but was type `" << wasType << "`!";
-    error(ss.str(), ctx);
-}
-
-void wrongKey(std::string expectedKey, Any wasKey, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    String wasKeyStr;
-    toString(wasKeyStr, wasKey);
-    ss << "Wrong key! Expected key `" << expectedKey << "`, but was key `" << wasKeyStr << "`!";
-    error(ss.str(), ctx);
-}
-
-void wrongNumberOfArguments(int expected, int was, antlr4::ParserRuleContext* ctx) {
-    std::stringstream ss;
-    ss << "Wrong number of arguments! Expected " << expected << ", but was " << was << "!";
-    error(ss.str(), ctx);
-}
-
-void error(std::string msg, antlr4::ParserRuleContext* ctx) {
-    const auto token = ctx->getStart();
-    std::cerr << "ERROR: " << msg << " @L" << token->getLine() << ":C" << token->getCharPositionInLine() << ":`" << ctx->getText() << "`" << std::endl;
-    exit(1);
 }

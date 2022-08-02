@@ -1,5 +1,7 @@
 #include "Helper.h"
 
+#include <algorithm>
+
 // FIXME do these work with unicode?
 
 bool strContains(const std::string& s1, const std::string& s2) {

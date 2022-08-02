@@ -25,4 +25,4 @@ g++ $comp_ops_src -o "$dst/Helper.o"            "$src/Helper.cpp"
 g++ $comp_ops_src -o "$dst/Interpreter.o"       "$src/Interpreter.cpp"
 g++ $comp_ops_src -o "$dst/Main.o"              "$src/Main.cpp"
 
-g++ -o 'aquila4c' "$dst/"*.o -lantlr4-runtime
+g++ -o 'aquila4c' "$dst/"*.o -lantlr4-runtime -lgmp

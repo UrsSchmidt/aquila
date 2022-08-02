@@ -5,6 +5,8 @@
 #include "../gen/AquilaParser.h"
 #include "Interpreter.h"
 
+#include <fstream>
+
 using namespace antlr4;
 
 int main(int argc, char* argv[]) {

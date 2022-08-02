@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <string>
 
 bool strContains(const std::string& s1, const std::string& s2);
