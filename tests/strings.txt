@@ -1,8 +1,8 @@
 
-HeLlO, WoRlD!
-abc
-abc
-abcdef
+HeLlO, WoRlD! こんにちは！
+あいう
+あいう
+あいうえおか
 true
 false
 false
@@ -13,16 +13,17 @@ true
 false
 true
 false
-13
+20
 72
+65281
 e
-, WoRlD!
+, WoRlD! こんにちは！
 eLlO,
 HeLlO
 eLlO,
-oRlD!
+んにちは！
 H
-eLlO, WoRlD!
+eLlO, WoRlD! こんにちは！
 0
 3
 0
@@ -36,21 +37,21 @@ eLlO, WoRlD!
 1,2,3
           
 
-abcabcabc
+あいうあいうあいう
 a_e
 abcde
 true
 false
-ab
+あい
 true
 false
-!DlRoW ,OlLeH
+！はちにんこ !DlRoW ,OlLeH
      
-hello, world!
-HELLO, WORLD!
-abc 
- abc
-abc
->a
->b
->c
+hello, world! こんにちは！
+HELLO, WORLD! こんにちは！
+あいう 
+ あいう
+あいう
+>あ
+>い
+>う

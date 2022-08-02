@@ -84,12 +84,18 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static final Comparator<Object> DICT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(Object a1, Object a2) {
-            final String s1 = Interpreter.toString(a1);
-            final String s2 = Interpreter.toString(a2);
-            if (s1.matches("[0-9]+") && s2.matches("[0-9]+")) {
-                return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
+            if (a1 instanceof BigInteger && a2 instanceof BigInteger) {
+                final BigInteger i1 = (BigInteger) a1;
+                final BigInteger i2 = (BigInteger) a2;
+                return i1.compareTo(i2);
             } else {
-                return s1.compareTo(s2);
+                final String s1 = Interpreter.toString(a1);
+                final String s2 = Interpreter.toString(a2);
+                if (s1.matches("[0-9]+") && s2.matches("[0-9]+")) {
+                    return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
+                } else {
+                    return s1.compareTo(s2);
+                }
             }
         }
     };
