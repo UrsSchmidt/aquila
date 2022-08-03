@@ -114,6 +114,29 @@ void toDictionary(Dictionary& result, String s, antlr4::ParserRuleContext* ctx) 
     result = d;
 }
 
+bool DictComparator::operator() (const std::any& a1, const std::any& a2) const {
+    if (isInt(a1) && isInt(a2)) {
+        return *toInt(a1) < *toInt(a2);
+    } else {
+        String s1, s2;
+        toString(s1, a1);
+        toString(s2, a2);
+        if (strIsNumeric(s1) && strIsNumeric(s2)) {
+            return std::stoi(s1) < std::stoi(s2);
+        } else {
+            return s1.compare(s2) < 0;
+        }
+    }
+}
+
+bool anyEquals(Any a, Any b) {
+    return (isBool(a) && isBool(b) && *toBool(a) == *toBool(b))
+        || (isInt(a)  && isInt(b)  && mpz_cmp(*toInt(a), *toInt(b)) == 0)
+        || (isStr(a)  && isStr(b)  && *toStr(a) == *toStr(b))
+        || (isFunc(a) && isFunc(b) && toFunc(a) == toFunc(b))
+        || (isDict(a) && isDict(b) && toDict(a) == toDict(b));
+}
+
 void error(std::string msg, antlr4::ParserRuleContext* ctx) {
     const auto token = ctx->getStart();
     std::cerr << "ERROR: " << msg << " @L" << token->getLine() << ":C" << token->getCharPositionInLine() << ":`" << ctx->getText() << "`" << std::endl;
@@ -172,31 +195,6 @@ void wrongNumberOfArguments(int expected, int was, antlr4::ParserRuleContext* ct
     std::stringstream ss;
     ss << "Wrong number of arguments! Expected " << expected << ", but was " << was << "!";
     error(ss.str(), ctx);
-}
-
-/* TODO struct DictComparator {
-    bool operator() (const Any& a1, const Any& a2) const {
-        if (isInt(a1) && isInt(a2)) {
-            return *toInt(a1) < *toInt(a2);
-        } else {
-            String s1, s2;
-            toString(s1, a1);
-            toString(s2, a2);
-            if (strIsNumeric(s1) && strIsNumeric(s2)) {
-                return std::stoi(s1) < std::stoi(s2);
-            } else {
-                return s1.compare(s2) < 0;
-            }
-        }
-    }
-}; */
-
-bool anyEquals(Any a, Any b) {
-    return (isBool(a) && isBool(b) && *toBool(a) == *toBool(b))
-        || (isInt(a)  && isInt(b)  && mpz_cmp(*toInt(a), *toInt(b)) == 0)
-        || (isStr(a)  && isStr(b)  && *toStr(a) == *toStr(b))
-        || (isFunc(a) && isFunc(b) && toFunc(a) == toFunc(b))
-        || (isDict(a) && isDict(b) && toDict(a) == toDict(b));
 }
 
 void Interpreter::assign(Dictionary* map, Any key, Any value, antlr4::ParserRuleContext* ctx) {
@@ -1005,10 +1003,10 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         const Dictionary* arg1 = toDict(arguments.get(0));
         const Function* arg2 = toFunc(arguments.get(1));
-        const std::vector<std::any> localArguments;
+        const std::vector<Any> localArguments;
         result = false;
-        for (std::any key : arg1.keySet()) {
-            const std::any value = arg1[key];
+        for (Any key : arg1.keySet()) {
+            const Any value = arg1[key];
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
@@ -1032,10 +1030,10 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         const Dictionary* arg1 = toDict(arguments.get(0));
         const Function* arg2 = toFunc(arguments.get(1));
-        const std::vector<std::any> localArguments;
+        const std::vector<Any> localArguments;
         const Dictionary resultMap = new TreeMap<>(DICT_COMPARATOR);
-        for (std::any key : arg1.keySet()) {
-            const std::any value = arg1.get(key);
+        for (Any key : arg1.keySet()) {
+            const Any value = arg1.get(key);
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
@@ -1070,10 +1068,10 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         const Dictionary* arg1 = toDict(arguments.get(0));
         const Any arg2 = arguments.get(1);
         const Function* arg3 = toFunc(arguments.get(2));
-        const std::vector<std::any> localArguments;
+        const std::vector<Any> localArguments;
         result = arg2;
-        for (std::any key : arg1.keySet()) {
-            const std::any value = arg1.get(key);
+        for (Any key : arg1.keySet()) {
+            const Any value = arg1.get(key);
             localArguments.clear();
             localArguments.push_back(result);
             localArguments.push_back(value);
@@ -1086,10 +1084,10 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         const Dictionary* arg1 = toDict(arguments.get(0));
         const Function* arg2 = toFunc(arguments.get(1));
-        const std::vector<std::any> localArguments;
+        const std::vector<Any> localArguments;
         result = true;
-        for (std::any key : arg1.keySet()) {
-            const std::any value = arg1.get(key);
+        for (Any key : arg1.keySet()) {
+            const Any value = arg1.get(key);
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
@@ -1105,9 +1103,9 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         const Dictionary* arg1 = toDict(arguments.get(0));
         const Function* arg2 = toFunc(arguments.get(1));
-        const std::vector<std::any> localArguments;
-        for (std::any key : arg1.keySet()) {
-            const std::any value = arg1.get(key);
+        const std::vector<Any> localArguments;
+        for (Any key : arg1.keySet()) {
+            const Any value = arg1.get(key);
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
@@ -1172,14 +1170,14 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         const Dictionary* arg1 = toDict(arguments.get(0));
         const Function* arg2 = toFunc(arguments.get(1));
-        const std::vector<std::any> localArguments;
+        const std::vector<Any> localArguments;
         const Dictionary resultMap = new TreeMap<>(DICT_COMPARATOR);
-        for (std::any key : arg1.keySet()) {
-            const std::any value = arg1.get(key);
+        for (Any key : arg1.keySet()) {
+            const Any value = arg1.get(key);
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
-            const std::any newValue = callFunction(ctx, arg2, localArguments);
+            const Any newValue = callFunction(ctx, arg2, localArguments);
             resultMap[key] = newValue;
         }
         result = resultMap;

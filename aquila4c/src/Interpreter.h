@@ -7,7 +7,10 @@
 #include <map>
 #include <string>
 
-// TODO struct DictComparator;
+class DictComparator {
+public:
+    bool operator() (const std::any& a1, const std::any& a2) const;
+};
 
 typedef
     std::any
@@ -24,17 +27,8 @@ typedef
 typedef
     AquilaParser::LambdaExpressionContext
     Function;
-void toString(String& result, Any o); // TODO remove
-struct TempComparator { // TODO remove
-    bool operator() (const Any& a1, const Any& a2) const {
-        String s1, s2;
-        toString(s1, a1);
-        toString(s2, a2);
-        return s1.compare(s2) < 0;
-    }
-};
 typedef
-    std::map<Any, Any, TempComparator> // TODO , DictComparator>
+    std::map<Any, Any, DictComparator>
     Dictionary;
 
 class Interpreter : public AquilaVisitor {
