@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    Interpreter interpreter;
+    Interpreter interpreter(argc, argv);
     interpreter.visit(tree);
     return 0;
 }

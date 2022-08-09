@@ -1,6 +1,6 @@
 # Aquila
 
-Aquila is a small scripting language that is run on an interpreter. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Haskell, Perl, Python, Ruby and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
+Aquila is a small scripting language that is run on an interpreter. This language has been influenced by JavaScript/ActionScript, Ada/Pascal, Bash, Batch, Groovy, Haskell, Perl, Python, Ruby, VBScript and Visual Basic 6. Because of the simplicity of the language, no context analysis is necessary when interpreting code.
 
 ## aquila4c
 

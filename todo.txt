@@ -1,5 +1,8 @@
 rewrite the Interpreter in C++ as aquila4c (using ANTLRs C++ backend with CMake and libgmp)
     rename all maps to ds (in both backends)
+    resort methods in aquila4j according to aquila4c order
+    make keys Strings (instead of Anys) in aquila4j as well?
+    make sure that there is a `delete` for every `new`
 
 fix all TODOs/FIXMEs
 
@@ -48,4 +51,4 @@ rewrite the bashscripts used in aquila4c as Makefiles
 
 look at older projects and merge with them
 
-look at other languages for further ideas (python, perl, ruby, groovy, actionscript)
+look at other languages for further ideas (python, perl, ruby, groovy, actionscript, vbscript)

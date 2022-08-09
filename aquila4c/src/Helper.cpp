@@ -9,8 +9,8 @@ bool strContains(const std::string& s1, const std::string& s2) {
 }
 
 std::string strDropQuotes(const std::string& s) {
-    return s.length() >= 2 && strStartsWith(s, "'") && strEndsWith(s, "'")
-        ? s.substr(1, s.length() - 1)
+    return s.size() >= 2 && strStartsWith(s, "'") && strEndsWith(s, "'")
+        ? s.substr(1, s.size() - 2)
         : s;
 }
 

@@ -84,19 +84,21 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static final Comparator<Object> DICT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(Object a1, Object a2) {
+            int result;
             if (a1 instanceof BigInteger && a2 instanceof BigInteger) {
                 final BigInteger i1 = (BigInteger) a1;
                 final BigInteger i2 = (BigInteger) a2;
-                return i1.compareTo(i2);
+                result = i1.compareTo(i2);
             } else {
                 final String s1 = Interpreter.toString(a1);
                 final String s2 = Interpreter.toString(a2);
                 if (s1.matches("[0-9]+") && s2.matches("[0-9]+")) {
-                    return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
+                    result = Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
                 } else {
-                    return s1.compareTo(s2);
+                    result = s1.compareTo(s2);
                 }
             }
+            return result;
         }
     };
 
@@ -262,16 +264,16 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         return null;
     }
 
-    private void assign(Map map, Object key, Object value, ParserRuleContext ctx) {
-        if (STRICT && map.containsKey(key)) {
-            final String expected = typeOf(map.get(key));
+    private static void assign(Map d, Object key, Object value, ParserRuleContext ctx) {
+        if (STRICT && d.containsKey(key)) {
+            final String expected = typeOf(d.get(key));
             final String was = typeOf(value);
             if (!expected.equals(was)) {
                 typeMismatch(expected, was, ctx);
                 return;
             }
         }
-        map.put(key, value);
+        d.put(key, value);
     }
 
     @Override
@@ -287,6 +289,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 map.remove(key);
             } else {
                 missingKey(map, key, ctx);
+                return;
             }
         });
         return null;
@@ -296,42 +299,42 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         final String identifier = lhsc.Identifier().getText();
         if (lhsc.lhsPart().isEmpty()) {
             handler.accept(variables.peek(), identifier);
-            return;
-        }
-        if (!variables.peek().containsKey(identifier)) {
-            variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
-        }
-        Object result = variables.peek().get(identifier);
-        for (int i = 0; i < lhsc.lhsPart().size(); i++) {
-            final LhsPartContext lhspc = lhsc.lhsPart(i);
-            Object key;
-            if (lhspc.Identifier() != null) {
-                key = lhspc.Identifier().getText();
-            } else if (lhspc.expression() != null) {
-                key = visit(lhspc.expression());
-            } else {
-                throw new AssertionError();
+        } else {
+            if (!variables.peek().containsKey(identifier)) {
+                variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
             }
-            if (i < lhsc.lhsPart().size() - 1) {
-                if (result instanceof Map) {
-                    final Map map = (Map) result;
-                    if (map.containsKey(key)) {
-                        result = map.get(key);
+            Object result = variables.peek().get(identifier);
+            for (int i = 0; i < lhsc.lhsPart().size(); i++) {
+                final LhsPartContext lhspc = lhsc.lhsPart(i);
+                Object key;
+                if (lhspc.Identifier() != null) {
+                    key = lhspc.Identifier().getText();
+                } else if (lhspc.expression() != null) {
+                    key = visit(lhspc.expression());
+                } else {
+                    throw new AssertionError();
+                }
+                if (i < lhsc.lhsPart().size() - 1) {
+                    if (result instanceof Map) {
+                        final Map d = (Map) result;
+                        if (d.containsKey(key)) {
+                            result = d.get(key);
+                        } else {
+                            missingKey(d, key, lhspc);
+                            return;
+                        }
                     } else {
-                        missingKey(map, key, lhspc);
+                        typeMismatch(TYPE_DICT, typeOf(result), lhspc);
                         return;
                     }
                 } else {
-                    typeMismatch(TYPE_DICT, typeOf(result), lhspc);
-                    return;
-                }
-            } else {
-                if (result instanceof Map) {
-                    final Map map = (Map) result;
-                    handler.accept(map, key);
-                } else {
-                    typeMismatch(TYPE_DICT, typeOf(result), lhspc);
-                    return;
+                    if (result instanceof Map) {
+                        final Map d = (Map) result;
+                        handler.accept(d, key);
+                    } else {
+                        typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                        return;
+                    }
                 }
             }
         }
@@ -777,14 +780,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitDictAggregate(DictAggregateContext ctx) {
-        Map d = new TreeMap<>(DICT_COMPARATOR);
+        Map result = new TreeMap<>(DICT_COMPARATOR);
         for (int i = 0; i < ctx.dictAggregatePair().size(); i++) {
-            final DictAggregatePairContext mapc = ctx.dictAggregatePair(i);
-            final Object key = mapc.key != null ? visit(mapc.key) : BigInteger.valueOf(i);
-            final Object value = visit(mapc.value);
-            d.put(key, value);
+            final DictAggregatePairContext dapc = ctx.dictAggregatePair(i);
+            final Object key = dapc.key != null ? visit(dapc.key) : BigInteger.valueOf(i);
+            final Object value = visit(dapc.value);
+            result.put(key, value);
         }
-        return d;
+        return result;
     }
 
     @Override
@@ -1223,8 +1226,9 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             result = arg1.isEmpty() ? "" : arg1.substring(1);
         }   break;
         default:
-            if (variables.peek().containsKey(identifier)) {
-                final Object object = variables.peek().get(identifier);
+            final Map d = variables.peek();
+            if (d.containsKey(identifier)) {
+                final Object object = d.get(identifier);
                 if (object instanceof LambdaExpressionContext) {
                     final LambdaExpressionContext function = (LambdaExpressionContext) object;
                     result = callFunction(ctx, function, arguments);
@@ -1233,7 +1237,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     return null;
                 }
             } else {
-                missingKey(variables.peek(), identifier, ctx);
+                missingKey(d, identifier, ctx);
                 return null;
             }
         }
@@ -1313,11 +1317,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 throw new AssertionError();
             }
             if (result instanceof Map) {
-                final Map map = (Map) result;
-                if (map.containsKey(key)) {
-                    result = map.get(key);
+                final Map d = (Map) result;
+                if (d.containsKey(key)) {
+                    result = d.get(key);
                 } else {
-                    missingKey(map, key, aepc);
+                    missingKey(d, key, aepc);
                     return null;
                 }
             } else {

@@ -6,6 +6,7 @@
 #include <gmp.h>
 #include <map>
 #include <string>
+#include <vector>
 
 class DictComparator {
 public:
@@ -19,7 +20,7 @@ typedef
     bool
     Boolean;
 typedef
-    mpz_t
+    struct Integer { mpz_t i; }
     Integer;
 typedef
     std::string
@@ -28,24 +29,24 @@ typedef
     AquilaParser::LambdaExpressionContext
     Function;
 typedef
-    std::map<Any, Any, DictComparator>
+    std::map<std::string, Any, DictComparator>
     Dictionary;
 
 class Interpreter : public AquilaVisitor {
 private:
 
-    void assign(Dictionary* map, Any key, Any value, antlr4::ParserRuleContext* ctx);
+    void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, std::string)> handler);
 
-    void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Any)> handler);
-
-    Any callFunction(AquilaParser::FunctionCallContext* callsite, Function* function, std::vector<Any> arguments);
-    /* TODO
-    bool checkArgs(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types);
-    bool checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, std::string... types);
-    bool checkArgsHelper(AquilaParser::FunctionCallContext* callsite, std::vector<Any> arguments, bool failOnTypeMismatch, std::string... types);
-    */
+    Any callFunction(AquilaParser::FunctionCallContext* callsite, Function& function, const std::vector<Any>& arguments);
+    bool checkArgs(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types);
+    bool checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types);
+    bool checkArgsHelper(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, bool failOnTypeMismatch, std::vector<std::string> types);
 
 public:
+
+    Interpreter(int argc, char* argv[]);
+
+    ~Interpreter();
 
     Any visitProgram(AquilaParser::ProgramContext *ctx);
 
