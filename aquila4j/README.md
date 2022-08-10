@@ -20,10 +20,10 @@ Types are implemented using the following Java types:
 
 | Aquila     | Java                                                |
 |------------|-----------------------------------------------------|
+| Boolean    | java.lang.Boolean                                   |
+| Integer    | java.math.BigInteger                                |
+| String     | java.lang.String[^1]                                |
 | Function   | aquila4j.antlr.AquilaParser.LambdaExpressionContext |
 | Dictionary | java.util.TreeMap                                   |
-| String     | java.lang.String\*                                  |
-| Integer    | java.math.BigInteger                                |
-| Boolean    | java.lang.Boolean                                   |
 
-\* Since this interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
+[^1]: Since this interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.

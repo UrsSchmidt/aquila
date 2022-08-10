@@ -3,6 +3,9 @@ rewrite the Interpreter in C++ as aquila4c (using ANTLRs C++ backend with CMake 
     resort methods in aquila4j according to aquila4c order
     make keys Strings (instead of Anys) in aquila4j as well?
     make sure that there is a `delete` for every `new`
+    make sure there is a mpz_clear for every mpz_init
+    I don't think `a.b.c := 42;` works in the aquila4c backend right now
+    move * in front of all toFunc() calls
 
 fix all TODOs/FIXMEs
 

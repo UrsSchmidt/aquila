@@ -99,10 +99,10 @@ String toString(const Any& o) {
         Function* f = toFunc((Any&) o);
         result = f->getText();
     } else if (isDict(o)) {
-        Dictionary* d = toDict((Any&) o);
+        Dictionary d = *toDict((Any&) o);
         std::stringstream ss;
         ss << "{" << std::endl;
-        for (const auto& [key, value] : *d) {
+        for (const auto& [key, value] : d) {
             ss << key << ": ";
             if (isStr(value)) {
                 ss << "'" << *toStr(value) << "'";
@@ -187,8 +187,8 @@ void fileNotFound(File file, antlr4::ParserRuleContext* ctx) {
 void missingKey(const Dictionary& expectedMap, const std::string& wasKey, antlr4::ParserRuleContext* ctx) {
     std::stringstream ss;
     ss << "Missing key! Expected one of: ";
-    for (auto i = expectedMap.begin(); i != expectedMap.end(); i++) {
-        ss << i->first << ", ";
+    for (const auto& [key, value] : expectedMap) {
+        ss << key << ", ";
     }
     ss << "but was key `" << wasKey << "`!";
     error(ss.str(), ctx);
@@ -200,9 +200,9 @@ void expectedNonVoidFunction(antlr4::ParserRuleContext* ctx) {
     error(ss.str(), ctx);
 }
 
-void typeMismatch(const std::string& expectedType, const std::string& wasType, antlr4::ParserRuleContext* ctx) {
+void typeMismatch(const std::string& expectedType, const Any& wasValue, antlr4::ParserRuleContext* ctx) {
     std::stringstream ss;
-    ss << "Type mismatch! Expected type `" << expectedType << "`, but was type `" << wasType << "`!";
+    ss << "Type mismatch! Expected type `" << expectedType << "`, but was `" << toString(wasValue) << "` which is of type `" << typeOf(wasValue) << "`!";
     error(ss.str(), ctx);
 }
 
@@ -224,11 +224,9 @@ void assign(Dictionary* d, const std::string& key, const Any& value, antlr4::Par
     if (d->count(key)) {
         DEBUG_LOG("map.count(key)");
         const std::string expected = typeOf((*d)[key]);
-        DEBUG_LOG("expected=" << expected);
         const std::string was = typeOf(value);
-        DEBUG_LOG("was=" << was);
         if (!strEquals(expected, was)) {
-            typeMismatch(expected, was, ctx);
+            typeMismatch(expected, value, ctx);
             return;
         }
     }
@@ -306,14 +304,14 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
                         assert(0);
                     }
                 } else {
-                    typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                    typeMismatch(TYPE_DICT, result, lhspc);
                     assert(0);
                 }
             } else {
                 if (isDict(result)) {
                     handler(toDict(result), key);
                 } else {
-                    typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                    typeMismatch(TYPE_DICT, result, lhspc);
                     assert(0);
                 }
             }
@@ -373,7 +371,7 @@ bool Interpreter::checkArgsHelper(AquilaParser::FunctionCallContext* callsite, c
         Any argument = arguments[i];
         if (!strEquals(type, TYPE_ANY) && !strEquals(typeOf(argument), type)) {
             if (failOnTypeMismatch) {
-                typeMismatch(type, typeOf(argument), callsite->arguments[i]);
+                typeMismatch(type, argument, callsite->arguments[i]);
             }
             return false;
         }
@@ -472,14 +470,14 @@ Any Interpreter::visitForStatement(AquilaParser::ForStatementContext *ctx) {
     /* from */
     Any from = visit(ctx->from);
     if (!isInt(from)) {
-        typeMismatch(TYPE_INT, typeOf(from), ctx->from);
+        typeMismatch(TYPE_INT, from, ctx->from);
         assert(0);
     }
     mpz_set(fromInt.i, toInt(from)->i);
     /* to */
     Any to = visit(ctx->to);
     if (!isInt(to)) {
-        typeMismatch(TYPE_INT, typeOf(to), ctx->to);
+        typeMismatch(TYPE_INT, to, ctx->to);
         assert(0);
     }
     mpz_set(toInt.i, toInt(to)->i);
@@ -487,28 +485,29 @@ Any Interpreter::visitForStatement(AquilaParser::ForStatementContext *ctx) {
     if (ctx->step) {
         Any step = visit(ctx->step);
         if (!isInt(step)) {
-            typeMismatch(TYPE_INT, typeOf(step), ctx->step);
+            typeMismatch(TYPE_INT, step, ctx->step);
             assert(0);
         }
         mpz_set(stepInt.i, toInt(step)->i);
     } else {
         mpz_set_ui(stepInt.i, 1);
     }
-    Dictionary d = *variables.back();
-    bool overridesValue = false;
+    Dictionary& d = *variables.back();
+    bool overridesValue = d.count(identifier);
     Any overriddenValue;
-    if (variables.back()->count(identifier)) {
-        overridesValue = true;
+    if (overridesValue) {
         overriddenValue = d[identifier];
     }
     for (mpz_set(i.i, fromInt.i); mpz_sgn(stepInt.i) >= 0 ? mpz_cmp(i.i, toInt.i) <= 0 : mpz_cmp(i.i, toInt.i) >= 0; mpz_add(i.i, i.i, stepInt.i)) {
         d[identifier] = i;
         visit(ctx->block());
     }
+    mpz_clears(fromInt.i, toInt.i, stepInt.i, i.i, NULL);
     if (overridesValue) {
         d[identifier] = overriddenValue;
+    } else {
+        d.erase(identifier);
     }
-    mpz_clears(fromInt.i, toInt.i, stepInt.i, i.i, NULL);
     DEBUG_END();
     return POISON;
 }
@@ -530,7 +529,7 @@ Any Interpreter::visitWriteStatement(AquilaParser::WriteStatementContext *ctx) {
     if (isStr(rhs)) {
         std::cout << *toStr(rhs) << std::endl;
     } else {
-        typeMismatch(TYPE_STR, typeOf(rhs), ctx->rhs);
+        typeMismatch(TYPE_STR, rhs, ctx->rhs);
         assert(0);
     }
     DEBUG_END();
@@ -588,7 +587,7 @@ Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
         }
         */
     } else {
-        typeMismatch(TYPE_STR, typeOf(rhs), ctx->rhs);
+        typeMismatch(TYPE_STR, rhs, ctx->rhs);
         assert(0);
     }
     DEBUG_END();
@@ -677,21 +676,23 @@ Any Interpreter::visitLogicalOperation(AquilaParser::LogicalOperationContext *ct
         AquilaParser::UnaryLogicalOperationContext* uloc = ctx->unaryLogicalOperation(i + 1);
         std::string op = loc->getText();
         Any operand = visit(uloc);
-        if (isBool(result) && isBool(operand)) {
-            if (strEquals(op, "and")) {
-                result = *toBool(result) && *toBool(operand);
-            } else if (strEquals(op, "or")) {
-                result = *toBool(result) || *toBool(operand);
-            } else if (strEquals(op, "xor")) {
-                result = *toBool(result) ^ *toBool(operand);
+        if (isBool(result)) {
+            if (isBool(operand)) {
+                if (strEquals(op, "and")) {
+                    result = *toBool(result) && *toBool(operand);
+                } else if (strEquals(op, "or")) {
+                    result = *toBool(result) || *toBool(operand);
+                } else if (strEquals(op, "xor")) {
+                    result = *toBool(result) ^ *toBool(operand);
+                } else {
+                    assert(0);
+                }
             } else {
+                typeMismatch(TYPE_BOOL, operand, uloc);
                 assert(0);
             }
         } else {
-            std::stringstream ss1, ss2;
-            ss1 << TYPE_BOOL << " and " << TYPE_BOOL;
-            ss2 << typeOf(result) << " and " << typeOf(operand);
-            typeMismatch(ss1.str(), ss2.str(), ctx);
+            typeMismatch(TYPE_BOOL, result, ctx);
             assert(0);
         }
     }
@@ -705,7 +706,8 @@ Any Interpreter::visitLogicalOperator(AquilaParser::LogicalOperatorContext *ctx)
 
 Any Interpreter::visitUnaryLogicalOperation(AquilaParser::UnaryLogicalOperationContext *ctx) {
     DEBUG_BGN();
-    Any result = visit(ctx->relation());
+    AquilaParser::RelationContext* rc = ctx->relation();
+    Any result = visit(rc);
     if (ctx->unaryLogicalOperator()) {
         if (isBool(result)) {
             std::string op = ctx->unaryLogicalOperator()->getText();
@@ -715,7 +717,7 @@ Any Interpreter::visitUnaryLogicalOperation(AquilaParser::UnaryLogicalOperationC
                 assert(0);
             }
         } else {
-            typeMismatch(TYPE_BOOL, typeOf(result), ctx->relation());
+            typeMismatch(TYPE_BOOL, result, rc);
             assert(0);
         }
     }
@@ -738,61 +740,75 @@ Any Interpreter::visitRelation(AquilaParser::RelationContext *ctx) {
         if (strEquals(op, ":")) {
             if (isDict(operand)) {
                 Dictionary d = *toDict(operand);
-                result = false;
-                for (Dictionary::iterator i = d.begin(); i != d.end(); i++) {
-                    if (anyEquals(i->second, result)) {
-                        result = true;
+                Boolean r = false;
+                for (const auto& [key, value] : d) {
+                    if (anyEquals(value, result)) {
+                        r = true;
                         break;
                     }
                 }
+                result = r;
             } else {
-                typeMismatch(TYPE_DICT, typeOf(operand), ac);
+                typeMismatch(TYPE_DICT, operand, ac);
                 assert(0);
             }
-        } else if (strEquals(op, "<=") || strEquals(op, "<>") || strEquals(op, "<") || strEquals(op, "=") || strEquals(op, ">=") || strEquals(op, ">")) {
-            if (isInt(result) && isInt(operand)) {
-                if (strEquals(op, "<=")) {
-                    result = mpz_cmp(toInt(result)->i, toInt(operand)->i) <= 0;
-                } else if (strEquals(op, "<>")) {
-                    result = mpz_cmp(toInt(result)->i, toInt(operand)->i) != 0;
-                } else if (strEquals(op, "<")) {
-                    result = mpz_cmp(toInt(result)->i, toInt(operand)->i) < 0;
-                } else if (strEquals(op, "=")) {
-                    result = mpz_cmp(toInt(result)->i, toInt(operand)->i) == 0;
-                } else if (strEquals(op, ">=")) {
-                    result = mpz_cmp(toInt(result)->i, toInt(operand)->i) >= 0;
-                } else if (strEquals(op, ">")) {
-                    result = mpz_cmp(toInt(result)->i, toInt(operand)->i) > 0;
+        } else if (strEquals(op, "<=")
+                || strEquals(op, "<>")
+                || strEquals(op, "<")
+                || strEquals(op, "=")
+                || strEquals(op, ">=")
+                || strEquals(op, ">")) {
+            if (isInt(result)) {
+                if (isInt(operand)) {
+                    if (strEquals(op, "<=")) {
+                        result = mpz_cmp(toInt(result)->i, toInt(operand)->i) <= 0;
+                    } else if (strEquals(op, "<>")) {
+                        result = mpz_cmp(toInt(result)->i, toInt(operand)->i) != 0;
+                    } else if (strEquals(op, "<")) {
+                        result = mpz_cmp(toInt(result)->i, toInt(operand)->i) < 0;
+                    } else if (strEquals(op, "=")) {
+                        result = mpz_cmp(toInt(result)->i, toInt(operand)->i) == 0;
+                    } else if (strEquals(op, ">=")) {
+                        result = mpz_cmp(toInt(result)->i, toInt(operand)->i) >= 0;
+                    } else if (strEquals(op, ">")) {
+                        result = mpz_cmp(toInt(result)->i, toInt(operand)->i) > 0;
+                    } else {
+                        assert(0);
+                    }
                 } else {
+                    typeMismatch(TYPE_INT, operand, ac);
                     assert(0);
                 }
             } else {
-                std::stringstream ss1, ss2;
-                ss1 << TYPE_INT << " and " << TYPE_INT;
-                ss2 << typeOf(result) << " and " << typeOf(operand);
-                typeMismatch(ss1.str(), ss2.str(), ctx);
+                typeMismatch(TYPE_INT, result, ctx);
                 assert(0);
             }
-        } else if (strEquals(op, "eq") || strEquals(op, "ew") || strEquals(op, "in") || strEquals(op, "ne") || strEquals(op, "sw")) {
-            if (isStr(result) && isStr(operand)) {
-                if (strEquals(op, "eq")) {
-                    result = strEquals(*toStr(result), *toStr(operand));
-                } else if (strEquals(op, "ew")) {
-                    result = strEndsWith(*toStr(result), *toStr(operand));
-                } else if (strEquals(op, "in")) {
-                    result = strContains(*toStr(operand), *toStr(result));
-                } else if (strEquals(op, "ne")) {
-                    result = !strEquals(*toStr(result), *toStr(operand));
-                } else if (strEquals(op, "sw")) {
-                    result = strStartsWith(*toStr(result), *toStr(operand));
+        } else if (strEquals(op, "eq")
+                || strEquals(op, "ew")
+                || strEquals(op, "in")
+                || strEquals(op, "ne")
+                || strEquals(op, "sw")) {
+            if (isStr(result)) {
+                if (isStr(operand)) {
+                    if (strEquals(op, "eq")) {
+                        result = strEquals(*toStr(result), *toStr(operand));
+                    } else if (strEquals(op, "ew")) {
+                        result = strEndsWith(*toStr(result), *toStr(operand));
+                    } else if (strEquals(op, "in")) {
+                        result = strContains(*toStr(operand), *toStr(result));
+                    } else if (strEquals(op, "ne")) {
+                        result = !strEquals(*toStr(result), *toStr(operand));
+                    } else if (strEquals(op, "sw")) {
+                        result = strStartsWith(*toStr(result), *toStr(operand));
+                    } else {
+                        assert(0);
+                    }
                 } else {
+                    typeMismatch(TYPE_STR, operand, ac);
                     assert(0);
                 }
             } else {
-                std::stringstream ss1, ss2;
-                ss1 << TYPE_STR << " and " << TYPE_STR;
-                ss2 << typeOf(result) << " and " << typeOf(operand);
-                typeMismatch(ss1.str(), ss2.str(), ctx);
+                typeMismatch(TYPE_STR, result, ctx);
                 assert(0);
             }
         } else {
@@ -816,34 +832,39 @@ Any Interpreter::visitAddition(AquilaParser::AdditionContext *ctx) {
         std::string op = aoc->getText();
         Any operand = visit(mc);
         if (strEquals(op, "&")) {
-            if (isStr(result) && isStr(operand)) {
-                std::stringstream ss;
-                ss << *toStr(result) << *toStr(operand);
-                result = ss.str();
-            } else {
-                std::stringstream ss1, ss2;
-                ss1 << TYPE_STR << " and " << TYPE_STR;
-                ss2 << typeOf(result) << " and " << typeOf(operand);
-                typeMismatch(ss1.str(), ss2.str(), ctx);
-                assert(0);
-            }
-        } else if (strEquals(op, "+") || strEquals(op, "-")) {
-            if (isInt(result) && isInt(operand)) {
-                Integer r;
-                mpz_init(r.i);
-                if (strEquals(op, "+")) {
-                    mpz_add(r.i, toInt(result)->i, toInt(operand)->i);
-                } else if (strEquals(op, "-")) {
-                    mpz_sub(r.i, toInt(result)->i, toInt(operand)->i);
+            if (isStr(result)) {
+                if (isStr(operand)) {
+                    std::stringstream ss;
+                    ss << *toStr(result) << *toStr(operand);
+                    result = ss.str();
                 } else {
+                    typeMismatch(TYPE_STR, operand, mc);
                     assert(0);
                 }
-                result = r;
             } else {
-                std::stringstream ss1, ss2;
-                ss1 << TYPE_INT << " and " << TYPE_INT;
-                ss2 << typeOf(result) << " and " << typeOf(operand);
-                typeMismatch(ss1.str(), ss2.str(), ctx);
+                typeMismatch(TYPE_STR, result, ctx);
+                assert(0);
+            }
+        } else if (strEquals(op, "+")
+                || strEquals(op, "-")) {
+            if (isInt(result)) {
+                if (isInt(operand)) {
+                    Integer r;
+                    mpz_init(r.i);
+                    if (strEquals(op, "+")) {
+                        mpz_add(r.i, toInt(result)->i, toInt(operand)->i);
+                    } else if (strEquals(op, "-")) {
+                        mpz_sub(r.i, toInt(result)->i, toInt(operand)->i);
+                    } else {
+                        assert(0);
+                    }
+                    result = r;
+                } else {
+                    typeMismatch(TYPE_INT, operand, mc);
+                    assert(0);
+                }
+            } else {
+                typeMismatch(TYPE_INT, result, ctx);
                 assert(0);
             }
         } else {
@@ -866,28 +887,30 @@ Any Interpreter::visitMultiplication(AquilaParser::MultiplicationContext *ctx) {
         AquilaParser::UnaryAdditionContext* uac = ctx->unaryAddition(i + 1);
         std::string op = moc->getText();
         Any operand = visit(uac);
-        if (isInt(result) && isInt(operand)) {
-            Integer r;
-            mpz_init(r.i);
-            if (strEquals(op, "*")) {
-                mpz_mul(r.i, toInt(result)->i, toInt(operand)->i);
-            } else if (strEquals(op, "/")) {
-                mpz_fdiv_q(r.i, toInt(result)->i, toInt(operand)->i);
-            } else if (strEquals(op, "mod")) {
-                // FIXME double check fdiv_r() behavior
-                mpz_fdiv_r(r.i, toInt(result)->i, toInt(operand)->i);
-            } else if (strEquals(op, "rem")) {
-                // FIXME double check mod() behavior
-                mpz_mod(r.i, toInt(result)->i, toInt(operand)->i);
+        if (isInt(result)) {
+            if (isInt(operand)) {
+                Integer r;
+                mpz_init(r.i);
+                if (strEquals(op, "*")) {
+                    mpz_mul(r.i, toInt(result)->i, toInt(operand)->i);
+                } else if (strEquals(op, "/")) {
+                    mpz_fdiv_q(r.i, toInt(result)->i, toInt(operand)->i);
+                } else if (strEquals(op, "mod")) {
+                    // FIXME double check fdiv_r() behavior
+                    mpz_fdiv_r(r.i, toInt(result)->i, toInt(operand)->i);
+                } else if (strEquals(op, "rem")) {
+                    // FIXME double check mod() behavior
+                    mpz_mod(r.i, toInt(result)->i, toInt(operand)->i);
+                } else {
+                    assert(0);
+                }
+                result = r;
             } else {
+                typeMismatch(TYPE_INT, operand, uac);
                 assert(0);
             }
-            result = r;
         } else {
-            std::stringstream ss1, ss2;
-            ss1 << TYPE_INT << " and " << TYPE_INT;
-            ss2 << typeOf(result) << " and " << typeOf(operand);
-            typeMismatch(ss1.str(), ss2.str(), ctx);
+            typeMismatch(TYPE_INT, result, ctx);
             assert(0);
         }
     }
@@ -901,7 +924,8 @@ Any Interpreter::visitMultiplicationOperator(AquilaParser::MultiplicationOperato
 
 Any Interpreter::visitUnaryAddition(AquilaParser::UnaryAdditionContext *ctx) {
     DEBUG_BGN();
-    Any result = visit(ctx->factorial());
+    AquilaParser::FactorialContext* fc = ctx->factorial();
+    Any result = visit(fc);
     if (ctx->unaryAdditionalOperator()) {
         if (isInt(result)) {
             std::string op = ctx->unaryAdditionalOperator()->getText();
@@ -916,7 +940,7 @@ Any Interpreter::visitUnaryAddition(AquilaParser::UnaryAdditionContext *ctx) {
             }
             result = r;
         } else {
-            typeMismatch(TYPE_INT, typeOf(result), ctx->factorial());
+            typeMismatch(TYPE_INT, result, fc);
             assert(0);
         }
     }
@@ -930,7 +954,8 @@ Any Interpreter::visitUnaryAdditionalOperator(AquilaParser::UnaryAdditionalOpera
 
 Any Interpreter::visitFactorial(AquilaParser::FactorialContext *ctx) {
     DEBUG_BGN();
-    Any result = visit(ctx->factor());
+    AquilaParser::FactorContext* fc = ctx->factor();
+    Any result = visit(fc);
     if (ctx->factorialOperator()) {
         if (isInt(result)) {
             std::string op = ctx->factorialOperator()->getText();
@@ -943,7 +968,7 @@ Any Interpreter::visitFactorial(AquilaParser::FactorialContext *ctx) {
             }
             result = r;
         } else {
-            typeMismatch(TYPE_INT, typeOf(result), ctx->factor());
+            typeMismatch(TYPE_INT, result, fc);
             assert(0);
         }
     }
@@ -986,14 +1011,15 @@ Any Interpreter::visitBracketExpression(AquilaParser::BracketExpressionContext *
 
 Any Interpreter::visitAbsExpression(AquilaParser::AbsExpressionContext *ctx) {
     DEBUG_BGN();
-    Any result = visit(ctx->expression());
+    AquilaParser::ExpressionContext* ec = ctx->expression();
+    Any result = visit(ec);
     if (isInt(result)) {
         Integer r;
         mpz_init(r.i);
         mpz_abs(r.i, toInt(result)->i);
         result = r;
     } else {
-        typeMismatch(TYPE_INT, typeOf(result), ctx->expression());
+        typeMismatch(TYPE_INT, result, ec);
         assert(0);
     }
     DEBUG_END_R(toString(result));
@@ -1454,7 +1480,7 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
                 Function* function = toFunc(object);
                 result = callFunction(ctx, *function, arguments);
             } else {
-                typeMismatch(TYPE_FUNC, typeOf(object), ctx);
+                typeMismatch(TYPE_FUNC, object, ctx);
                 assert(0);
             }
         } else {
@@ -1473,7 +1499,7 @@ Any Interpreter::visitAccessExpression(AquilaParser::AccessExpressionContext *ct
         Dictionary d;
         (*variables.back())[identifier] = d;
     }
-    Any& result = (*variables.back())[identifier];
+    Any result = (*variables.back())[identifier];
     for (AquilaParser::AccessExpressionPartContext* aepc : ctx->accessExpressionPart()) {
         std::string key;
         if (aepc->Identifier()) {
@@ -1492,7 +1518,7 @@ Any Interpreter::visitAccessExpression(AquilaParser::AccessExpressionContext *ct
                 assert(0);
             }
         } else {
-            typeMismatch(TYPE_DICT, typeOf(result), aepc);
+            typeMismatch(TYPE_DICT, result, aepc);
             assert(0);
         }
     }

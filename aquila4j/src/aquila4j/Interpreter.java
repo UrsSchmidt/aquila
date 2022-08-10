@@ -206,14 +206,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         /* from */
         final Object from = visit(ctx.from);
         if (!(from instanceof BigInteger)) {
-            typeMismatch(TYPE_INT, typeOf(from), ctx.from);
+            typeMismatch(TYPE_INT, from, ctx.from);
             return null;
         }
         final BigInteger fromInt = (BigInteger) from;
         /* to */
         final Object to = visit(ctx.to);
         if (!(to instanceof BigInteger)) {
-            typeMismatch(TYPE_INT, typeOf(to), ctx.to);
+            typeMismatch(TYPE_INT, to, ctx.to);
             return null;
         }
         final BigInteger toInt = (BigInteger) to;
@@ -222,19 +222,28 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (ctx.step != null) {
             final Object step = visit(ctx.step);
             if (!(step instanceof BigInteger)) {
-                typeMismatch(TYPE_INT, typeOf(step), ctx.step);
+                typeMismatch(TYPE_INT, step, ctx.step);
                 return null;
             }
             stepInt = (BigInteger) step;
         } else {
             stepInt = BigInteger.ONE;
         }
-        final Object overriddenValue = variables.peek().get(identifier);
+        Map d = variables.peek();
+        final boolean overridesValue = d.containsKey(identifier);
+        Object overriddenValue = null;
+        if (overridesValue) {
+            overriddenValue = d.get(identifier);
+        }
         for (BigInteger i = fromInt; stepInt.signum() >= 0 ? i.compareTo(toInt) <= 0 : i.compareTo(toInt) >= 0; i = i.add(stepInt)) {
-            variables.peek().put(identifier, i);
+            d.put(identifier, i);
             visit(ctx.block());
         }
-        variables.peek().put(identifier, overriddenValue);
+        if (overridesValue) {
+            d.put(identifier, overriddenValue);
+        } else {
+            d.remove(identifier);
+        }
         return null;
     }
 
@@ -251,7 +260,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (rhs instanceof String) {
             System.out.println(rhs);
         } else {
-            typeMismatch(TYPE_STR, typeOf(rhs), ctx.rhs);
+            typeMismatch(TYPE_STR, rhs, ctx.rhs);
             return null;
         }
         return null;
@@ -269,7 +278,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String expected = typeOf(d.get(key));
             final String was = typeOf(value);
             if (!expected.equals(was)) {
-                typeMismatch(expected, was, ctx);
+                typeMismatch(expected, value, ctx);
                 return;
             }
         }
@@ -324,7 +333,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                             return;
                         }
                     } else {
-                        typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                        typeMismatch(TYPE_DICT, result, lhspc);
                         return;
                     }
                 } else {
@@ -332,7 +341,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                         final Map d = (Map) result;
                         handler.accept(d, key);
                     } else {
-                        typeMismatch(TYPE_DICT, typeOf(result), lhspc);
+                        typeMismatch(TYPE_DICT, result, lhspc);
                         return;
                     }
                 }
@@ -358,7 +367,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 return null;
             }
         } else {
-            typeMismatch(TYPE_STR, typeOf(rhs), ctx.rhs);
+            typeMismatch(TYPE_STR, rhs, ctx.rhs);
             return null;
         }
         return null;
@@ -441,24 +450,29 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         for (int i = 0; i < ctx.logicalOperator().size(); i++) {
             final LogicalOperatorContext loc = ctx.logicalOperator(i);
             final UnaryLogicalOperationContext uloc = ctx.unaryLogicalOperation(i + 1);
-            final String operator = loc.getText();
+            final String op = loc.getText();
             final Object operand = visit(uloc);
-            if (result instanceof Boolean && operand instanceof Boolean) {
-                switch (operator) {
-                case "and":
-                    result = ((Boolean) result) && ((Boolean) operand);
-                    break;
-                case "or":
-                    result = ((Boolean) result) || ((Boolean) operand);
-                    break;
-                case "xor":
-                    result = ((Boolean) result) ^ ((Boolean) operand);
-                    break;
-                default:
-                    throw new AssertionError();
+            if (result instanceof Boolean) {
+                if (operand instanceof Boolean) {
+                    switch (op) {
+                    case "and":
+                        result = ((Boolean) result) && ((Boolean) operand);
+                        break;
+                    case "or":
+                        result = ((Boolean) result) || ((Boolean) operand);
+                        break;
+                    case "xor":
+                        result = ((Boolean) result) ^ ((Boolean) operand);
+                        break;
+                    default:
+                        throw new AssertionError();
+                    }
+                } else {
+                    typeMismatch(TYPE_BOOL, operand, uloc);
+                    return null;
                 }
             } else {
-                typeMismatch(TYPE_BOOL + " and " + TYPE_BOOL, typeOf(result) + " and " + typeOf(operand), ctx);
+                typeMismatch(TYPE_BOOL, result, ctx);
                 return null;
             }
         }
@@ -472,7 +486,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitUnaryLogicalOperation(UnaryLogicalOperationContext ctx) {
-        Object result = visit(ctx.relation());
+        final RelationContext rc = ctx.relation();
+        Object result = visit(rc);
         if (ctx.unaryLogicalOperator() != null) {
             if (result instanceof Boolean) {
                 switch (ctx.unaryLogicalOperator().getText()) {
@@ -483,7 +498,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     throw new AssertionError();
                 }
             } else {
-                typeMismatch(TYPE_BOOL, typeOf(result), ctx.relation());
+                typeMismatch(TYPE_BOOL, result, rc);
                 return null;
             }
         }
@@ -501,14 +516,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         if (ctx.relationalOperator() != null && ctx.addition().size() == 2) {
             final RelationalOperatorContext roc = ctx.relationalOperator();
             final AdditionContext ac = ctx.addition(1);
-            final String operator = roc.getText();
+            final String op = roc.getText();
             final Object operand = visit(ac);
-            switch (operator) {
+            switch (op) {
             case ":":
                 if (operand instanceof Map) {
                     result = ((Map) operand).containsValue(result);
                 } else {
-                    typeMismatch(TYPE_DICT, typeOf(operand), ac);
+                    typeMismatch(TYPE_DICT, operand, ac);
                     return null;
                 }
                 break;
@@ -518,31 +533,36 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             case "=":
             case ">=":
             case ">":
-                if (result instanceof BigInteger && operand instanceof BigInteger) {
-                    switch (operator) {
-                    case "<=":
-                        result = ((BigInteger) result).compareTo((BigInteger) operand) <= 0;
-                        break;
-                    case "<>":
-                        result = ((BigInteger) result).compareTo((BigInteger) operand) != 0;
-                        break;
-                    case "<":
-                        result = ((BigInteger) result).compareTo((BigInteger) operand) < 0;
-                        break;
-                    case "=":
-                        result = ((BigInteger) result).compareTo((BigInteger) operand) == 0;
-                        break;
-                    case ">=":
-                        result = ((BigInteger) result).compareTo((BigInteger) operand) >= 0;
-                        break;
-                    case ">":
-                        result = ((BigInteger) result).compareTo((BigInteger) operand) > 0;
-                        break;
-                    default:
-                        throw new AssertionError();
+                if (result instanceof BigInteger) {
+                    if (operand instanceof BigInteger) {
+                        switch (op) {
+                        case "<=":
+                            result = ((BigInteger) result).compareTo((BigInteger) operand) <= 0;
+                            break;
+                        case "<>":
+                            result = ((BigInteger) result).compareTo((BigInteger) operand) != 0;
+                            break;
+                        case "<":
+                            result = ((BigInteger) result).compareTo((BigInteger) operand) < 0;
+                            break;
+                        case "=":
+                            result = ((BigInteger) result).compareTo((BigInteger) operand) == 0;
+                            break;
+                        case ">=":
+                            result = ((BigInteger) result).compareTo((BigInteger) operand) >= 0;
+                            break;
+                        case ">":
+                            result = ((BigInteger) result).compareTo((BigInteger) operand) > 0;
+                            break;
+                        default:
+                            throw new AssertionError();
+                        }
+                    } else {
+                        typeMismatch(TYPE_INT, operand, ac);
+                        return null;
                     }
                 } else {
-                    typeMismatch(TYPE_INT + " and " + TYPE_INT, typeOf(result) + " and " + typeOf(operand), ctx);
+                    typeMismatch(TYPE_INT, result, ctx);
                     return null;
                 }
                 break;
@@ -551,28 +571,33 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             case "in":
             case "ne":
             case "sw":
-                if (result instanceof String && operand instanceof String) {
-                    switch (operator) {
-                    case "eq":
-                        result = ((String) result).equals((String) operand);
-                        break;
-                    case "ew":
-                        result = ((String) result).endsWith((String) operand);
-                        break;
-                    case "in":
-                        result = ((String) operand).contains((String) result);
-                        break;
-                    case "ne":
-                        result = !((String) result).equals((String) operand);
-                        break;
-                    case "sw":
-                        result = ((String) result).startsWith((String) operand);
-                        break;
-                    default:
-                        throw new AssertionError();
+                if (result instanceof String) {
+                    if (operand instanceof String) {
+                        switch (op) {
+                        case "eq":
+                            result = ((String) result).equals((String) operand);
+                            break;
+                        case "ew":
+                            result = ((String) result).endsWith((String) operand);
+                            break;
+                        case "in":
+                            result = ((String) operand).contains((String) result);
+                            break;
+                        case "ne":
+                            result = !((String) result).equals((String) operand);
+                            break;
+                        case "sw":
+                            result = ((String) result).startsWith((String) operand);
+                            break;
+                        default:
+                            throw new AssertionError();
+                        }
+                    } else {
+                        typeMismatch(TYPE_STR, operand, ac);
+                        return null;
                     }
                 } else {
-                    typeMismatch(TYPE_STR + " and " + TYPE_STR, typeOf(result) + " and " + typeOf(operand), ctx);
+                    typeMismatch(TYPE_STR, result, ctx);
                     return null;
                 }
                 break;
@@ -594,32 +619,42 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         for (int i = 0; i < ctx.additionalOperator().size(); i++) {
             final AdditionalOperatorContext aoc = ctx.additionalOperator(i);
             final MultiplicationContext mc = ctx.multiplication(i + 1);
-            final String operator = aoc.getText();
+            final String op = aoc.getText();
             final Object operand = visit(mc);
-            switch (operator) {
+            switch (op) {
             case "&":
-                if (result instanceof String && operand instanceof String) {
-                    result = ((String) result) + (String) operand;
+                if (result instanceof String) {
+                    if (operand instanceof String) {
+                        result = ((String) result) + (String) operand;
+                    } else {
+                        typeMismatch(TYPE_STR, operand, mc);
+                        return null;
+                    }
                 } else {
-                    typeMismatch(TYPE_STR + " and " + TYPE_STR, typeOf(result) + " and " + typeOf(operand), ctx);
+                    typeMismatch(TYPE_STR, result, ctx);
                     return null;
                 }
                 break;
             case "+":
             case "-":
-                if (result instanceof BigInteger && operand instanceof BigInteger) {
-                    switch (operator) {
-                    case "+":
-                        result = ((BigInteger) result).add((BigInteger) operand);
-                        break;
-                    case "-":
-                        result = ((BigInteger) result).subtract((BigInteger) operand);
-                        break;
-                    default:
-                        throw new AssertionError();
+                if (result instanceof BigInteger) {
+                    if (operand instanceof BigInteger) {
+                        switch (op) {
+                        case "+":
+                            result = ((BigInteger) result).add((BigInteger) operand);
+                            break;
+                        case "-":
+                            result = ((BigInteger) result).subtract((BigInteger) operand);
+                            break;
+                        default:
+                            throw new AssertionError();
+                        }
+                    } else {
+                        typeMismatch(TYPE_INT, operand, mc);
+                        return null;
                     }
                 } else {
-                    typeMismatch(TYPE_INT + " and " + TYPE_INT, typeOf(result) + " and " + typeOf(operand), ctx);
+                    typeMismatch(TYPE_INT, result, ctx);
                     return null;
                 }
                 break;
@@ -641,27 +676,32 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         for (int i = 0; i < ctx.multiplicationOperator().size(); i++) {
             final MultiplicationOperatorContext moc = ctx.multiplicationOperator(i);
             final UnaryAdditionContext uac = ctx.unaryAddition(i + 1);
-            final String operator = moc.getText();
+            final String op = moc.getText();
             final Object operand = visit(uac);
-            if (result instanceof BigInteger && operand instanceof BigInteger) {
-                switch (operator) {
-                case "*":
-                    result = ((BigInteger) result).multiply((BigInteger) operand);
-                    break;
-                case "/":
-                    result = ((BigInteger) result).divide((BigInteger) operand);
-                    break;
-                case "mod":
-                    result = ((BigInteger) result).mod((BigInteger) operand);
-                    break;
-                case "rem":
-                    result = ((BigInteger) result).remainder((BigInteger) operand);
-                    break;
-                default:
-                    throw new AssertionError();
+            if (result instanceof BigInteger) {
+                if (operand instanceof BigInteger) {
+                    switch (op) {
+                    case "*":
+                        result = ((BigInteger) result).multiply((BigInteger) operand);
+                        break;
+                    case "/":
+                        result = ((BigInteger) result).divide((BigInteger) operand);
+                        break;
+                    case "mod":
+                        result = ((BigInteger) result).mod((BigInteger) operand);
+                        break;
+                    case "rem":
+                        result = ((BigInteger) result).remainder((BigInteger) operand);
+                        break;
+                    default:
+                        throw new AssertionError();
+                    }
+                } else {
+                    typeMismatch(TYPE_INT, operand, uac);
+                    return null;
                 }
             } else {
-                typeMismatch(TYPE_INT + " and " + TYPE_INT, typeOf(result) + " and " + typeOf(operand), ctx);
+                typeMismatch(TYPE_INT, result, ctx);
                 return null;
             }
         }
@@ -675,7 +715,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitUnaryAddition(UnaryAdditionContext ctx) {
-        Object result = visit(ctx.factorial());
+        final FactorialContext fc = ctx.factorial();
+        Object result = visit(fc);
         if (ctx.unaryAdditionalOperator() != null) {
             if (result instanceof BigInteger) {
                 switch (ctx.unaryAdditionalOperator().getText()) {
@@ -689,7 +730,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     throw new AssertionError();
                 }
             } else {
-                typeMismatch(TYPE_INT, typeOf(result), ctx.factorial());
+                typeMismatch(TYPE_INT, result, fc);
                 return null;
             }
         }
@@ -703,7 +744,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitFactorial(FactorialContext ctx) {
-        Object result = visit(ctx.factor());
+        final FactorContext fc = ctx.factor();
+        Object result = visit(fc);
         if (ctx.factorialOperator() != null) {
             if (result instanceof BigInteger) {
                 switch (ctx.factorialOperator().getText()) {
@@ -714,7 +756,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     throw new AssertionError();
                 }
             } else {
-                typeMismatch(TYPE_INT, typeOf(result), ctx.factor());
+                typeMismatch(TYPE_INT, result, fc);
                 return null;
             }
         }
@@ -768,11 +810,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitAbsExpression(AbsExpressionContext ctx) {
-        Object result = visit(ctx.expression());
+        final ExpressionContext ec = ctx.expression();
+        Object result = visit(ec);
         if (result instanceof BigInteger) {
             result = ((BigInteger) result).abs();
         } else {
-            typeMismatch(TYPE_INT, typeOf(result), ctx.expression());
+            typeMismatch(TYPE_INT, result, ec);
             return null;
         }
         return result;
@@ -1233,7 +1276,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     final LambdaExpressionContext function = (LambdaExpressionContext) object;
                     result = callFunction(ctx, function, arguments);
                 } else {
-                    typeMismatch(TYPE_FUNC, typeOf(object), ctx);
+                    typeMismatch(TYPE_FUNC, object, ctx);
                     return null;
                 }
             } else {
@@ -1292,7 +1335,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final Object argument = arguments.get(i);
             if (!type.equals(TYPE_ANY) && !typeOf(argument).equals(type)) {
                 if (failOnTypeMismatch) {
-                    typeMismatch(type, typeOf(argument), callsite.arguments.get(i));
+                    typeMismatch(type, argument, callsite.arguments.get(i));
                 }
                 return false;
             }
@@ -1325,7 +1368,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     return null;
                 }
             } else {
-                typeMismatch(TYPE_DICT, typeOf(result), aepc);
+                typeMismatch(TYPE_DICT, result, aepc);
                 return null;
             }
         }
@@ -1444,19 +1487,19 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     }
 
     private static void missingKey(Map expectedMap, Object wasKey, ParserRuleContext ctx) {
-        error("Missing key! Expected one of: " + expectedMap.keySet() + ", but was key `" + toString(wasKey) + "`!", ctx);
+        error("Missing key! Expected one of: " + expectedMap.keySet() + ", but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
     }
 
     private static void expectedNonVoidFunction(ParserRuleContext ctx) {
         error("Expected non-void " + TYPE_FUNC + "!", ctx);
     }
 
-    private static void typeMismatch(String expectedType, String wasType, ParserRuleContext ctx) {
-        error("Type mismatch! Expected type `" + expectedType + "`, but was type `" + wasType + "`!", ctx);
+    private static void typeMismatch(String expectedType, Object wasValue, ParserRuleContext ctx) {
+        error("Type mismatch! Expected type `" + expectedType + "`, but was `" + toString(wasValue) + "` which is of type `" + typeOf(wasValue) + "`!", ctx);
     }
 
     private static void wrongKey(String expectedKey, Object wasKey, ParserRuleContext ctx) {
-        error("Wrong key! Expected key `" + expectedKey + "`, but was key `" + toString(wasKey) + "`!", ctx);
+        error("Wrong key! Expected key `" + expectedKey + "`, but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
     }
 
     private static void wrongNumberOfArguments(int expected, int was, ParserRuleContext ctx) {
