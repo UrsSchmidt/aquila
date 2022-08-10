@@ -18,10 +18,11 @@ You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which wil
 
 Types are implemented using the following C++ types:
 
-| Aquila     | C++                                          |
-|------------|----------------------------------------------|
-| Boolean    | `bool`                                       |
-| Integer    | `struct Integer { mpz_t i; }`                |
-| String     | `std::string`                                |
-| Function   | `AquilaParser::LambdaExpressionContext`      |
-| Dictionary | `std::map<std::string, Any, DictComparator>` |
+| Aquila     | C++                                     |
+|------------|-----------------------------------------|
+| Any        | `std::any`                              |
+| Boolean    | `bool`                                  |
+| Integer    | `struct { mpz_t i; }`                   |
+| String     | `std::string`                           |
+| Function   | `AquilaParser::LambdaExpressionContext` |
+| Dictionary | `std::map<std::string, std::any>`       |
