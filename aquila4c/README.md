@@ -13,3 +13,15 @@ Then simply run `./build.sh` to build the `aquila4c` file.
 
 Run `cp aquila4c /usr/local/bin/aq`. You might need sudo rights.
 You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the interpreter.
+
+## Implementation details
+
+Types are implemented using the following C++ types:
+
+| Aquila     | C++                                          |
+|------------|----------------------------------------------|
+| Boolean    | `bool`                                       |
+| Integer    | `struct Integer { mpz_t i; }`                |
+| String     | `std::string`                                |
+| Function   | `AquilaParser::LambdaExpressionContext`      |
+| Dictionary | `std::map<std::string, Any, DictComparator>` |

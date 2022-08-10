@@ -18,12 +18,12 @@ You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which wil
 
 Types are implemented using the following Java types:
 
-| Aquila     | Java                                                |
-|------------|-----------------------------------------------------|
-| Boolean    | java.lang.Boolean                                   |
-| Integer    | java.math.BigInteger                                |
-| String     | java.lang.String[^1]                                |
-| Function   | aquila4j.antlr.AquilaParser.LambdaExpressionContext |
-| Dictionary | java.util.TreeMap                                   |
+| Aquila     | Java                                                  |
+|------------|-------------------------------------------------------|
+| Boolean    | `java.lang.Boolean`                                   |
+| Integer    | `java.math.BigInteger`                                |
+| String     | `java.lang.String`[^1]                                |
+| Function   | `aquila4j.antlr.AquilaParser.LambdaExpressionContext` |
+| Dictionary | `java.util.TreeMap`                                   |
 
 [^1]: Since this interpreter is written in Java and Strings in Java are Unicode-compatible, you can use Unicode characters in your Strings as well.
