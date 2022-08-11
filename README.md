@@ -30,14 +30,17 @@ Comments are written like this: `# this is a comment`
 
 ## Types
 
-There are five types as of now: `Boolean`, `Integer`, `String`, `Function` and `Dictionary`. You **cannot** define your own types. There is also the Any type, which can be used to explicitly signify that a functions argument can be of any of the above types.
+There are five types as of now: `Boolean`, `Integer`, `String`, `Function` and `Dictionary`. You **cannot** define your own types. There is also the `Any` type, which can be used to explicitly signify that a functions argument can be of any of the above types.
 
 ### Boolean
 
 The two `Boolean` literals are `true` and `false`.
 
 The following operations are available on booleans:
-`not`, `and`, `or` and `xor`
+ * `not` a
+ * a `and` b
+ * a `or` b
+ * a `xor` b
 
 The following predefined functions are available on booleans:
 
@@ -53,7 +56,22 @@ Integers are written like this:
  * Hexadecimal: `0xabcd`
 
 The following operations are available on integers:
-`+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=`, `n!` and `|x|`
+ * `+` a
+ * `-` a
+ * a `+` b
+ * a `-` b
+ * a `*` b
+ * a `/` b
+ * a `mod` b
+ * a `rem` b
+ * a `=` b
+ * a `<>` b
+ * a `<` b
+ * a `<=` b
+ * a `>` b
+ * a `>=` b
+ * a `!`: the factorial of `a`
+ * `|` a `|`: the absolute value of `a`
 
 The following predefined functions are available on integers:
 
@@ -72,12 +90,12 @@ Numerical functions:
 Strings are written like this: `'Hello, world!'`
 
 The following operations are available on strings:
-a `&` b: concatenating `a` and `b`
-a `eq` b: whether `a` equals `b`
-a `ew` b: whether `a` ends with `b`
-a `in` b: whether `b` contains `a`
-a `ne` b: whether `a` does not equal `b`
-a `sw` b: whether `a` starts with `b`
+ * a `&` b: concatenating `a` and `b`
+ * a `eq` b: whether `a` equals `b`
+ * a `ew` b: whether `a` ends with `b`
+ * a `in` b: whether `b` contains `a`
+ * a `ne` b: whether `a` does not equal `b`
+ * a `sw` b: whether `a` starts with `b`
 
 The following predefined functions are available on strings:
 
@@ -125,7 +143,7 @@ You can assign functions to variables like any other value: `a := \x -> 2 * x;`
 You can also write recursive functions by using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
 You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 You can write void functions by using code blocks: `a := \s -> (write s;);`
-Here you can also use `Any` to explicitly state, that the argument can take any type.
+Here you can also use `Any` to explicitly state, that the argument can take any type: `\x : Any -> x`
 
 The following predefined functions are available on functions:
  * `foreach(d : Dictionary, f : Function)`
@@ -147,9 +165,9 @@ Dictionary aggregates are written like this: `{ key: value }`
 If you do not care about the keys, you can also use `{ v1, v2, v3 }` as a shorthand for `{ 0: v1, 1: v2, 2: v3 }`.
 
 The following operations are available on dictionaries:
-`.key`: value access via key name
-`[keyExpression]`: value access via expression
-`:`: contains
+ * a `.` b: access value of `Dictionary` `a` via key name `b`
+ * a `[` b `]`: access value of `Dictionary` `a` via key expression `b`
+ * a `:` b: whether `Dictionary` `b` contains value `a`
 
 The following predefined functions are available on dictionaries:
 
