@@ -4,7 +4,7 @@ Aquila is a small scripting language that is run on an interpreter. This languag
 
 ## aquila4c
 
-This is the C++ implementation of Aquila. See [here](aquila4c/README.md) for details on how to build `aquila4c`. **This is a work in progress.**
+This is the C++ 17 implementation of Aquila. See [here](aquila4c/README.md) for details on how to build `aquila4c`. **This is a work in progress.**
 
 ## aquila4j
 
@@ -30,23 +30,108 @@ Comments are written like this: `# this is a comment`
 
 ## Types
 
-There are five types as of now: Functions, Dictionaries, Strings, Integers and Booleans. You **cannot** define your own types.
+There are five types as of now: `Boolean`, `Integer`, `String`, `Function` and `Dictionary`. You **cannot** define your own types. There is also the Any type, which can be used to explicitly signify that a functions argument can be of any of the above types.
 
-### Functions
+### Boolean
+
+The two `Boolean` literals are `true` and `false`.
+
+The following operations are available on booleans:
+`not`, `and`, `or` and `xor`
+
+The following predefined functions are available on booleans:
+
+Type conversion functions:
+ * `bool2str(a)` returns `a` as a `String`
+
+### Integer
+
+Integers are written like this:
+ * Decimal: `12345`
+ * Binary: `0b10101010`
+ * Octal: `0o755`
+ * Hexadecimal: `0xabcd`
+
+The following operations are available on integers:
+`+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=`, `n!` and `|x|`
+
+The following predefined functions are available on integers:
+
+Type conversion functions:
+ * `int2str(a)` returns `a` as a `String`
+ * `ord2char(a)` returns a `String` containing the Unicode character with codepoint `a`
+
+Numerical functions:
+ * `gcd(a, b)` returns the greatest common divisor of `a` and `b`
+ * `pow(a, b)` returns `a` to the power of `b`
+ * `sgn(a)` returns the sign of `a`
+ * `sqrt(a)` returns the square root of `a`
+
+### String
+
+Strings are written like this: `'Hello, world!'`
+
+The following operations are available on strings:
+a `&` b: concatenating `a` and `b`
+a `eq` b: whether `a` equals `b`
+a `ew` b: whether `a` ends with `b`
+a `in` b: whether `b` contains `a`
+a `ne` b: whether `a` does not equal `b`
+a `sw` b: whether `a` starts with `b`
+
+The following predefined functions are available on strings:
+
+General functions:
+ * `length(a)` returns the number of characters in `a`
+
+Type conversion functions:
+ * `char2ord(a)` returns the Unicode value of the first character of `a` as an `Integer`
+ * `str2bool(a)` parsing `a` to a `Boolean`
+ * `str2dict(a)` parsing `a` to a `Dictionary`
+ * `str2int(a)` parsing `a` to an `Integer`
+
+Java style charat/substring functions:
+ * `charat(a, b)` returns the character with the index `b` in `a`
+ * `substring1(a, b)` returns the substring from `a` that starts at `b`
+ * `substring2(a, b, c)` returns the substring from `a` that starts at `b` and ends at `c`
+
+VB style left/mid/right functions:
+ * `left(a, b)` returns the substring from `a` that starts at `0` and has length `b`
+ * `mid(a, b, c)` returns the substring from `a` that starts at `b` and has length `c`
+ * `right(a, b)` returns the substring from `a` that starts at `length - b` and has length `b`
+
+Haskell style head/tail functions:
+ * `head(a)` returns the first character of `a`
+ * `tail(a)` returns everything after the first character of `a`
+
+Finding substrings in strings:
+ * `findleft(a, b, c)` returns the first occurrence of `b` in `a` starting from the left at `c`
+ * `findright(a, b, c)` returns the first occurrence of `b` in `a` starting from the right at `c`
+
+Splitting and joining strings:
+ * `split(a, b)` returns the `String` `b` splitted at `String` `a` as a `Dictionary`
+ * `join(a, b)` returns the `Dictionary` `b` joined with `String` `a` as a `String`
+
+Other functions:
+ * `repeat(a, b)` returns `a` repeated `b` times
+ * `replace(a, b, c)` replace all occurrences of `b` in `a` with `c`
+
+There are also a lot of predefined `String` functions under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
+
+### Function
 
 Functions are always written as lambdas: `\x, y -> x + y`
-You can assign Functions to variables like any other value: `a := \x -> 2 * x;`
-You can also write recursive Functions by using the variable that you assign the Function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
+You can assign functions to variables like any other value: `a := \x -> 2 * x;`
+You can also write recursive functions by using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
 You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
+You can write void functions by using code blocks: `a := \s -> (write s;);`
 Here you can also use `Any` to explicitly state, that the argument can take any type.
 
-The following predefined functions are available on Functions:
-
+The following predefined functions are available on functions:
  * `foreach(d : Dictionary, f : Function)`
    `(Dictionary, (Any, Any) -> Void) -> Void`
  * `forall(d : Dictionary, f : Function)`
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
-
  * `exists(d : Dictionary, f : Function)`
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
  * `filter(d : Dictionary, f : Function)`
@@ -56,83 +141,23 @@ The following predefined functions are available on Functions:
  * `fold(d : Dictionary, n : Any, f : Function)`
    `(Dictionary, Any, (Any, Any) -> Any) -> Any`
 
-### Dictionaries
+### Dictionary
 
 Dictionary aggregates are written like this: `{ key: value }`
 If you do not care about the keys, you can also use `{ v1, v2, v3 }` as a shorthand for `{ 0: v1, 1: v2, 2: v3 }`.
 
-The following operations are available on Dictionaries: `.key` (value access via key name), `[keyExpression]` (value access via expression) and `:` (contains).
+The following operations are available on dictionaries:
+`.key`: value access via key name
+`[keyExpression]`: value access via expression
+`:`: contains
 
-The following predefined functions are available on Dictionaries:
+The following predefined functions are available on dictionaries:
 
- * `size(a)` returns the number of key/value pairs in a
-
- * `dict2str(a)` returns a as a String
-
-### Strings
-
-Strings are written like this: `'Hello, world!'`
-
-The following operations are available on Strings: `&` (concatenation), `eq` (equals), `ew` (ends with), `in` (contains), `ne` (not equals) and `sw` (starts with).
-
-The following predefined functions are available on Strings:
-
- * `length(a)` returns the number of characters in a
-
- * `char2ord(a)` returns the Unicode value of the first character of a
- * `str2bool(a)` parsing a to a Boolean
- * `str2dict(a)` parsing a to a Dictionary
- * `str2int(a)` parsing a to an Integer
-
- * `charat(a, b)` returns the character with the index b in a
- * `substring1(a, b)` returns the substring from a that starts at b
- * `substring2(a, b, c)` returns the substring from a that starts at b and ends at c
-
- * `left(a, b)` returns the substring from a that starts at 0 and has length b
- * `mid(a, b, c)` returns the substring from a that starts at b and has length c
- * `right(a, b)` returns the substring from a that starts at length - b and has length b
-
- * `head(a)` returns the first character of the String
- * `tail(a)` returns everything after the first character of the String
-
- * `findleft(a, b, c)` returns the first occurrence of b in a starting from the left at c
- * `findright(a, b, c)` returns the first occurrence of b in a starting from the right at c
- * `split(a, b)` returns the String b splitted at String a as a Dictionary
- * `join(a, b)` returns the Dictionary b joined with String a as a String
- * `repeat(a, b)` returns a repeated b times
- * `replace(a, b, c)` replace all occurrences of b in a with c
-
-There are also a lot of predefined String functions under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
-
-### Integers
-
-Integers are written like this:
- * Decimal: `12345`
- * Binary: `0b10101010`
- * Octal: `0o755`
- * Hexadecimal: `0xabcd`
-
-The following operations are available on Integers: `+`, `-`, `*`, `/`, `mod`, `rem`, `=`, `<>`, `<`, `<=`, `>`, `>=`, `n!` and `|x|`.
-
-The following predefined functions are available on Integers:
-
- * `int2str(a)` returns a as a String
- * `ord2char(a)` returns a String containing a single Unicode character
-
- * `gcd(a, b)` returns the greatest common divisor of a and b
- * `pow(a, b)` returns the a to the power of b
- * `sgn(a)` returns the sign of a
- * `sqrt(a)` returns the square root of a
-
-### Booleans
-
-The two Booleans are `true` and `false`.
-
-The following operations are available on Booleans: `not`, `and`, `or` and `xor`.
-
-The following predefined functions are available on Booleans:
-
- * `bool2str(a)` returns a as a String
+General functions:
+ * `size(a)` returns the number of key/value pairs in `a`
+ 
+Type conversion functions:
+ * `dict2str(a)` returns `a` as a `String`
 
 ### Checking for types
 
@@ -185,6 +210,30 @@ There can be 0..n `case` parts and the `default` part is mandatory.
  * `sleep(a)` sleeps/waits for a milliseconds
 
 ## Statements
+
+### Assignments
+
+You can assign values to variables using: `myVariable := myValue;`
+
+### Call statements
+
+You can call a void function by using: `call myVoidFunction(p1, p2);`
+
+### Read statements
+
+You can read a line from the command line into a `String` using: `read myVariable;`
+
+### Write statements
+
+You can write a `String` as a line to the command line using: `write 'Hello, world!';`
+
+### Remove statements
+
+You can remove key/value pairs from dictionaries using: `remove myDictionary.myKey;`
+
+### Run statements
+
+You can run other Aquila scripts using: `run 'script.aq';`
 
 ### If statements
 
@@ -249,26 +298,6 @@ for i from 1 to 100 step 2 (
 )
 ```
 If not needed, the `step` part can be omitted, it will default to `step 1`.
-
-### Read statements
-
-You can read a line from the command line into a String using: `read myVariable;`
-
-### Write statements
-
-You can write a String as a line to the command line using: `write 'Hello, world!';`
-
-### Assignments
-
-You can assign values to variables using: `myVariable := myValue;`
-
-### Remove statements
-
-You can remove key/value pairs from Dictionaries using: `remove myDictionary.myKey;`
-
-### Run statements
-
-You can run other Aquila scripts using: `run 'script.aq';`
 
 ## Using command line arguments
 

@@ -34,6 +34,8 @@ write int2str(|72|);
 write int2str(|-72|);
 
 # functions
+write int2str(str2int('00'));
+write int2str(str2int('42'));
 write int2str(gcd(8, 4));
 write int2str(pow(0, 0));
 write int2str(pow(0, 1));

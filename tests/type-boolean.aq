@@ -24,4 +24,5 @@ write bool2str(true xor false);
 write bool2str(true xor true);
 
 # functions
-# none
+write bool2str(str2bool('false'));
+write bool2str(str2bool('true'));

@@ -1,11 +1,11 @@
-rewrite the Interpreter in C++ as aquila4c (using ANTLRs C++ backend with CMake and libgmp)
-    rename all maps to ds (in both backends)
-    resort methods in aquila4j according to aquila4c order
+rewrite the Interpreter in C++ as aquila4c
     make keys Strings (instead of Anys) in aquila4j as well?
     make sure that there is a `delete` for every `new`
-    make sure there is a mpz_clear for every mpz_init
-    I don't think `a.b.c := 42;` works in the aquila4c backend right now
+    make sure there is a `mpz_clear` for every `mpz_init`
     move * in front of all toFunc() calls
+    remove tests/example.aq
+    rewrite the bashscripts used in aquila4c as Makefiles
+    remove a lot of debug outputs (DEBUG_LOG etc)
 
 fix all TODOs/FIXMEs
 
@@ -50,7 +50,8 @@ predefined functions:
         content operations:
             read/write file line-by-line
 
-rewrite the bashscripts used in aquila4c as Makefiles
+use checkstyle for aquila4j
+use cpplint & cppcheck for aquila4c
 
 look at older projects and merge with them
 

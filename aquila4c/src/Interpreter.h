@@ -62,17 +62,17 @@ public:
 
     Any visitForStatement(AquilaParser::ForStatementContext *ctx);
 
+    Any visitCallStatement(AquilaParser::CallStatementContext *ctx);
+
     Any visitReadStatement(AquilaParser::ReadStatementContext *ctx);
 
     Any visitWriteStatement(AquilaParser::WriteStatementContext *ctx);
 
-    Any visitAssignStatement(AquilaParser::AssignStatementContext *ctx);
-
-    Any visitCallStatement(AquilaParser::CallStatementContext *ctx);
-
     Any visitRemoveStatement(AquilaParser::RemoveStatementContext *ctx);
 
     Any visitRunStatement(AquilaParser::RunStatementContext *ctx);
+
+    Any visitAssignStatement(AquilaParser::AssignStatementContext *ctx);
 
     Any visitBlock(AquilaParser::BlockContext *ctx);
 

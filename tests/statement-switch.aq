@@ -1,0 +1,73 @@
+#!/usr/local/bin/aq
+
+switch 'a':
+case 'a' (
+    write 'OK';
+)
+
+switch 'a':
+case 'b' (
+    write 'NOT OK';
+)
+
+switch 'a':
+case 'a' (
+    write 'OK';
+)
+default (
+    write 'NOT OK';
+)
+
+switch 'a':
+case 'b' (
+    write 'NOT OK';
+)
+default (
+    write 'OK';
+)
+
+switch 'a':
+case 'a' (
+    write 'OK';
+)
+case 'b' (
+    write 'NOT OK';
+)
+
+switch 'a':
+case 'a' (
+    write 'OK';
+)
+case 'b' (
+    write 'NOT OK';
+)
+
+switch 'a':
+case 'a' (
+    write 'OK';
+)
+case 'b' (
+    write 'NOT OK';
+)
+default (
+    write 'NOT OK';
+)
+
+switch 'a':
+case 'a' (
+    write 'OK';
+)
+case 'b' (
+    write 'NOT OK';
+)
+default (
+    write 'NOT OK';
+)
+
+switch 'd':
+case 'a', 'b' (
+    write 'NOT OK';
+)
+case 'c', 'd' (
+    write 'OK';
+)

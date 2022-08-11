@@ -1,0 +1,21 @@
+#!/usr/local/bin/aq
+
+n := 3;
+loop (
+    write int2str(n);
+    n := n - 1;
+) while n > 0 (
+    write int2str(n);
+)
+
+n := 3;
+loop (
+    write int2str(n);
+    n := n - 1;
+) while n > 0;
+
+n := 3;
+while n > 0 (
+    write int2str(n);
+    n := n - 1;
+)

@@ -1,8 +1,5 @@
 #!/usr/local/bin/aq
 
-#write dict2str(args);
-#write dict2str(env);
-
 abc.def := 2;
 write int2str(abc.def);
 
@@ -16,16 +13,6 @@ write dict2str(a);
 write a.mykey;
 write bool2str('myvalue' : a);
 
-if a.mykey eq 'myvalue' (
-    write 'OK';
-) else (
-    write 'NOT OK';
-)
-
-for i from 10 to 1 step -3 (
-    write int2str(i);
-)
-
 remove a['mystringkey'];
 call foreach(a, \k, v -> (
     if integer(k) and integer(v) (
@@ -37,9 +24,6 @@ call foreach(a, \k, v -> (
     )
 ));
 
-x := 'abc';
-write int2str(length(x));
-
 # array example
 array := { 5, 4, 3, 2, 1 };
 array[4] := 42;
@@ -48,11 +32,3 @@ write dict2str(array);
 call foreach(array, \k, v -> (
     write int2str(v);
 ));
-
-write bool2str(str2bool('true'));
-write dict2str(str2dict('{a:42}'));
-write int2str(str2int('42'));
-
-y := 123;
-#y := 'abc'; # error
-write int2str(y);

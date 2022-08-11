@@ -1,0 +1,27 @@
+#!/usr/local/bin/aq
+
+write switch 'a':
+    default: 'OK';
+
+write switch 'a':
+    case 'a': 'OK'
+    default: 'NOT OK';
+
+write switch 'b':
+    case 'a': 'NOT OK'
+    default: 'OK';
+
+write switch 'a':
+    case 'a': 'OK'
+    case 'b': 'NOT OK'
+    default: 'NOT OK';
+
+write switch 'b':
+    case 'a': 'NOT OK'
+    case 'b': 'OK'
+    default: 'NOT OK';
+
+write switch 'c':
+    case 'a': 'NOT OK'
+    case 'b': 'NOT OK'
+    default: 'OK';

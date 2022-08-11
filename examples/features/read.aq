@@ -1,0 +1,7 @@
+#!/usr/local/bin/aq
+
+# reads a line from the command line and echoes it back to the user
+
+read line;
+
+write line;

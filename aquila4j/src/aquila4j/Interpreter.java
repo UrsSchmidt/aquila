@@ -9,12 +9,12 @@ import aquila4j.antlr.AquilaParser.SwitchStatementContext;
 import aquila4j.antlr.AquilaParser.SwitchStatementLabelsContext;
 import aquila4j.antlr.AquilaParser.LoopStatementContext;
 import aquila4j.antlr.AquilaParser.ForStatementContext;
+import aquila4j.antlr.AquilaParser.CallStatementContext;
 import aquila4j.antlr.AquilaParser.ReadStatementContext;
 import aquila4j.antlr.AquilaParser.WriteStatementContext;
-import aquila4j.antlr.AquilaParser.AssignStatementContext;
-import aquila4j.antlr.AquilaParser.CallStatementContext;
 import aquila4j.antlr.AquilaParser.RemoveStatementContext;
 import aquila4j.antlr.AquilaParser.RunStatementContext;
+import aquila4j.antlr.AquilaParser.AssignStatementContext;
 import aquila4j.antlr.AquilaParser.BlockContext;
 import aquila4j.antlr.AquilaParser.LhsContext;
 import aquila4j.antlr.AquilaParser.LhsPartContext;
@@ -92,7 +92,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             } else {
                 final String s1 = Interpreter.toString(a1);
                 final String s2 = Interpreter.toString(a2);
-                if (s1.matches("[0-9]+") && s2.matches("[0-9]+")) {
+                if (Helper.strIsNumeric(s1) && Helper.strIsNumeric(s2)) {
                     result = Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
                 } else {
                     result = s1.compareTo(s2);
@@ -107,6 +107,138 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static Stack<Map> variables = new Stack<>();
 
     private final File scriptRoot;
+
+    private static String typeOf(Object o) {
+        if (o == null) {
+            return "<err:no-value>";
+        } else if (o instanceof Boolean) {
+            return TYPE_BOOL;
+        } else if (o instanceof BigInteger) {
+            return TYPE_INT;
+        } else if (o instanceof String) {
+            return TYPE_STR;
+        } else if (o instanceof LambdaExpressionContext) {
+            return TYPE_FUNC;
+        } else if (o instanceof Map) {
+            return TYPE_DICT;
+        } else {
+            return "<err:invalid-type>";
+        }
+    }
+
+    private static Boolean toBoolean(String s, ParserRuleContext ctx) {
+        return s != null && s.equals("true");
+    }
+
+    private static BigInteger toInteger(String s, ParserRuleContext ctx) {
+        BigInteger result;
+        if (Helper.strIsNumeric(s)) {
+            result = new BigInteger(s);
+        } else {
+            result = BigInteger.ZERO;
+        }
+        return result;
+    }
+
+    private static String toString(Object o) {
+        String result;
+        if (o == null) {
+            result = "<err:no-value>";
+        } else if (o instanceof Boolean) {
+            final Boolean b = (Boolean) o;
+            result = b ? "true" : "false";
+        } else if (o instanceof BigInteger) {
+            final BigInteger i = (BigInteger) o;
+            result = i.toString();
+        } else if (o instanceof String) {
+            final String s = (String) o;
+            result = s.toString();
+        } else if (o instanceof LambdaExpressionContext) {
+            final LambdaExpressionContext f = (LambdaExpressionContext) o;
+            result = f.getText();
+        } else if (o instanceof Map) {
+            final Map d = (Map) o;
+            StringBuilder sb = new StringBuilder();
+            sb.append("{\n");
+            for (Object key : d.keySet()) {
+                final Object value = d.get(key);
+                sb.append(toString(key)).append(": ");
+                if (value instanceof String) {
+                    sb.append("'").append(toString(value)).append("'");
+                } else {
+                    sb.append(toString(value));
+                }
+                sb.append(",\n");
+            }
+            sb.append("}");
+            result = sb.toString();
+        } else {
+            result = "<err:invalid-type>";
+        }
+        return result;
+    }
+
+    private static Map toDictionary(String s, ParserRuleContext ctx) {
+        if (s != null) {
+            try {
+                AquilaLexer lexer = new AquilaLexer(CharStreams.fromString(s));
+                AquilaParser parser = new AquilaParser(new CommonTokenStream(lexer));
+                DictAggregateContext dictAggregate = parser.dictAggregate();
+                if (parser.getNumberOfSyntaxErrors() == 0) {
+                    return (Map) new Interpreter(new String[0]).visit(dictAggregate);
+                }
+            } catch (Exception e) {
+                /* do nothing */
+            }
+        }
+        return new TreeMap<>(DICT_COMPARATOR);
+    }
+
+    private static void error(String msg, ParserRuleContext ctx) {
+        final Token token = ctx.getStart();
+        System.err.println("ERROR: " + msg + " @L" + token.getLine() + ":C" + token.getCharPositionInLine() + ":`" + ctx.getText() + "`");
+        System.exit(1);
+    }
+
+    private static void exception(Exception e, ParserRuleContext ctx) {
+        error("An exception occurred: " + e.getClass().getSimpleName() + ": `" + e.getMessage() + "`", ctx);
+    }
+
+    private static void fileNotFound(File file, ParserRuleContext ctx) {
+        error("File not found! Expected: " + file, ctx);
+    }
+
+    private static void missingKey(Map expected, Object wasKey, ParserRuleContext ctx) {
+        error("Missing key! Expected one of: " + expected.keySet() + ", but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
+    }
+
+    private static void expectedNonVoidFunction(ParserRuleContext ctx) {
+        error("Expected non-void " + TYPE_FUNC + "!", ctx);
+    }
+
+    private static void typeMismatch(String expectedType, Object wasValue, ParserRuleContext ctx) {
+        error("Type mismatch! Expected type `" + expectedType + "`, but was `" + toString(wasValue) + "` which is of type `" + typeOf(wasValue) + "`!", ctx);
+    }
+
+    private static void wrongKey(String expectedKey, Object wasKey, ParserRuleContext ctx) {
+        error("Wrong key! Expected key `" + expectedKey + "`, but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
+    }
+
+    private static void wrongNumberOfArguments(int expected, int was, ParserRuleContext ctx) {
+        error("Wrong number of arguments! Expected " + expected + ", but was " + was + "!", ctx);
+    }
+
+    private static void assign(Map d, Object key, Object value, ParserRuleContext ctx) {
+        if (STRICT && d.containsKey(key)) {
+            final String expected = typeOf(d.get(key));
+            final String was = typeOf(value);
+            if (!expected.equals(was)) {
+                typeMismatch(expected, value, ctx);
+                return;
+            }
+        }
+        d.put(key, value);
+    }
 
     public Interpreter(String[] args) {
         super();
@@ -125,6 +257,105 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             envMap.put(envName, env.get(envName));
         }
         variables.peek().put("env", envMap);
+    }
+
+    private void handleLhs(LhsContext lhsc, BiConsumer<Map, Object> handler) {
+        final String identifier = lhsc.Identifier().getText();
+        if (lhsc.lhsPart().isEmpty()) {
+            handler.accept(variables.peek(), identifier);
+        } else {
+            if (!variables.peek().containsKey(identifier)) {
+                variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
+            }
+            Object result = variables.peek().get(identifier);
+            for (int i = 0; i < lhsc.lhsPart().size(); i++) {
+                final LhsPartContext lhspc = lhsc.lhsPart(i);
+                Object key;
+                if (lhspc.Identifier() != null) {
+                    key = lhspc.Identifier().getText();
+                } else if (lhspc.expression() != null) {
+                    key = visit(lhspc.expression());
+                } else {
+                    throw new AssertionError();
+                }
+                if (i < lhsc.lhsPart().size() - 1) {
+                    if (result instanceof Map) {
+                        final Map d = (Map) result;
+                        if (!d.containsKey(key)) {
+                            d.put(key, new TreeMap<>(DICT_COMPARATOR));
+                        }
+                        result = d.get(key);
+                    } else {
+                        typeMismatch(TYPE_DICT, result, lhspc);
+                        return;
+                    }
+                } else {
+                    if (result instanceof Map) {
+                        final Map d = (Map) result;
+                        handler.accept(d, key);
+                    } else {
+                        typeMismatch(TYPE_DICT, result, lhspc);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private Object callFunction(FunctionCallContext callsite, LambdaExpressionContext function, List<Object> arguments) {
+        List<String> parameters = new ArrayList<>();
+        List<String> types = new ArrayList<>();
+        for (LambdaExpressionParameterContext lepc : function.lambdaExpressionParameter()) {
+            parameters.add(lepc.Identifier().getText());
+            types.add(lepc.Type() != null ? lepc.Type().getText() : TYPE_ANY);
+        }
+        if (!checkArgs(callsite, arguments, types.toArray(new String[0]))) {
+            return null;
+        }
+        variables.push(new TreeMap<>(variables.peek()));
+        for (int i = 0; i < parameters.size(); i++) {
+            final String parameter = parameters.get(i);
+            final Object argument = arguments.get(i);
+            // TODO does this have to be fully qualified?
+            variables.peek().put(parameter, argument);
+        }
+        Object result;
+        if (function.expression() != null) {
+            result = visit(function.expression());
+        } else if (function.block() != null) {
+            visit(function.block());
+            result = null;
+        } else {
+            throw new AssertionError();
+        }
+        variables.pop();
+        return result;
+    }
+
+    private static boolean checkArgs(FunctionCallContext callsite, List<Object> arguments, String... types) {
+        return checkArgsHelper(callsite, arguments, true, types);
+    }
+
+    private static boolean checkArgsNoFail(FunctionCallContext callsite, List<Object> arguments, String... types) {
+        return checkArgsHelper(callsite, arguments, false, types);
+    }
+
+    private static boolean checkArgsHelper(FunctionCallContext callsite, List<Object> arguments, boolean failOnTypeMismatch, String... types) {
+        if (arguments.size() != types.length) {
+            wrongNumberOfArguments(types.length, arguments.size(), callsite);
+            return false;
+        }
+        for (int i = 0; i < types.length; i++) {
+            final String type = types[i];
+            final Object argument = arguments.get(i);
+            if (!type.equals(TYPE_ANY) && !typeOf(argument).equals(type)) {
+                if (failOnTypeMismatch) {
+                    typeMismatch(type, argument, callsite.arguments.get(i));
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -248,9 +479,15 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     }
 
     @Override
+    public Object visitCallStatement(CallStatementContext ctx) {
+        visit(ctx.functionCall());
+        return null;
+    }
+
+    @Override
     public Object visitReadStatement(ReadStatementContext ctx) {
         final String line = new Scanner(System.in).nextLine();
-        handleLhs(ctx.lhs(), (map, key) -> assign(map, key, line, ctx));
+        handleLhs(ctx.lhs(), (d, key) -> assign(d, key, line, ctx));
         return null;
     }
 
@@ -267,86 +504,16 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     }
 
     @Override
-    public Object visitAssignStatement(AssignStatementContext ctx) {
-        final Object rhs = visit(ctx.rhs);
-        handleLhs(ctx.lhs(), (map, key) -> assign(map, key, rhs, ctx.rhs));
-        return null;
-    }
-
-    private static void assign(Map d, Object key, Object value, ParserRuleContext ctx) {
-        if (STRICT && d.containsKey(key)) {
-            final String expected = typeOf(d.get(key));
-            final String was = typeOf(value);
-            if (!expected.equals(was)) {
-                typeMismatch(expected, value, ctx);
-                return;
-            }
-        }
-        d.put(key, value);
-    }
-
-    @Override
-    public Object visitCallStatement(CallStatementContext ctx) {
-        visit(ctx.functionCall());
-        return null;
-    }
-
-    @Override
     public Object visitRemoveStatement(RemoveStatementContext ctx) {
-        handleLhs(ctx.lhs(), (map, key) -> {
-            if (map.containsKey(key)) {
-                map.remove(key);
+        handleLhs(ctx.lhs(), (d, key) -> {
+            if (d.containsKey(key)) {
+                d.remove(key);
             } else {
-                missingKey(map, key, ctx);
+                missingKey(d, key, ctx);
                 return;
             }
         });
         return null;
-    }
-
-    private void handleLhs(LhsContext lhsc, BiConsumer<Map, Object> handler) {
-        final String identifier = lhsc.Identifier().getText();
-        if (lhsc.lhsPart().isEmpty()) {
-            handler.accept(variables.peek(), identifier);
-        } else {
-            if (!variables.peek().containsKey(identifier)) {
-                variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
-            }
-            Object result = variables.peek().get(identifier);
-            for (int i = 0; i < lhsc.lhsPart().size(); i++) {
-                final LhsPartContext lhspc = lhsc.lhsPart(i);
-                Object key;
-                if (lhspc.Identifier() != null) {
-                    key = lhspc.Identifier().getText();
-                } else if (lhspc.expression() != null) {
-                    key = visit(lhspc.expression());
-                } else {
-                    throw new AssertionError();
-                }
-                if (i < lhsc.lhsPart().size() - 1) {
-                    if (result instanceof Map) {
-                        final Map d = (Map) result;
-                        if (d.containsKey(key)) {
-                            result = d.get(key);
-                        } else {
-                            missingKey(d, key, lhspc);
-                            return;
-                        }
-                    } else {
-                        typeMismatch(TYPE_DICT, result, lhspc);
-                        return;
-                    }
-                } else {
-                    if (result instanceof Map) {
-                        final Map d = (Map) result;
-                        handler.accept(d, key);
-                    } else {
-                        typeMismatch(TYPE_DICT, result, lhspc);
-                        return;
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -370,6 +537,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             typeMismatch(TYPE_STR, rhs, ctx.rhs);
             return null;
         }
+        return null;
+    }
+
+    @Override
+    public Object visitAssignStatement(AssignStatementContext ctx) {
+        final Object rhs = visit(ctx.rhs);
+        handleLhs(ctx.lhs(), (d, key) -> assign(d, key, rhs, ctx.rhs));
         return null;
     }
 
@@ -412,7 +586,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         variables.push(new TreeMap<>(variables.peek()));
         for (LetBindExpressionContext lbec : ctx.letBindExpression()) {
             final Object rhs = visit(lbec.rhs);
-            handleLhs(lbec.lhs(), (map, key) -> assign(map, key, rhs, lbec));
+            handleLhs(lbec.lhs(), (d, key) -> assign(d, key, rhs, lbec));
         }
         final Object result = visit(ctx.body);
         variables.pop();
@@ -750,7 +924,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (result instanceof BigInteger) {
                 switch (ctx.factorialOperator().getText()) {
                 case "!":
-                    result = factorial((BigInteger) result);
+                    result = Helper.intFactorial((BigInteger) result);
                     break;
                 default:
                     throw new AssertionError();
@@ -761,15 +935,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
         }
         return result;
-    }
-
-    private static BigInteger factorial(BigInteger n) {
-        if (n == null || n.compareTo(BigInteger.ONE) < 0) {
-            throw new IllegalArgumentException();
-        }
-        return n.equals(BigInteger.ONE)
-            ? BigInteger.ONE
-            : n.multiply(factorial(n.subtract(BigInteger.ONE)));
     }
 
     @Override
@@ -862,11 +1027,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitLiteral(LiteralContext ctx) {
         if (ctx.String() != null) {
-            return dropQuotes(ctx.String().getText());
+            return Helper.strDropQuotes(ctx.String().getText());
         } else if (ctx.Integer() != null) {
             String s = ctx.Integer().getText();
             int radix = 10;
-            if (!s.matches("[0-9]+")) {
+            if (!Helper.strIsNumeric(s)) {
                 if (s.startsWith("0b")) {
                     radix = 2;
                 } else if (s.startsWith("0o")) {
@@ -974,17 +1139,17 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final TreeMap arg1 = (TreeMap) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
-            final Map resultMap = new TreeMap<>(DICT_COMPARATOR);
+            final Map d = new TreeMap<>(DICT_COMPARATOR);
             for (Object key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
                 localArguments.add(value);
                 if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
-                    resultMap.put(key, value);
+                    d.put(key, value);
                 }
             }
-            result = resultMap;
+            result = d;
         }   break;
         case "findleft": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
@@ -1114,16 +1279,16 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final TreeMap arg1 = (TreeMap) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
-            final Map resultMap = new TreeMap<>(DICT_COMPARATOR);
+            final Map d = new TreeMap<>(DICT_COMPARATOR);
             for (Object key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
                 localArguments.add(value);
                 final Object newValue = callFunction(ctx, arg2, localArguments);
-                resultMap.put(key, newValue);
+                d.put(key, newValue);
             }
-            result = resultMap;
+            result = d;
         }   break;
         case "mid": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
@@ -1207,11 +1372,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             final String arg2 = (String) arguments.get(1);
             final String[] parts = arg2.split(arg1, -1);
-            final Map resultMap = new TreeMap<>(DICT_COMPARATOR);
+            final Map d = new TreeMap<>(DICT_COMPARATOR);
             for (int i = 0; i < parts.length; i++) {
-                resultMap.put(BigInteger.valueOf(i), parts[i]);
+                d.put(BigInteger.valueOf(i), parts[i]);
             }
-            result = resultMap;
+            result = d;
         }   break;
         case "sqrt": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
@@ -1287,62 +1452,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         return result;
     }
 
-    private Object callFunction(FunctionCallContext callsite, LambdaExpressionContext function, List<Object> arguments) {
-        List<String> parameters = new ArrayList<>();
-        List<String> types = new ArrayList<>();
-        for (LambdaExpressionParameterContext lepc : function.lambdaExpressionParameter()) {
-            parameters.add(lepc.Identifier().getText());
-            types.add(lepc.Type() != null ? lepc.Type().getText() : TYPE_ANY);
-        }
-        if (!checkArgs(callsite, arguments, types.toArray(new String[0]))) {
-            return null;
-        }
-        variables.push(new TreeMap<>(variables.peek()));
-        for (int i = 0; i < parameters.size(); i++) {
-            final String parameter = parameters.get(i);
-            final Object argument = arguments.get(i);
-            // TODO does this have to be fully qualified?
-            variables.peek().put(parameter, argument);
-        }
-        Object result;
-        if (function.expression() != null) {
-            result = visit(function.expression());
-        } else if (function.block() != null) {
-            visit(function.block());
-            result = null;
-        } else {
-            throw new AssertionError();
-        }
-        variables.pop();
-        return result;
-    }
-
-    private static boolean checkArgs(FunctionCallContext callsite, List<Object> arguments, String... types) {
-        return checkArgsHelper(callsite, arguments, true, types);
-    }
-
-    private static boolean checkArgsNoFail(FunctionCallContext callsite, List<Object> arguments, String... types) {
-        return checkArgsHelper(callsite, arguments, false, types);
-    }
-
-    private static boolean checkArgsHelper(FunctionCallContext callsite, List<Object> arguments, boolean failOnTypeMismatch, String... types) {
-        if (arguments.size() != types.length) {
-            wrongNumberOfArguments(types.length, arguments.size(), callsite);
-            return false;
-        }
-        for (int i = 0; i < types.length; i++) {
-            final String type = types[i];
-            final Object argument = arguments.get(i);
-            if (!type.equals(TYPE_ANY) && !typeOf(argument).equals(type)) {
-                if (failOnTypeMismatch) {
-                    typeMismatch(type, argument, callsite.arguments.get(i));
-                }
-                return false;
-            }
-        }
-        return true;
-    }
-
     @Override
     public Object visitAccessExpression(AccessExpressionContext ctx) {
         final String identifier = ctx.Identifier().getText();
@@ -1378,138 +1487,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitAccessExpressionPart(AccessExpressionPartContext ctx) {
         throw new AssertionError();
-    }
-
-    private static String dropQuotes(String s) {
-        if (s == null || s.length() < 2 || !s.startsWith("'") || !s.endsWith("'")) {
-            throw new IllegalArgumentException();
-        }
-        return s.substring(1, s.length() - 1);
-    }
-
-    private static String typeOf(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        if (o instanceof Boolean) {
-            return TYPE_BOOL;
-        } else if (o instanceof BigInteger) {
-            return TYPE_INT;
-        } else if (o instanceof String) {
-            return TYPE_STR;
-        } else if (o instanceof LambdaExpressionContext) {
-            return TYPE_FUNC;
-        } else if (o instanceof Map) {
-            return TYPE_DICT;
-        } else {
-            throw new AssertionError();
-        }
-    }
-
-    private static Boolean toBoolean(String s, ParserRuleContext ctx) {
-        if (s == null) {
-            throw new NullPointerException();
-        }
-        return s.equals("true");
-    }
-
-    private static BigInteger toInteger(String s, ParserRuleContext ctx) {
-        if (s == null) {
-            throw new NullPointerException();
-        }
-        if (s.matches("[0-9]+")) {
-            return new BigInteger(s);
-        } else {
-            return BigInteger.ZERO;
-        }
-    }
-
-    private static String toString(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        if (o instanceof Boolean) {
-            final Boolean b = (Boolean) o;
-            return b ? "true" : "false";
-        } else if (o instanceof BigInteger) {
-            final BigInteger i = (BigInteger) o;
-            return i.toString();
-        } else if (o instanceof String) {
-            final String s = (String) o;
-            return s.toString();
-        } else if (o instanceof LambdaExpressionContext) {
-            final LambdaExpressionContext f = (LambdaExpressionContext) o;
-            return f.getText();
-        } else if (o instanceof Map) {
-            final Map d = (Map) o;
-            StringBuilder result = new StringBuilder();
-            result.append("{\n");
-            for (Object key : d.keySet()) {
-                final Object value = d.get(key);
-                result.append(toString(key)).append(": ");
-                if (value instanceof String) {
-                    result.append("'").append(toString(value)).append("'");
-                } else {
-                    result.append(toString(value));
-                }
-                result.append(",\n");
-            }
-            result.append("}");
-            return result.toString();
-        } else {
-            throw new AssertionError();
-        }
-    }
-
-    private static Map toDictionary(String s, ParserRuleContext ctx) {
-        if (s == null) {
-            throw new NullPointerException();
-        }
-        try {
-            AquilaLexer lexer = new AquilaLexer(CharStreams.fromString(s));
-            AquilaParser parser = new AquilaParser(new CommonTokenStream(lexer));
-            DictAggregateContext dictAggregate = parser.dictAggregate();
-            if (parser.getNumberOfSyntaxErrors() == 0) {
-                return (Map) new Interpreter(new String[0]).visit(dictAggregate);
-            }
-        } catch (Exception e) {
-            /* do nothing */
-        }
-        return new TreeMap<>(DICT_COMPARATOR);
-    }
-
-    private static void exception(Exception e, ParserRuleContext ctx) {
-        error("An exception occurred: " + e.getClass().getSimpleName() + ": `" + e.getMessage() + "`", ctx);
-    }
-
-    private static void fileNotFound(File file, ParserRuleContext ctx) {
-        error("File not found! Expected: " + file, ctx);
-    }
-
-    private static void missingKey(Map expectedMap, Object wasKey, ParserRuleContext ctx) {
-        error("Missing key! Expected one of: " + expectedMap.keySet() + ", but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
-    }
-
-    private static void expectedNonVoidFunction(ParserRuleContext ctx) {
-        error("Expected non-void " + TYPE_FUNC + "!", ctx);
-    }
-
-    private static void typeMismatch(String expectedType, Object wasValue, ParserRuleContext ctx) {
-        error("Type mismatch! Expected type `" + expectedType + "`, but was `" + toString(wasValue) + "` which is of type `" + typeOf(wasValue) + "`!", ctx);
-    }
-
-    private static void wrongKey(String expectedKey, Object wasKey, ParserRuleContext ctx) {
-        error("Wrong key! Expected key `" + expectedKey + "`, but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
-    }
-
-    private static void wrongNumberOfArguments(int expected, int was, ParserRuleContext ctx) {
-        error("Wrong number of arguments! Expected " + expected + ", but was " + was + "!", ctx);
-    }
-
-    private static void error(String msg, ParserRuleContext ctx) {
-        final Token token = ctx.getStart();
-        System.err.println("ERROR: " + msg + " @L" + token.getLine() + ":C" + token.getCharPositionInLine() + ":`" + ctx.getText() + "`");
-        System.exit(1);
     }
 
 }

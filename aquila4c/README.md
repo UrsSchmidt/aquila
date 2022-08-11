@@ -1,6 +1,6 @@
 # aquila4c
 
-This is the C++ implementation of Aquila. **This is a work in progress.**
+This is the C++ 17 implementation of Aquila. **This is a work in progress.**
 
 ## Building the interpreter
 

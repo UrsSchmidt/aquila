@@ -6,14 +6,15 @@ program
 
 statement
     : ifStatement
+    | switchStatement
     | loopStatement
     | forStatement
+    | callStatement
     | readStatement
     | writeStatement
-    | assignStatement
-    | callStatement
     | removeStatement
     | runStatement
+    | assignStatement
     ;
 
 ifStatement
@@ -41,6 +42,10 @@ forStatement
     : 'for' Identifier 'from' from=expression 'to' to=expression ('step' step=expression)? block
     ;
 
+callStatement
+    : 'call' functionCall ';'
+    ;
+
 readStatement
     : 'read' lhs ';'
     ;
@@ -49,20 +54,16 @@ writeStatement
     : 'write' rhs=expression ';'
     ;
 
-assignStatement
-    : lhs ':=' rhs=expression ';'
-    ;
-
-callStatement
-    : 'call' functionCall ';'
-    ;
-
 removeStatement
     : 'remove' lhs ';'
     ;
 
 runStatement
     : 'run' rhs=expression ';'
+    ;
+
+assignStatement
+    : lhs ':=' rhs=expression ';'
     ;
 
 block
