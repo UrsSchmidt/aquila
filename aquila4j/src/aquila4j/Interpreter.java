@@ -1255,6 +1255,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             final String arg1 = (String) arguments.get(0);
             final Map arg2 = (Map) arguments.get(1);
+            // FIXME this won't call my custom toString() method on the individual values
             result = String.join(arg1, arg2.values());
         }   break;
         case "left": {

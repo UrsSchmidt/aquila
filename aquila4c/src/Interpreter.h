@@ -3,6 +3,7 @@
 #include "../gen/AquilaVisitor.h"
 
 #include <any>
+#include <filesystem>
 #include <gmp.h>
 #include <map>
 #include <string>
@@ -35,7 +36,10 @@ typedef
 class Interpreter : public AquilaVisitor {
 private:
 
-    void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, std::string)> handler);
+    char* script_caller;
+    std::filesystem::path script_root;
+
+    void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, String)> handler);
 
     Any callFunction(AquilaParser::FunctionCallContext* callsite, Function& function, const std::vector<Any>& arguments);
     bool checkArgs(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types);
