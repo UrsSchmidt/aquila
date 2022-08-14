@@ -100,7 +100,7 @@ String toString(const Any& o) {
         String s = *toStr(o);
         result = s;
     } else if (isFunc(o)) {
-        Function* f = toFunc((Any&) o);
+        Function f = *toFunc((Any&) o);
         result = f->getText();
     } else if (isDict(o)) {
         Dictionary d = *toDict((Any&) o);
@@ -162,7 +162,7 @@ bool anyEquals(const Any& a, const Any& b) {
            (isBool(a) && isBool(b) && *toBool(a) == *toBool(b))
         || (isInt(a)  && isInt(b)  && mpz_cmp(toInt(a)->i, toInt(b)->i) == 0)
         || (isStr(a)  && isStr(b)  && strEquals(*toStr(a), *toStr(b)))
-        || (isFunc(a) && isFunc(b) && toFunc(a) == toFunc(b))
+        || (isFunc(a) && isFunc(b) && *toFunc(a) == *toFunc(b))
         || (isDict(a) && isDict(b) && toDict(a) == toDict(b));
     DEBUG_END_R(result);
     return result;
@@ -247,30 +247,22 @@ Interpreter::Interpreter(int argc, char* argv[]) {
     variables.push_back(new Dictionary());
     /* passing command line arguments */
     /* TODO
-    Map argsMap = new TreeMap<>(DICT_COMPARATOR);
+    Dictionary argsD;
     for (int i = 0; i < args.length; i++) {
-        argsMap.put(BigInteger.valueOf(i), args[i]);
+        argsD.put(BigInteger.valueOf(i), args[i]);
     }
-    variables.peek().put("args", argsMap);
+    variables.peek().put("args", argsD);
     */
     /* passing environment variables */
     /* TODO
-    Map envMap = new TreeMap<>(DICT_COMPARATOR);
+    Dictionary envD;
     final Map<String, String> env = System.getenv();
     for (String envName : env.keySet()) {
-        envMap.put(envName, env.get(envName));
+        envD.put(envName, env.get(envName));
     }
-    variables.peek().put("env", envMap);
+    variables.peek().put("env", envD);
     */
     DEBUG_CTX();
-    DEBUG_END();
-}
-
-Interpreter::~Interpreter() {
-    DEBUG_BGN();
-    DEBUG_CTX();
-    delete variables.back();
-    variables.pop_back();
     DEBUG_END();
 }
 
@@ -328,7 +320,7 @@ Any Interpreter::callFunction(AquilaParser::FunctionCallContext* callsite, Funct
     DEBUG_BGN();
     std::vector<std::string> parameters;
     std::vector<std::string> types;
-    for (AquilaParser::LambdaExpressionParameterContext* lepc : function.lambdaExpressionParameter()) {
+    for (AquilaParser::LambdaExpressionParameterContext* lepc : function->lambdaExpressionParameter()) {
         parameters.push_back(lepc->Identifier()->getText());
         types.push_back(lepc->Type() ? lepc->Type()->getText() : TYPE_ANY);
     }
@@ -344,10 +336,10 @@ Any Interpreter::callFunction(AquilaParser::FunctionCallContext* callsite, Funct
         (*variables.back())[parameter] = argument;
     }
     Any result;
-    if (function.expression()) {
-        result = visit(function.expression());
-    } else if (function.block()) {
-        visit(function.block());
+    if (function->expression()) {
+        result = visit(function->expression());
+    } else if (function->block()) {
+        visit(function->block());
         result = 0;
     } else {
         assert(0);
@@ -573,6 +565,7 @@ Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
                 int argc = 2;
                 char* argv[] = { script_caller, (char*) file.c_str() };
                 run(argc, argv);
+                DEBUG_CTX();
             } catch (std::exception& e) {
                 exception(e, ctx->rhs);
                 assert(0);
@@ -1148,21 +1141,19 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             assert(0);
         }
         Dictionary arg1 = *toDict(arguments[0]);
-        //Function arg2 = *toFunc(arguments[1]);
-        /* TODO
+        Function arg2 = *toFunc(arguments[1]);
         std::vector<Any> localArguments;
         result = false;
-        for (std::string key : arg1.keySet()) {
-            const Any value = arg1[key];
+        for (const auto& [key, value] : arg1) {
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
-            if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
+            Any condition = callFunction(ctx, arg2, localArguments);
+            if (isBool(condition) && *toBool(condition)) {
                 result = true;
                 break;
             }
         }
-        */
     } else if (strEquals(identifier, "exit")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
@@ -1175,21 +1166,19 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             assert(0);
         }
         Dictionary arg1 = *toDict(arguments[0]);
-        //Function arg2 = *toFunc(arguments[1]);
-        /* TODO
+        Function arg2 = *toFunc(arguments[1]);
         std::vector<Any> localArguments;
-        Dictionary d = new TreeMap<>(DICT_COMPARATOR);
-        for (std::string key : arg1.keySet()) {
-            const Any value = arg1.get(key);
+        Dictionary d;
+        for (const auto& [key, value] : arg1) {
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
-            if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
+            Any condition = callFunction(ctx, arg2, localArguments);
+            if (isBool(condition) && *toBool(condition)) {
                 d[key] = value;
             }
         }
         result = d;
-        */
     } else if (strEquals(identifier, "findleft")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_INT })) {
             assert(0);
@@ -1216,55 +1205,47 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         Dictionary arg1 = *toDict(arguments[0]);
         Any arg2 = arguments[1];
-        //Function arg3 = *toFunc(arguments[2]);
-        /* TODO
+        Function arg3 = *toFunc(arguments[2]);
         std::vector<Any> localArguments;
         result = arg2;
-        for (std::string key : arg1.keySet()) {
-            const Any value = arg1.get(key);
+        for (const auto& [key, value] : arg1) {
             localArguments.clear();
             localArguments.push_back(result);
             localArguments.push_back(value);
             result = callFunction(ctx, arg3, localArguments);
         }
-        */
     } else if (strEquals(identifier, "forall")) {
         if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
             assert(0);
         }
         Dictionary arg1 = *toDict(arguments[0]);
-        //Function arg2 = *toFunc(arguments[1]);
-        /* TODO
+        Function arg2 = *toFunc(arguments[1]);
         std::vector<Any> localArguments;
         result = true;
-        for (std::string key : arg1.keySet()) {
-            const Any value = arg1.get(key);
+        for (const auto& [key, value] : arg1) {
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
-            if (!Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
+            Any condition = callFunction(ctx, arg2, localArguments);
+            if (!isBool(condition) || !*toBool(condition)) {
                 result = false;
                 break;
             }
         }
-        */
     } else if (strEquals(identifier, "foreach")) {
         if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
             assert(0);
         }
         Dictionary arg1 = *toDict(arguments[0]);
-        //Function arg2 = *toFunc(arguments[1]);
-        /* TODO
+        Function arg2 = *toFunc(arguments[1]);
         std::vector<Any> localArguments;
-        for (std::string key : arg1.keySet()) {
-            const Any value = arg1.get(key);
+        for (const auto& [key, value] : arg1) {
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
             callFunction(ctx, arg2, localArguments);
         }
-        result = null;
-        */
+        result = POISON;
     } else if (strEquals(identifier, "function")) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_FUNC });
     } else if (strEquals(identifier, "gcd")) {
@@ -1327,12 +1308,10 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             assert(0);
         }
         Dictionary arg1 = *toDict(arguments[0]);
-        //Function arg2 = *toFunc(arguments[1]);
-        /* TODO
+        Function arg2 = *toFunc(arguments[1]);
         std::vector<Any> localArguments;
-        Dictionary d = new TreeMap<>(DICT_COMPARATOR);
-        for (std::string key : arg1.keySet()) {
-            const Any value = arg1.get(key);
+        Dictionary d;
+        for (const auto& [key, value] : arg1) {
             localArguments.clear();
             localArguments.push_back(key);
             localArguments.push_back(value);
@@ -1340,7 +1319,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             d[key] = newValue;
         }
         result = d;
-        */
     } else if (strEquals(identifier, "mid")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT, TYPE_INT })) {
             assert(0);
@@ -1488,8 +1466,8 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         if (d.count(identifier)) {
             Any object = d[identifier];
             if (isFunc(object)) {
-                Function* function = toFunc(object);
-                result = callFunction(ctx, *function, arguments);
+                Function function = *toFunc(object);
+                result = callFunction(ctx, function, arguments);
             } else {
                 typeMismatch(TYPE_FUNC, object, ctx);
                 assert(0);

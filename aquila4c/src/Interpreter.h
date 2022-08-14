@@ -27,7 +27,7 @@ typedef
     std::string
     String;
 typedef
-    AquilaParser::LambdaExpressionContext
+    AquilaParser::LambdaExpressionContext*
     Function;
 typedef
     std::map<std::string, Any, DictComparator>
@@ -49,8 +49,6 @@ private:
 public:
 
     Interpreter(int argc, char* argv[]);
-
-    ~Interpreter();
 
     Any visitProgram(AquilaParser::ProgramContext *ctx);
 
