@@ -52,6 +52,9 @@
 #define toFunc(x) (std::any_cast<Function>(&(x)))
 #define toDict(x) (std::any_cast<Dictionary>(&(x)))
 
+#define isTrue(x)  (isBool(x) && *toBool(x))
+#define isFalse(x) (!isBool(x) || !*toBool(x))
+
 /* variables are shared between multiple instances
    to allow for function declarations to be used in different files */
 std::vector<Dictionary*> variables;
@@ -402,7 +405,7 @@ Any Interpreter::visitIfStatement(AquilaParser::IfStatementContext *ctx) {
     DEBUG_BGN();
     for (size_t i = 0; i < ctx->condition.size(); i++) {
         Any condition = visit(ctx->condition[i]);
-        if (isBool(condition) && *toBool(condition)) {
+        if (isTrue(condition)) {
             visit(ctx->then[i]);
             goto end;
         }
@@ -447,7 +450,7 @@ Any Interpreter::visitLoopStatement(AquilaParser::LoopStatementContext *ctx) {
             visit(ctx->top);
         }
         Any condition = visit(ctx->expression());
-        if (!isBool(condition) || !*toBool(condition)) {
+        if (isFalse(condition)) {
             break;
         }
         if (ctx->bottom) {
@@ -616,7 +619,7 @@ Any Interpreter::visitIfExpression(AquilaParser::IfExpressionContext *ctx) {
     DEBUG_BGN();
     for (size_t i = 0; i < ctx->condition.size(); i++) {
         Any condition = visit(ctx->condition[i]);
-        if (isBool(condition) && *toBool(condition)) {
+        if (isTrue(condition)) {
             return visit(ctx->then[i]);
         }
     }
@@ -1149,7 +1152,7 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             localArguments.push_back(key);
             localArguments.push_back(value);
             Any condition = callFunction(ctx, arg2, localArguments);
-            if (isBool(condition) && *toBool(condition)) {
+            if (isTrue(condition)) {
                 result = true;
                 break;
             }
@@ -1174,7 +1177,7 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             localArguments.push_back(key);
             localArguments.push_back(value);
             Any condition = callFunction(ctx, arg2, localArguments);
-            if (isBool(condition) && *toBool(condition)) {
+            if (isTrue(condition)) {
                 d[key] = value;
             }
         }
@@ -1227,7 +1230,7 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             localArguments.push_back(key);
             localArguments.push_back(value);
             Any condition = callFunction(ctx, arg2, localArguments);
-            if (!isBool(condition) || !*toBool(condition)) {
+            if (isFalse(condition)) {
                 result = false;
                 break;
             }

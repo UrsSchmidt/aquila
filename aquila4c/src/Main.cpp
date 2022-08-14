@@ -33,8 +33,8 @@ int run(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    Interpreter interpreter(argc, argv);
-    interpreter.visit(tree);
+    Interpreter* interpreter = new Interpreter(argc, argv);
+    interpreter->visit(tree);
     return EXIT_SUCCESS;
 }
 
