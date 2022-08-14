@@ -3,8 +3,10 @@
 #include "Interpreter.h"
 #include "Main.h"
 
+#include <chrono>
 #include <filesystem>
 #include <sstream>
+#include <thread>
 
 //#define DEBUG true
 
@@ -169,7 +171,7 @@ bool anyEquals(const Any& a, const Any& b) {
 void error(const std::string& msg, antlr4::ParserRuleContext* ctx) {
     const auto token = ctx->getStart();
     std::cerr << "ERROR: " << msg << " @L" << token->getLine() << ":C" << token->getCharPositionInLine() << ":`" << ctx->getText() << "`" << std::endl;
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 void exception(const std::exception& e, antlr4::ParserRuleContext* ctx) {
@@ -1412,14 +1414,8 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             assert(0);
         }
         Integer arg1 = *toInt(arguments[0]);
-        /* TODO
-        try {
-            Thread.sleep(arg1.longValueExact());
-            result = true;
-        } catch (InterruptedException e) {
-            result = false;
-        }
-        */
+        std::this_thread::sleep_for(std::chrono::milliseconds(mpz_get_ui(arg1.i)));
+        result = true;
     } else if (strEquals(identifier, "split")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR })) {
             assert(0);

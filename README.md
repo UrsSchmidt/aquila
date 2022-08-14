@@ -223,9 +223,9 @@ There can be 0..n `case` parts and the `default` part is mandatory.
 
 ### Misc. built-in functions
 
- * `error(a)` exits the current script with the error message a and exit code 1
- * `exit(a)` exits the current script with exit code a
- * `sleep(a)` sleeps/waits for a milliseconds
+ * `error(a)` exits the current script with the error message `a` and exit code 1
+ * `exit(a)` exits the current script with exit code `a`
+ * `sleep(a)` sleeps/waits for `a` milliseconds
 
 ## Statements
 

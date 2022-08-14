@@ -265,11 +265,11 @@ Integer
 
 Type
     : 'Any'
+    | 'Boolean'
+    | 'Integer'
+    | 'String'
     | 'Function'
     | 'Dictionary'
-    | 'String'
-    | 'Integer'
-    | 'Boolean'
     ;
 
 False
