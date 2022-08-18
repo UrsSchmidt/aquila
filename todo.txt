@@ -8,6 +8,9 @@ rewrite the Interpreter in C++ as aquila4c
 
 fix all TODOs/FIXMEs
 
+use checkstyle for aquila4j
+use cpplint & cppcheck for aquila4c
+
 predefined functions:
     on strings:
         implement in Aquila as part of the prelude: matches (regex)
@@ -48,9 +51,6 @@ predefined functions:
             for each file in directory do ...
         content operations:
             read/write file line-by-line
-
-use checkstyle for aquila4j
-use cpplint & cppcheck for aquila4c
 
 look at older projects and merge with them
 

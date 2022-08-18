@@ -3,10 +3,15 @@
 #include "Interpreter.h"
 #include "Main.h"
 
-#include <chrono>
 #include <filesystem>
 #include <sstream>
+
+#define SUPPORT_SLEEP true
+
+#ifdef SUPPORT_SLEEP
+#include <chrono>
 #include <thread>
+#endif
 
 //#define DEBUG true
 
@@ -298,8 +303,8 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
                 if (isDict(result)) {
                     Dictionary d = *toDict(result);
                     if (!d.count(key)) {
-                        Dictionary d;
-                        d[key] = d;
+                        Dictionary e;
+                        d[key] = e;
                     }
                     result = d[key];
                 } else {
@@ -1394,8 +1399,10 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
         }
+#ifdef SUPPORT_SLEEP
         Integer arg1 = *toInt(arguments[0]);
         std::this_thread::sleep_for(std::chrono::milliseconds(mpz_get_ui(arg1.i)));
+#endif
         result = true;
     } else if (strEquals(identifier, "split")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR })) {

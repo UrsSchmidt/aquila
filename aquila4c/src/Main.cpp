@@ -21,20 +21,20 @@ int run(int argc, char* argv[]) {
     }
 
     std::ifstream infile(file);
-    antlr4::ANTLRInputStream input(infile);
-    AquilaLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    AquilaParser parser(&tokens);
-    antlr4::tree::ParseTree* tree = parser.program();
+    antlr4::ANTLRInputStream* input = new antlr4::ANTLRInputStream(infile);
+    AquilaLexer* lexer = new AquilaLexer(input);
+    antlr4::CommonTokenStream* tokens = new antlr4::CommonTokenStream(lexer);
+    AquilaParser* parser = new AquilaParser(tokens);
+    antlr4::tree::ParseTree* tree = parser->program();
 
-    const size_t nose = parser.getNumberOfSyntaxErrors();
+    const size_t nose = parser->getNumberOfSyntaxErrors();
     if (nose > 0) {
         std::cerr << "ERROR: There were syntax errors!" << std::endl;
         return EXIT_FAILURE;
     }
 
-    Interpreter* interpreter = new Interpreter(argc, argv);
-    interpreter->visit(tree);
+    Interpreter interpreter(argc, argv);
+    interpreter.visit(tree);
     return EXIT_SUCCESS;
 }
 
