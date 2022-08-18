@@ -267,7 +267,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!variables.peek().containsKey(identifier)) {
                 variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
             }
-            Object result = variables.peek().get(identifier);
+            Object a1 = variables.peek().get(identifier);
+            if (!(a1 instanceof Map)) {
+                typeMismatch(TYPE_DICT, a1, lhsc);
+                return;
+            }
+            Map d = (Map) a1;
             for (int i = 0; i < lhsc.lhsPart().size(); i++) {
                 final LhsPartContext lhspc = lhsc.lhsPart(i);
                 Object key;
@@ -279,24 +284,17 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                     throw new AssertionError();
                 }
                 if (i < lhsc.lhsPart().size() - 1) {
-                    if (result instanceof Map) {
-                        final Map d = (Map) result;
-                        if (!d.containsKey(key)) {
-                            d.put(key, new TreeMap<>(DICT_COMPARATOR));
-                        }
-                        result = d.get(key);
-                    } else {
-                        typeMismatch(TYPE_DICT, result, lhspc);
+                    if (!d.containsKey(key)) {
+                        d.put(key, new TreeMap<>(DICT_COMPARATOR));
+                    }
+                    Object a2 = d.get(key);
+                    if (!(a2 instanceof Map)) {
+                        typeMismatch(TYPE_DICT, a2, lhspc);
                         return;
                     }
+                    d = (Map) a2;
                 } else {
-                    if (result instanceof Map) {
-                        final Map d = (Map) result;
-                        handler.accept(d, key);
-                    } else {
-                        typeMismatch(TYPE_DICT, result, lhspc);
-                        return;
-                    }
+                    handler.accept(d, key);
                 }
             }
         }

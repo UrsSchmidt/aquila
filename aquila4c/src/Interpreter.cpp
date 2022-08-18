@@ -288,7 +288,12 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
             Dictionary d;
             (*variables.back())[identifier] = d;
         }
-        Any& result = (*variables.back())[identifier];
+        Any& a1 = (*variables.back())[identifier];
+        if (!isDict(a1)) {
+            typeMismatch(TYPE_DICT, a1, lhsc);
+            assert(0);
+        }
+        Dictionary* d = toDict(a1);
         for (size_t i = 0; i < lhsc->lhsPart().size(); i++) {
             AquilaParser::LhsPartContext* lhspc = lhsc->lhsPart()[i];
             std::string key;
@@ -300,24 +305,18 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
                 assert(0);
             }
             if (i < lhsc->lhsPart().size() - 1) {
-                if (isDict(result)) {
-                    Dictionary d = *toDict(result);
-                    if (!d.count(key)) {
-                        Dictionary e;
-                        d[key] = e;
-                    }
-                    result = d[key];
-                } else {
-                    typeMismatch(TYPE_DICT, result, lhspc);
+                if (!d->count(key)) {
+                    Dictionary e;
+                    (*d)[key] = e;
+                }
+                Any& a2 = (*d)[key];
+                if (!isDict(a2)) {
+                    typeMismatch(TYPE_DICT, a2, lhspc);
                     assert(0);
                 }
+                d = toDict(a2);
             } else {
-                if (isDict(result)) {
-                    handler(toDict(result), key);
-                } else {
-                    typeMismatch(TYPE_DICT, result, lhspc);
-                    assert(0);
-                }
+                handler(d, key);
             }
         }
     }
