@@ -1,0 +1,7 @@
+#!/usr/local/bin/aq
+
+f := \s : String -> (write s;);
+
+call f('Hello, world!'); # ok
+
+write f('Hello, world!'); # error

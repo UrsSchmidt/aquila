@@ -36,7 +36,7 @@
 // XXX make this an option
 #define STRICT true
 
-#define POISON 0
+#define POISON std::any()
 
 #define TYPE_ANY  "Any"
 #define TYPE_BOOL "Boolean"
@@ -57,14 +57,16 @@
 #define toFunc(x) (std::any_cast<Function>(&(x)))
 #define toDict(x) (std::any_cast<Dictionary>(&(x)))
 
-#define isTrue(x)  (isBool(x) && *toBool(x))
-#define isFalse(x) (!isBool(x) || !*toBool(x))
+#define isTrue(x)    (isBool(x) && *toBool(x))
+#define isNotTrue(x) (!isBool(x) || !*toBool(x))
+
+extern char** environ;
 
 /* variables are shared between multiple instances
    to allow for function declarations to be used in different files */
 std::vector<Dictionary*> variables;
 
-std::string typeOf(const Any& o) {
+Type typeOf(const Any& o) {
     if (isBool(o)) {
         return TYPE_BOOL;
     } else if (isInt(o)) {
@@ -102,8 +104,8 @@ String toString(const Any& o) {
         Boolean b = *toBool(o);
         result = b ? "true" : "false";
     } else if (isInt(o)) {
-        String s(mpz_get_str(NULL, 10, toInt(o)->i));
-        result = s;
+        Integer i = *toInt(o);
+        result = std::string(mpz_get_str(NULL, 10, i.i));
     } else if (isStr(o)) {
         String s = *toStr(o);
         result = s;
@@ -111,7 +113,7 @@ String toString(const Any& o) {
         Function f = *toFunc((Any&) o);
         result = f->getText();
     } else if (isDict(o)) {
-        Dictionary d = *toDict((Any&) o);
+        Dictionary& d = *toDict((Any&) o);
         std::stringstream ss;
         ss << "{" << std::endl;
         for (const auto& [key, value] : d) {
@@ -148,18 +150,16 @@ Dictionary toDictionary(const String& s, antlr4::ParserRuleContext* ctx) {
     return result;
 }
 
-bool DictComparator::operator() (const std::any& a1, const std::any& a2) const {
+bool DictComparator::operator() (const Key& k1, const Key& k2) const {
     bool result;
-    if (isInt(a1) && isInt(a2)) {
-        result = mpz_cmp(toInt(a1)->i, toInt(a2)->i) < 0;
+    if (strIsNumeric(k1) && strIsNumeric(k2)) {
+        Integer i1, i2;
+        mpz_init_set_str(i1.i, k1.c_str(), 10);
+        mpz_init_set_str(i2.i, k2.c_str(), 10);
+        result = mpz_cmp(i1.i, i2.i) < 0;
+        mpz_clears(i1.i, i2.i, NULL);
     } else {
-        String s1 = toString(a1);
-        String s2 = toString(a2);
-        if (strIsNumeric(s1) && strIsNumeric(s2)) {
-            result = std::stoi(s1) < std::stoi(s2);
-        } else {
-            result = s1.compare(s2) < 0;
-        }
+        result = k1.compare(k2) < 0;
     }
     return result;
 }
@@ -188,13 +188,13 @@ void exception(const std::exception& e, antlr4::ParserRuleContext* ctx) {
     error(ss.str(), ctx);
 }
 
-void fileNotFound(const String& file, antlr4::ParserRuleContext* ctx) {
+void fileNotFound(const std::filesystem::path& file, antlr4::ParserRuleContext* ctx) {
     std::stringstream ss;
     ss << "File not found! Expected: " << file;
     error(ss.str(), ctx);
 }
 
-void missingKey(const Dictionary& expected, const String& wasKey, antlr4::ParserRuleContext* ctx) {
+void missingKey(const Dictionary& expected, const Key& wasKey, antlr4::ParserRuleContext* ctx) {
     std::stringstream ss;
     ss << "Missing key! Expected one of: ";
     for (const auto& [key, value] : expected) {
@@ -210,13 +210,13 @@ void expectedNonVoidFunction(antlr4::ParserRuleContext* ctx) {
     error(ss.str(), ctx);
 }
 
-void typeMismatch(const std::string& expectedType, const Any& wasValue, antlr4::ParserRuleContext* ctx) {
+void typeMismatch(const Type& expectedType, const Any& wasValue, antlr4::ParserRuleContext* ctx) {
     std::stringstream ss;
     ss << "Type mismatch! Expected type `" << expectedType << "`, but was `" << toString(wasValue) << "` which is of type `" << typeOf(wasValue) << "`!";
     error(ss.str(), ctx);
 }
 
-void wrongKey(const String& expectedKey, const String& wasKey, antlr4::ParserRuleContext* ctx) {
+void wrongKey(const Key& expectedKey, const Key& wasKey, antlr4::ParserRuleContext* ctx) {
     std::stringstream ss;
     ss << "Wrong key! Expected key `" << expectedKey << "`, but was key `" << wasKey << "`!";
     error(ss.str(), ctx);
@@ -228,65 +228,62 @@ void wrongNumberOfArguments(int expected, int was, antlr4::ParserRuleContext* ct
     error(ss.str(), ctx);
 }
 
-void assign(Dictionary* d, const String& key, const Any& value, antlr4::ParserRuleContext* ctx) {
-    DEBUG_BGN_P("d=" << toString(*d) << ", key=" << key << ", value=" << toString(value));
+void assign(Dictionary* d, const Key& key, const Any& value, antlr4::ParserRuleContext* ctx) {
+    Dictionary& e = *d;
+    DEBUG_BGN_P("e=" << toString(e) << ", key=" << key << ", value=" << toString(value));
 #ifdef STRICT
-    if (d->count(key)) {
-        DEBUG_LOG("d->count(key)");
-        const std::string expected = typeOf((*d)[key]);
-        const std::string was = typeOf(value);
+    if (e.count(key)) {
+        const Type expected = typeOf(e[key]);
+        const Type was = typeOf(value);
         if (!strEquals(expected, was)) {
             typeMismatch(expected, value, ctx);
             return;
         }
     }
 #endif
-    (*d)[key] = value;
-    DEBUG_LOG("d=" << toString(*d));
+    e[key] = value;
     DEBUG_END();
 }
 
 Interpreter::Interpreter(int argc, char* argv[]) {
     DEBUG_BGN_P("argc=" << argc);
     script_caller = argv[0];
-    DEBUG_LOG("script_caller=" << script_caller);
     script_root = ((std::filesystem::path) argv[1]).parent_path();
-    DEBUG_LOG("script_root=" << script_root);
-    variables.push_back(new Dictionary());
+    Dictionary* d = new Dictionary();
+
     /* passing command line arguments */
-    /* TODO
-    Dictionary argsD;
-    for (int i = 0; i < args.length; i++) {
-        argsD.put(BigInteger.valueOf(i), args[i]);
+    Dictionary dArgs;
+    for (int i = 0; i < argc; i++) {
+        dArgs[std::to_string(i)] = std::string(argv[i]);
     }
-    variables.peek().put("args", argsD);
-    */
+    (*d)["args"] = dArgs;
+
     /* passing environment variables */
-    /* TODO
-    Dictionary envD;
-    final Map<String, String> env = System.getenv();
-    for (String envName : env.keySet()) {
-        envD.put(envName, env.get(envName));
+    Dictionary dEnv;
+    for (char** s = environ; *s; s++) {
+        std::string pair = std::string(*s);
+        const size_t pos = pair.find('=');
+        if (pos != std::string::npos) {
+            Key key = pair.substr(0, pos);
+            String value = pair.substr(pos + 1);
+            dEnv[key] = value;
+        }
     }
-    variables.peek().put("env", envD);
-    */
+    (*d)["env"] = dEnv;
+
+    variables.push_back(d);
     DEBUG_CTX();
     DEBUG_END();
 }
 
-void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, String)> handler) {
+void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Key)> handler) {
     DEBUG_BGN();
-    String identifier = lhsc->Identifier()->getText();
-    DEBUG_LOG("identifier=" << identifier);
+    const std::string identifier = lhsc->Identifier()->getText();
     if (lhsc->lhsPart().empty()) {
-        DEBUG_LOG("lhsc->lhsPart().empty()");
         handler(variables.back(), identifier);
     } else {
-        DEBUG_LOG("!(lhsc->lhsPart().empty())");
         if (!variables.back()->count(identifier)) {
-            DEBUG_LOG("!variables.back()->count(identifier)");
-            Dictionary d;
-            (*variables.back())[identifier] = d;
+            (*variables.back())[identifier] = Dictionary();
         }
         Any& a1 = (*variables.back())[identifier];
         if (!isDict(a1)) {
@@ -296,7 +293,7 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
         Dictionary* d = toDict(a1);
         for (size_t i = 0; i < lhsc->lhsPart().size(); i++) {
             AquilaParser::LhsPartContext* lhspc = lhsc->lhsPart()[i];
-            std::string key;
+            Key key;
             if (lhspc->Identifier()) {
                 key = lhspc->Identifier()->getText();
             } else if (lhspc->expression()) {
@@ -305,11 +302,11 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
                 assert(0);
             }
             if (i < lhsc->lhsPart().size() - 1) {
-                if (!d->count(key)) {
-                    Dictionary e;
-                    (*d)[key] = e;
+                Dictionary& e = *d;
+                if (!e.count(key)) {
+                    e[key] = Dictionary();
                 }
-                Any& a2 = (*d)[key];
+                Any& a2 = e[key];
                 if (!isDict(a2)) {
                     typeMismatch(TYPE_DICT, a2, lhspc);
                     assert(0);
@@ -326,7 +323,7 @@ void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(D
 Any Interpreter::callFunction(AquilaParser::FunctionCallContext* callsite, Function& function, const std::vector<Any>& arguments) {
     DEBUG_BGN();
     std::vector<std::string> parameters;
-    std::vector<std::string> types;
+    std::vector<Type> types;
     for (AquilaParser::LambdaExpressionParameterContext* lepc : function->lambdaExpressionParameter()) {
         parameters.push_back(lepc->Identifier()->getText());
         types.push_back(lepc->Type() ? lepc->Type()->getText() : TYPE_ANY);
@@ -334,8 +331,7 @@ Any Interpreter::callFunction(AquilaParser::FunctionCallContext* callsite, Funct
     if (!checkArgs(callsite, arguments, types)) {
         assert(0);
     }
-    Dictionary d(*variables.back());
-    variables.push_back(&d);
+    variables.push_back(new Dictionary(*variables.back()));
     for (size_t i = 0; i < parameters.size(); i++) {
         const std::string parameter = parameters[i];
         Any argument = arguments[i];
@@ -347,30 +343,31 @@ Any Interpreter::callFunction(AquilaParser::FunctionCallContext* callsite, Funct
         result = visit(function->expression());
     } else if (function->block()) {
         visit(function->block());
-        result = 0;
+        result = POISON;
     } else {
         assert(0);
     }
+    delete variables.back();
     variables.pop_back();
     DEBUG_END();
     return result;
 }
 
-bool Interpreter::checkArgs(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types) {
+bool Interpreter::checkArgs(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<Type> types) {
     return checkArgsHelper(callsite, arguments, true, types);
 }
 
-bool Interpreter::checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types) {
+bool Interpreter::checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<Type> types) {
     return checkArgsHelper(callsite, arguments, false, types);
 }
 
-bool Interpreter::checkArgsHelper(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, bool failOnTypeMismatch, std::vector<std::string> types) {
+bool Interpreter::checkArgsHelper(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, bool failOnTypeMismatch, std::vector<Type> types) {
     if (arguments.size() != types.size()) {
         wrongNumberOfArguments(types.size(), arguments.size(), callsite);
         return false;
     }
     for (size_t i = 0; i < types.size(); i++) {
-        const std::string type = types[i];
+        const Type type = types[i];
         Any argument = arguments[i];
         if (!strEquals(type, TYPE_ANY) && !strEquals(typeOf(argument), type)) {
             if (failOnTypeMismatch) {
@@ -401,6 +398,7 @@ Any Interpreter::visitStatement(AquilaParser::StatementContext *ctx) {
     DEBUG_BGN();
     DEBUG_CTX();
     Any result = visitChildren(ctx);
+    DEBUG_CTX();
     DEBUG_END();
     return result;
 }
@@ -454,7 +452,7 @@ Any Interpreter::visitLoopStatement(AquilaParser::LoopStatementContext *ctx) {
             visit(ctx->top);
         }
         Any condition = visit(ctx->expression());
-        if (isFalse(condition)) {
+        if (isNotTrue(condition)) {
             break;
         }
         if (ctx->bottom) {
@@ -524,10 +522,9 @@ Any Interpreter::visitCallStatement(AquilaParser::CallStatementContext *ctx) {
 
 Any Interpreter::visitReadStatement(AquilaParser::ReadStatementContext *ctx) {
     DEBUG_BGN();
-    String line;
+    std::string line;
     std::getline(std::cin, line);
-    DEBUG_LOG("line=" << line);
-    handleLhs(ctx->lhs(), [this, line, ctx](Dictionary* d, const String& key) { assign(d, key, line, ctx); });
+    handleLhs(ctx->lhs(), [this, line, ctx](Dictionary* d, const Key& key) { assign(d, key, line, ctx); });
     DEBUG_END();
     return POISON;
 }
@@ -535,7 +532,6 @@ Any Interpreter::visitReadStatement(AquilaParser::ReadStatementContext *ctx) {
 Any Interpreter::visitWriteStatement(AquilaParser::WriteStatementContext *ctx) {
     DEBUG_BGN();
     Any rhs = visit(ctx->rhs);
-    DEBUG_LOG("rhs=" << toString(rhs));
     if (isStr(rhs)) {
         std::cout << *toStr(rhs) << std::endl;
     } else {
@@ -548,11 +544,12 @@ Any Interpreter::visitWriteStatement(AquilaParser::WriteStatementContext *ctx) {
 
 Any Interpreter::visitRemoveStatement(AquilaParser::RemoveStatementContext *ctx) {
     DEBUG_BGN();
-    handleLhs(ctx->lhs(), [this, ctx](Dictionary* d, const String& key) {
-        if (d->count(key)) {
-            d->erase(key);
+    handleLhs(ctx->lhs(), [this, ctx](Dictionary* d, const Key& key) {
+        Dictionary& e = *d;
+        if (e.count(key)) {
+            e.erase(key);
         } else {
-            missingKey(*d, key, ctx);
+            missingKey(e, key, ctx);
             assert(0);
         }
     });
@@ -563,7 +560,6 @@ Any Interpreter::visitRemoveStatement(AquilaParser::RemoveStatementContext *ctx)
 Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
     DEBUG_BGN();
     Any rhs = visit(ctx->rhs);
-    DEBUG_LOG("rhs=" << toString(rhs));
     if (isStr(rhs)) {
         std::filesystem::path file = script_root / *toStr(rhs);
         if (std::filesystem::exists(file)) {
@@ -572,7 +568,6 @@ Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
                 int argc = 2;
                 char* argv[] = { script_caller, (char*) file.c_str() };
                 run(argc, argv);
-                DEBUG_CTX();
             } catch (std::exception& e) {
                 exception(e, ctx->rhs);
                 assert(0);
@@ -592,8 +587,7 @@ Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
 Any Interpreter::visitAssignStatement(AquilaParser::AssignStatementContext *ctx) {
     DEBUG_BGN();
     Any rhs = visit(ctx->rhs);
-    DEBUG_LOG("rhs=" << toString(rhs));
-    handleLhs(ctx->lhs(), [this, rhs, ctx](Dictionary* d, const String& key) { assign(d, key, rhs, ctx->rhs); });
+    handleLhs(ctx->lhs(), [this, rhs, ctx](Dictionary* d, const Key& key) { assign(d, key, rhs, ctx->rhs); });
     DEBUG_END();
     return POISON;
 }
@@ -634,14 +628,13 @@ Any Interpreter::visitIfExpression(AquilaParser::IfExpressionContext *ctx) {
 
 Any Interpreter::visitLetExpression(AquilaParser::LetExpressionContext *ctx) {
     DEBUG_BGN();
-    Dictionary d(*variables.back());
-    variables.push_back(&d);
+    variables.push_back(new Dictionary(*variables.back()));
     for (AquilaParser::LetBindExpressionContext* lbec : ctx->letBindExpression()) {
         Any rhs = visit(lbec->rhs);
-        DEBUG_LOG("rhs=" << toString(rhs));
-        handleLhs(lbec->lhs(), [this, rhs, lbec](Dictionary* d, const String& key) { assign(d, key, rhs, lbec); });
+        handleLhs(lbec->lhs(), [this, rhs, lbec](Dictionary* d, const Key& key) { assign(d, key, rhs, lbec); });
     }
     Any result = visit(ctx->body);
+    delete variables.back();
     variables.pop_back();
     DEBUG_END_R(toString(result));
     return result;
@@ -678,7 +671,7 @@ Any Interpreter::visitLogicalOperation(AquilaParser::LogicalOperationContext *ct
     for (size_t i = 0; i < ctx->logicalOperator().size(); i++) {
         AquilaParser::LogicalOperatorContext* loc = ctx->logicalOperator(i);
         AquilaParser::UnaryLogicalOperationContext* uloc = ctx->unaryLogicalOperation(i + 1);
-        std::string op = loc->getText();
+        const std::string op = loc->getText();
         Any operand = visit(uloc);
         if (isBool(result)) {
             if (isBool(operand)) {
@@ -714,7 +707,7 @@ Any Interpreter::visitUnaryLogicalOperation(AquilaParser::UnaryLogicalOperationC
     Any result = visit(rc);
     if (ctx->unaryLogicalOperator()) {
         if (isBool(result)) {
-            std::string op = ctx->unaryLogicalOperator()->getText();
+            const std::string op = ctx->unaryLogicalOperator()->getText();
             if (strEquals(op, "not")) {
                 result = !*toBool(result);
             } else {
@@ -739,11 +732,11 @@ Any Interpreter::visitRelation(AquilaParser::RelationContext *ctx) {
     if (ctx->relationalOperator() && ctx->addition().size() == 2) {
         AquilaParser::RelationalOperatorContext* roc = ctx->relationalOperator();
         AquilaParser::AdditionContext* ac = ctx->addition(1);
-        std::string op = roc->getText();
+        const std::string op = roc->getText();
         Any operand = visit(ac);
         if (strEquals(op, ":")) {
             if (isDict(operand)) {
-                Dictionary d = *toDict(operand);
+                Dictionary& d = *toDict(operand);
                 Boolean r = false;
                 for (const auto& [key, value] : d) {
                     if (anyEquals(value, result)) {
@@ -833,7 +826,7 @@ Any Interpreter::visitAddition(AquilaParser::AdditionContext *ctx) {
     for (size_t i = 0; i < ctx->additionalOperator().size(); i++) {
         AquilaParser::AdditionalOperatorContext* aoc = ctx->additionalOperator(i);
         AquilaParser::MultiplicationContext* mc = ctx->multiplication(i + 1);
-        std::string op = aoc->getText();
+        const std::string op = aoc->getText();
         Any operand = visit(mc);
         if (strEquals(op, "&")) {
             if (isStr(result)) {
@@ -889,7 +882,7 @@ Any Interpreter::visitMultiplication(AquilaParser::MultiplicationContext *ctx) {
     for (size_t i = 0; i < ctx->multiplicationOperator().size(); i++) {
         AquilaParser::MultiplicationOperatorContext* moc = ctx->multiplicationOperator(i);
         AquilaParser::UnaryAdditionContext* uac = ctx->unaryAddition(i + 1);
-        std::string op = moc->getText();
+        const std::string op = moc->getText();
         Any operand = visit(uac);
         if (isInt(result)) {
             if (isInt(operand)) {
@@ -932,7 +925,7 @@ Any Interpreter::visitUnaryAddition(AquilaParser::UnaryAdditionContext *ctx) {
     Any result = visit(fc);
     if (ctx->unaryAdditionalOperator()) {
         if (isInt(result)) {
-            std::string op = ctx->unaryAdditionalOperator()->getText();
+            const std::string op = ctx->unaryAdditionalOperator()->getText();
             Integer r;
             mpz_init(r.i);
             if (strEquals(op, "+")) {
@@ -962,7 +955,7 @@ Any Interpreter::visitFactorial(AquilaParser::FactorialContext *ctx) {
     Any result = visit(fc);
     if (ctx->factorialOperator()) {
         if (isInt(result)) {
-            std::string op = ctx->factorialOperator()->getText();
+            const std::string op = ctx->factorialOperator()->getText();
             Integer r;
             mpz_init(r.i);
             if (strEquals(op, "!")) {
@@ -997,10 +990,10 @@ Any Interpreter::visitFactor(AquilaParser::FactorContext *ctx) {
         return visit(ctx->literal());
     } else if (ctx->functionCall()) {
         Any result = visit(ctx->functionCall());
-        /* TODO if (result == POISON) {
+        if (!result.has_value()) {
             expectedNonVoidFunction(ctx->functionCall());
             assert(0);
-        } */
+        }
         return result;
     } else if (ctx->accessExpression()) {
         return visit(ctx->accessExpression());
@@ -1035,7 +1028,7 @@ Any Interpreter::visitDictAggregate(AquilaParser::DictAggregateContext *ctx) {
     Dictionary result;
     for (size_t i = 0; i < ctx->dictAggregatePair().size(); i++) {
         AquilaParser::DictAggregatePairContext* dapc = ctx->dictAggregatePair(i);
-        std::string key = dapc->key
+        Key key = dapc->key
             ? toString(visit(dapc->key))
             : std::to_string(i);
         Any value = visit(dapc->value);
@@ -1234,7 +1227,7 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             localArguments.push_back(key);
             localArguments.push_back(value);
             Any condition = callFunction(ctx, arg2, localArguments);
-            if (isFalse(condition)) {
+            if (isNotTrue(condition)) {
                 result = false;
                 break;
             }
@@ -1471,7 +1464,7 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         String arg1 = *toStr(arguments[0]);
         result = arg1.empty() ? "" : arg1.substr(1);
     } else {
-        Dictionary d = *variables.back();
+        Dictionary& d = *variables.back();
         if (d.count(identifier)) {
             Any object = d[identifier];
             if (isFunc(object)) {
@@ -1493,13 +1486,9 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
 Any Interpreter::visitAccessExpression(AquilaParser::AccessExpressionContext *ctx) {
     DEBUG_BGN();
     const std::string identifier = ctx->Identifier()->getText();
-    if (!variables.back()->count(identifier)) {
-        Dictionary d;
-        (*variables.back())[identifier] = d;
-    }
     Any result = (*variables.back())[identifier];
     for (AquilaParser::AccessExpressionPartContext* aepc : ctx->accessExpressionPart()) {
-        std::string key;
+        Key key;
         if (aepc->Identifier()) {
             key = aepc->Identifier()->getText();
         } else if (aepc->expression()) {
@@ -1508,7 +1497,7 @@ Any Interpreter::visitAccessExpression(AquilaParser::AccessExpressionContext *ct
             assert(0);
         }
         if (isDict(result)) {
-            Dictionary d = *toDict(result);
+            Dictionary& d = *toDict(result);
             if (d.count(key)) {
                 result = d[key];
             } else {

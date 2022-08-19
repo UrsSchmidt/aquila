@@ -81,24 +81,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static final String TYPE_FUNC = "Function";
     private static final String TYPE_DICT = "Dictionary";
 
-    private static final Comparator<Object> DICT_COMPARATOR = new Comparator<>() {
+    private static final Comparator<String> DICT_COMPARATOR = new Comparator<>() {
         @Override
-        public int compare(Object a1, Object a2) {
-            int result;
-            if (a1 instanceof BigInteger && a2 instanceof BigInteger) {
-                final BigInteger i1 = (BigInteger) a1;
-                final BigInteger i2 = (BigInteger) a2;
-                result = i1.compareTo(i2);
-            } else {
-                final String s1 = Interpreter.toString(a1);
-                final String s2 = Interpreter.toString(a2);
-                if (Helper.strIsNumeric(s1) && Helper.strIsNumeric(s2)) {
-                    result = Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
-                } else {
-                    result = s1.compareTo(s2);
-                }
-            }
-            return result;
+        public int compare(String s1, String s2) {
+            return Helper.strIsNumeric(s1) && Helper.strIsNumeric(s2)
+                ? new BigInteger(s1).compareTo(new BigInteger(s2))
+                : s1.compareTo(s2);
         }
     };
 
@@ -157,12 +145,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final LambdaExpressionContext f = (LambdaExpressionContext) o;
             result = f.getText();
         } else if (o instanceof Map) {
-            final Map d = (Map) o;
+            final Map<String, Object> d = (Map) o;
             StringBuilder sb = new StringBuilder();
             sb.append("{\n");
-            for (Object key : d.keySet()) {
+            for (String key : d.keySet()) {
                 final Object value = d.get(key);
-                sb.append(toString(key)).append(": ");
+                sb.append(key).append(": ");
                 if (value instanceof String) {
                     sb.append("'").append(toString(value)).append("'");
                 } else {
@@ -208,8 +196,8 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         error("File not found! Expected: " + file, ctx);
     }
 
-    private static void missingKey(Map expected, Object wasKey, ParserRuleContext ctx) {
-        error("Missing key! Expected one of: " + expected.keySet() + ", but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
+    private static void missingKey(Map expected, String wasKey, ParserRuleContext ctx) {
+        error("Missing key! Expected one of: " + expected.keySet() + ", but was key `" + wasKey + "`!", ctx);
     }
 
     private static void expectedNonVoidFunction(ParserRuleContext ctx) {
@@ -220,15 +208,15 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         error("Type mismatch! Expected type `" + expectedType + "`, but was `" + toString(wasValue) + "` which is of type `" + typeOf(wasValue) + "`!", ctx);
     }
 
-    private static void wrongKey(String expectedKey, Object wasKey, ParserRuleContext ctx) {
-        error("Wrong key! Expected key `" + expectedKey + "`, but was key `" + toString(wasKey) + "` which is of type `" + typeOf(wasKey) + "`!", ctx);
+    private static void wrongKey(String expectedKey, String wasKey, ParserRuleContext ctx) {
+        error("Wrong key! Expected key `" + expectedKey + "`, but was key `" + wasKey + "`!", ctx);
     }
 
     private static void wrongNumberOfArguments(int expected, int was, ParserRuleContext ctx) {
         error("Wrong number of arguments! Expected " + expected + ", but was " + was + "!", ctx);
     }
 
-    private static void assign(Map d, Object key, Object value, ParserRuleContext ctx) {
+    private static void assign(Map d, String key, Object value, ParserRuleContext ctx) {
         if (STRICT && d.containsKey(key)) {
             final String expected = typeOf(d.get(key));
             final String was = typeOf(value);
@@ -243,23 +231,27 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     public Interpreter(String[] args) {
         super();
         scriptRoot = args.length > 0 ? new File(args[0]).getParentFile() : null;
-        variables.push(new TreeMap<>(DICT_COMPARATOR));
+        Map root = new TreeMap<>(DICT_COMPARATOR);
+
         /* passing command line arguments */
-        Map argsMap = new TreeMap<>(DICT_COMPARATOR);
+        Map dArgs = new TreeMap<>(DICT_COMPARATOR);
         for (int i = 0; i < args.length; i++) {
-            argsMap.put(BigInteger.valueOf(i), args[i]);
+            dArgs.put(Integer.toString(i), args[i]);
         }
-        variables.peek().put("args", argsMap);
+        root.put("args", dArgs);
+
         /* passing environment variables */
-        Map envMap = new TreeMap<>(DICT_COMPARATOR);
+        Map dEnv = new TreeMap<>(DICT_COMPARATOR);
         final Map<String, String> env = System.getenv();
         for (String envName : env.keySet()) {
-            envMap.put(envName, env.get(envName));
+            dEnv.put(envName, env.get(envName));
         }
-        variables.peek().put("env", envMap);
+        root.put("env", dEnv);
+
+        variables.push(root);
     }
 
-    private void handleLhs(LhsContext lhsc, BiConsumer<Map, Object> handler) {
+    private void handleLhs(LhsContext lhsc, BiConsumer<Map, String> handler) {
         final String identifier = lhsc.Identifier().getText();
         if (lhsc.lhsPart().isEmpty()) {
             handler.accept(variables.peek(), identifier);
@@ -275,11 +267,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             Map d = (Map) a1;
             for (int i = 0; i < lhsc.lhsPart().size(); i++) {
                 final LhsPartContext lhspc = lhsc.lhsPart(i);
-                Object key;
+                String key;
                 if (lhspc.Identifier() != null) {
                     key = lhspc.Identifier().getText();
                 } else if (lhspc.expression() != null) {
-                    key = visit(lhspc.expression());
+                    key = toString(visit(lhspc.expression()));
                 } else {
                     throw new AssertionError();
                 }
@@ -989,7 +981,9 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         Map result = new TreeMap<>(DICT_COMPARATOR);
         for (int i = 0; i < ctx.dictAggregatePair().size(); i++) {
             final DictAggregatePairContext dapc = ctx.dictAggregatePair(i);
-            final Object key = dapc.key != null ? visit(dapc.key) : BigInteger.valueOf(i);
+            final String key = dapc.key != null
+                ? toString(visit(dapc.key))
+                : Integer.toString(i);
             final Object value = visit(dapc.value);
             result.put(key, value);
         }
@@ -1107,11 +1101,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
             }
-            final TreeMap arg1 = (TreeMap) arguments.get(0);
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
             result = false;
-            for (Object key : arg1.keySet()) {
+            for (String key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
@@ -1134,11 +1128,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
             }
-            final TreeMap arg1 = (TreeMap) arguments.get(0);
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
             final Map d = new TreeMap<>(DICT_COMPARATOR);
-            for (Object key : arg1.keySet()) {
+            for (String key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
@@ -1171,12 +1165,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_ANY, TYPE_FUNC)) {
                 return null;
             }
-            final TreeMap arg1 = (TreeMap) arguments.get(0);
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
             final Object arg2 = arguments.get(1);
             final LambdaExpressionContext arg3 = (LambdaExpressionContext) arguments.get(2);
             final List<Object> localArguments = new ArrayList<>();
             result = arg2;
-            for (Object key : arg1.keySet()) {
+            for (String key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(result);
@@ -1188,11 +1182,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
             }
-            final TreeMap arg1 = (TreeMap) arguments.get(0);
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
             result = true;
-            for (Object key : arg1.keySet()) {
+            for (String key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
@@ -1207,10 +1201,10 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
             }
-            final TreeMap arg1 = (TreeMap) arguments.get(0);
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
-            for (Object key : arg1.keySet()) {
+            for (String key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
@@ -1275,11 +1269,11 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
             }
-            final TreeMap arg1 = (TreeMap) arguments.get(0);
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
             final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
             final List<Object> localArguments = new ArrayList<>();
             final Map d = new TreeMap<>(DICT_COMPARATOR);
-            for (Object key : arg1.keySet()) {
+            for (String key : arg1.keySet()) {
                 final Object value = arg1.get(key);
                 localArguments.clear();
                 localArguments.add(key);
@@ -1373,7 +1367,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String[] parts = arg2.split(arg1, -1);
             final Map d = new TreeMap<>(DICT_COMPARATOR);
             for (int i = 0; i < parts.length; i++) {
-                d.put(BigInteger.valueOf(i), parts[i]);
+                d.put(Integer.toString(i), parts[i]);
             }
             result = d;
         }   break;
@@ -1454,16 +1448,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     @Override
     public Object visitAccessExpression(AccessExpressionContext ctx) {
         final String identifier = ctx.Identifier().getText();
-        if (!variables.peek().containsKey(identifier)) {
-            variables.peek().put(identifier, new TreeMap<>(DICT_COMPARATOR));
-        }
         Object result = variables.peek().get(identifier);
         for (AccessExpressionPartContext aepc : ctx.accessExpressionPart()) {
-            Object key;
+            String key;
             if (aepc.Identifier() != null) {
                 key = aepc.Identifier().getText();
             } else if (aepc.expression() != null) {
-                key = visit(aepc.expression());
+                key = toString(visit(aepc.expression()));
             } else {
                 throw new AssertionError();
             }

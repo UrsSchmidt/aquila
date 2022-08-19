@@ -10,7 +10,7 @@ format := \s : String, d : Dictionary ->
     elif s sw '%':
         (let nextchar = charat(s, 1): (
             if isdigit(nextchar):
-                d[str2int(nextchar)]
+                d[nextchar]
             else:
                 nextchar
         ))

@@ -1,5 +1,7 @@
 #!/usr/local/bin/aq
 
+run '../prelude/integerfunctions.aq';
+
 # literals
 write int2str(000);
 write int2str(12345);
@@ -46,3 +48,7 @@ write int2str(sgn(72));
 write int2str(sgn(-72));
 write int2str(sqrt(0));
 write int2str(sqrt(49));
+
+# prelude functions
+write int2str(bin(2, 2));
+write int2str(lcm(5, 2));

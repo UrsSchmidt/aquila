@@ -15,12 +15,12 @@ write bool2str('myvalue' : a);
 
 remove a['mystringkey'];
 call foreach(a, \k, v -> (
-    if integer(k) and integer(v) (
-        write int2str(k) & ': ' & int2str(v);
-    ) elif string(k) and string(v) (
+    if integer(v) (
+        write k & ': ' & int2str(v);
+    ) elif string(v) (
         write k & ': ' & v;
     ) else (
-        write 'else';
+        write k & ': ?';
     )
 ));
 

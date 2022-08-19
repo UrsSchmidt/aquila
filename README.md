@@ -34,7 +34,7 @@ There are five types as of now: `Boolean`, `Integer`, `String`, `Function` and `
 
 ### Boolean
 
-The two `Boolean` literals are `true` and `false`.
+The two `Boolean` literals are written as `true` and `false`.
 
 The following operations are available on booleans:
  * `not` a
@@ -49,7 +49,7 @@ Type conversion functions:
 
 ### Integer
 
-Integers are written like this:
+Integer literals are written like this:
  * Decimal: `12345`
  * Binary: `0b10101010`
  * Octal: `0o755`
@@ -85,9 +85,11 @@ Numerical functions:
  * `sgn(a)` returns the sign of `a`
  * `sqrt(a)` returns the square root of `a`
 
+There are also predefined `Integer` functions available under `prelude/integerfunctions.aq`, which can be used by first running `run 'prelude/integerfunctions.aq';`.
+
 ### String
 
-Strings are written like this: `'Hello, world!'`
+String literals are written like this: `'Hello, world!'`
 
 The following operations are available on strings:
  * a `&` b: concatenating `a` and `b`
@@ -134,34 +136,53 @@ Other functions:
  * `repeat(a, b)` returns `a` repeated `b` times
  * `replace(a, b, c)` replace all occurrences of `b` in `a` with `c`
 
-There are also a lot of predefined `String` functions under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
+There are also predefined `String` functions available under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
 
 ### Function
 
 Functions are always written as lambdas: `\x, y -> x + y`
+
 You can assign functions to variables like any other value: `a := \x -> 2 * x;`
-You can also write recursive functions by using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
-You can also add additional (runtime) type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
-You can write void functions by using code blocks: `a := \s -> (write s;);`
+
+You can write recursive functions by using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
+
+You can add additional runtime type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
+
 Here you can also use `Any` to explicitly state, that the argument can take any type: `\x : Any -> x`
+
+You can write void functions by using code blocks: `a := \s -> (write s;);`
 
 The following predefined functions are available on functions:
  * `foreach(d : Dictionary, f : Function)`
+
    `(Dictionary, (Any, Any) -> Void) -> Void`
+
  * `forall(d : Dictionary, f : Function)`
+
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
+
  * `exists(d : Dictionary, f : Function)`
+
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
+
  * `filter(d : Dictionary, f : Function)`
+
    `(Dictionary, (Any, Any) -> Boolean)) -> Dictionary`
+
  * `map(d : Dictionary, f : Function)`
+
    `(Dictionary, (Any, Any) -> Any)) -> Dictionary`
+
  * `fold(d : Dictionary, n : Any, f : Function)`
+
    `(Dictionary, Any, (Any, Any) -> Any) -> Any`
 
 ### Dictionary
 
+The keys of dictionaries are always of type `String`.
+
 Dictionary aggregates are written like this: `{ key: value }`
+
 If you do not care about the keys, you can also use `{ v1, v2, v3 }` as a shorthand for `{ 0: v1, 1: v2, 2: v3 }`.
 
 The following operations are available on dictionaries:
@@ -251,7 +272,7 @@ You can remove key/value pairs from dictionaries using: `remove myDictionary.myK
 
 ### Run statements
 
-You can run other Aquila scripts using: `run 'script.aq';`
+You can run other external Aquila scripts using: `run 'script.aq';`
 
 ### If statements
 

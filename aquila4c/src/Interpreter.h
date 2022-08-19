@@ -9,9 +9,16 @@
 #include <string>
 #include <vector>
 
+typedef
+    std::string
+    Key;
+typedef
+    std::string
+    Type;
+
 class DictComparator {
 public:
-    bool operator() (const std::any& a1, const std::any& a2) const;
+    bool operator() (const Key& k1, const Key& k2) const;
 };
 
 typedef
@@ -30,7 +37,7 @@ typedef
     AquilaParser::LambdaExpressionContext*
     Function;
 typedef
-    std::map<std::string, Any, DictComparator>
+    std::map<Key, Any, DictComparator>
     Dictionary;
 
 class Interpreter : public AquilaVisitor {
@@ -39,12 +46,12 @@ private:
     char* script_caller;
     std::filesystem::path script_root;
 
-    void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, String)> handler);
+    void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Key)> handler);
 
     Any callFunction(AquilaParser::FunctionCallContext* callsite, Function& function, const std::vector<Any>& arguments);
-    bool checkArgs(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types);
-    bool checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<std::string> types);
-    bool checkArgsHelper(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, bool failOnTypeMismatch, std::vector<std::string> types);
+    bool checkArgs(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<Type> types);
+    bool checkArgsNoFail(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, std::vector<Type> types);
+    bool checkArgsHelper(AquilaParser::FunctionCallContext* callsite, const std::vector<Any>& arguments, bool failOnTypeMismatch, std::vector<Type> types);
 
 public:
 
