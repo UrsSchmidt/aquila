@@ -1,0 +1,6 @@
+#!/usr/local/bin/aq
+
+for i from 1 to 10 (
+    random n from 1 to 10;
+    write int2str(n);
+)

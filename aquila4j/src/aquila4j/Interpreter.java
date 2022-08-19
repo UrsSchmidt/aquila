@@ -10,10 +10,14 @@ import aquila4j.antlr.AquilaParser.SwitchStatementLabelsContext;
 import aquila4j.antlr.AquilaParser.LoopStatementContext;
 import aquila4j.antlr.AquilaParser.ForStatementContext;
 import aquila4j.antlr.AquilaParser.CallStatementContext;
+import aquila4j.antlr.AquilaParser.ExitStatementContext;
+import aquila4j.antlr.AquilaParser.NowStatementContext;
+import aquila4j.antlr.AquilaParser.RandomStatementContext;
 import aquila4j.antlr.AquilaParser.ReadStatementContext;
-import aquila4j.antlr.AquilaParser.WriteStatementContext;
 import aquila4j.antlr.AquilaParser.RemoveStatementContext;
 import aquila4j.antlr.AquilaParser.RunStatementContext;
+import aquila4j.antlr.AquilaParser.SleepStatementContext;
+import aquila4j.antlr.AquilaParser.WriteStatementContext;
 import aquila4j.antlr.AquilaParser.AssignStatementContext;
 import aquila4j.antlr.AquilaParser.BlockContext;
 import aquila4j.antlr.AquilaParser.LhsContext;
@@ -475,21 +479,50 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     }
 
     @Override
-    public Object visitReadStatement(ReadStatementContext ctx) {
-        final String line = new Scanner(System.in).nextLine();
-        handleLhs(ctx.lhs(), (d, key) -> assign(d, key, line, ctx));
+    public Object visitExitStatement(ExitStatementContext ctx) {
+        final Object rhs = visit(ctx.rhs);
+        if (rhs instanceof BigInteger) {
+            System.exit(((BigInteger) rhs).intValueExact());
+        } else {
+            typeMismatch(TYPE_INT, rhs, ctx.rhs);
+            return null;
+        }
         return null;
     }
 
     @Override
-    public Object visitWriteStatement(WriteStatementContext ctx) {
-        final Object rhs = visit(ctx.rhs);
-        if (rhs instanceof String) {
-            System.out.println(rhs);
-        } else {
-            typeMismatch(TYPE_STR, rhs, ctx.rhs);
+    public Object visitNowStatement(NowStatementContext ctx) {
+        final BigInteger now = BigInteger.valueOf(System.currentTimeMillis());
+        handleLhs(ctx.lhs(), (d, key) -> assign(d, key, now, ctx));
+        return null;
+    }
+
+    @Override
+    public Object visitRandomStatement(RandomStatementContext ctx) {
+        /* from */
+        final Object from = visit(ctx.from);
+        if (!(from instanceof BigInteger)) {
+            typeMismatch(TYPE_INT, from, ctx.from);
             return null;
         }
+        final BigInteger fromInt = (BigInteger) from;
+        /* to */
+        final Object to = visit(ctx.to);
+        if (!(to instanceof BigInteger)) {
+            typeMismatch(TYPE_INT, to, ctx.to);
+            return null;
+        }
+        final BigInteger toInt = (BigInteger) to;
+        /* random */
+        final BigInteger random = BigInteger.valueOf((long) ((toInt.subtract(fromInt).longValueExact()) * Math.random())).add(fromInt);
+        handleLhs(ctx.lhs(), (d, key) -> assign(d, key, random, ctx));
+        return null;
+    }
+
+    @Override
+    public Object visitReadStatement(ReadStatementContext ctx) {
+        final String line = new Scanner(System.in).nextLine();
+        handleLhs(ctx.lhs(), (d, key) -> assign(d, key, line, ctx));
         return null;
     }
 
@@ -523,6 +556,34 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 fileNotFound(file, ctx.rhs);
                 return null;
             }
+        } else {
+            typeMismatch(TYPE_STR, rhs, ctx.rhs);
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitSleepStatement(SleepStatementContext ctx) {
+        final Object rhs = visit(ctx.rhs);
+        if (rhs instanceof BigInteger) {
+            try {
+                Thread.sleep(((BigInteger) rhs).longValueExact());
+            } catch (InterruptedException e) {
+                /* do nothing */
+            }
+        } else {
+            typeMismatch(TYPE_INT, rhs, ctx.rhs);
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitWriteStatement(WriteStatementContext ctx) {
+        final Object rhs = visit(ctx.rhs);
+        if (rhs instanceof String) {
+            System.out.println((String) rhs);
         } else {
             typeMismatch(TYPE_STR, rhs, ctx.rhs);
             return null;
@@ -1116,14 +1177,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
                 }
             }
         }   break;
-        case "exit": {
-            if (!checkArgs(ctx, arguments, TYPE_INT)) {
-                return null;
-            }
-            final BigInteger arg1 = (BigInteger) arguments.get(0);
-            result = arg1;
-            System.exit(arg1.intValueExact());
-        }   break;
         case "filter": {
             if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
                 return null;
@@ -1345,18 +1398,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             final Map arg1 = (Map) arguments.get(0);
             result = BigInteger.valueOf(arg1.size());
-        }   break;
-        case "sleep": {
-            if (!checkArgs(ctx, arguments, TYPE_INT)) {
-                return null;
-            }
-            final BigInteger arg1 = (BigInteger) arguments.get(0);
-            try {
-                Thread.sleep(arg1.longValueExact());
-                result = true;
-            } catch (InterruptedException e) {
-                result = false;
-            }
         }   break;
         case "split": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR)) {

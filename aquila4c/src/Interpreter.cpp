@@ -6,9 +6,9 @@
 #include <filesystem>
 #include <sstream>
 
-#define SUPPORT_SLEEP true
+#define SUPPORT_NOW_AND_SLEEP true
 
-#ifdef SUPPORT_SLEEP
+#ifdef SUPPORT_NOW_AND_SLEEP
 #include <chrono>
 #include <thread>
 #endif
@@ -247,6 +247,8 @@ void assign(Dictionary* d, const Key& key, const Any& value, antlr4::ParserRuleC
 
 Interpreter::Interpreter(int argc, char* argv[]) {
     DEBUG_BGN_P("argc=" << argc);
+    gmp_randinit_default(state);
+    gmp_randseed_ui(state, 123); // FIXME seed
     script_caller = argv[0];
     script_root = ((std::filesystem::path) argv[1]).parent_path();
     Dictionary* d = new Dictionary();
@@ -274,6 +276,10 @@ Interpreter::Interpreter(int argc, char* argv[]) {
     variables.push_back(d);
     DEBUG_CTX();
     DEBUG_END();
+}
+
+Interpreter::~Interpreter() {
+    gmp_randclear(state);
 }
 
 void Interpreter::handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Key)> handler) {
@@ -520,24 +526,68 @@ Any Interpreter::visitCallStatement(AquilaParser::CallStatementContext *ctx) {
     return POISON;
 }
 
+Any Interpreter::visitExitStatement(AquilaParser::ExitStatementContext *ctx) {
+    DEBUG_BGN();
+    Any rhs = visit(ctx->rhs);
+    if (isInt(rhs)) {
+        exit(mpz_get_ui(toInt(rhs)->i));
+    } else {
+        typeMismatch(TYPE_INT, rhs, ctx->rhs);
+        assert(0);
+    }
+    DEBUG_END();
+    return POISON;
+}
+
+Any Interpreter::visitNowStatement(AquilaParser::NowStatementContext *ctx) {
+    DEBUG_BGN();
+    Integer now;
+#ifdef SUPPORT_NOW_AND_SLEEP
+    auto time = std::chrono::system_clock::now();
+    auto since_epoch = time.time_since_epoch();
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
+    mpz_init_set_ui(now.i, millis.count());
+#else
+    mpz_init(now.i);
+#endif
+    handleLhs(ctx->lhs(), [this, now, ctx](Dictionary* d, const Key& key) { assign(d, key, now, ctx); });
+    DEBUG_END();
+    return POISON;
+}
+
+Any Interpreter::visitRandomStatement(AquilaParser::RandomStatementContext *ctx) {
+    DEBUG_BGN();
+    Integer fromInt, toInt, range, random;
+    mpz_inits(fromInt.i, toInt.i, range.i, random.i, NULL);
+    /* from */
+    Any from = visit(ctx->from);
+    if (!isInt(from)) {
+        typeMismatch(TYPE_INT, from, ctx->from);
+        assert(0);
+    }
+    mpz_set(fromInt.i, toInt(from)->i);
+    /* to */
+    Any to = visit(ctx->to);
+    if (!isInt(to)) {
+        typeMismatch(TYPE_INT, to, ctx->to);
+        assert(0);
+    }
+    mpz_set(toInt.i, toInt(to)->i);
+    /* random */
+    mpz_sub(range.i, toInt.i, fromInt.i);
+    mpz_urandomm(random.i, state, range.i);
+    mpz_add(random.i, random.i, fromInt.i);
+    mpz_clears(fromInt.i, toInt.i, range.i, NULL);
+    handleLhs(ctx->lhs(), [this, random, ctx](Dictionary* d, const Key& key) { assign(d, key, random, ctx); });
+    DEBUG_END();
+    return POISON;
+}
+
 Any Interpreter::visitReadStatement(AquilaParser::ReadStatementContext *ctx) {
     DEBUG_BGN();
     std::string line;
     std::getline(std::cin, line);
     handleLhs(ctx->lhs(), [this, line, ctx](Dictionary* d, const Key& key) { assign(d, key, line, ctx); });
-    DEBUG_END();
-    return POISON;
-}
-
-Any Interpreter::visitWriteStatement(AquilaParser::WriteStatementContext *ctx) {
-    DEBUG_BGN();
-    Any rhs = visit(ctx->rhs);
-    if (isStr(rhs)) {
-        std::cout << *toStr(rhs) << std::endl;
-    } else {
-        typeMismatch(TYPE_STR, rhs, ctx->rhs);
-        assert(0);
-    }
     DEBUG_END();
     return POISON;
 }
@@ -576,6 +626,34 @@ Any Interpreter::visitRunStatement(AquilaParser::RunStatementContext *ctx) {
             fileNotFound(file, ctx->rhs);
             assert(0);
         }
+    } else {
+        typeMismatch(TYPE_STR, rhs, ctx->rhs);
+        assert(0);
+    }
+    DEBUG_END();
+    return POISON;
+}
+
+Any Interpreter::visitSleepStatement(AquilaParser::SleepStatementContext *ctx) {
+    DEBUG_BGN();
+    Any rhs = visit(ctx->rhs);
+    if (isInt(rhs)) {
+#ifdef SUPPORT_NOW_AND_SLEEP
+        std::this_thread::sleep_for(std::chrono::milliseconds(mpz_get_ui(toInt(rhs)->i)));
+#endif
+    } else {
+        typeMismatch(TYPE_INT, rhs, ctx->rhs);
+        assert(0);
+    }
+    DEBUG_END();
+    return POISON;
+}
+
+Any Interpreter::visitWriteStatement(AquilaParser::WriteStatementContext *ctx) {
+    DEBUG_BGN();
+    Any rhs = visit(ctx->rhs);
+    if (isStr(rhs)) {
+        std::cout << *toStr(rhs) << std::endl;
     } else {
         typeMismatch(TYPE_STR, rhs, ctx->rhs);
         assert(0);
@@ -1154,13 +1232,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
                 break;
             }
         }
-    } else if (strEquals(identifier, "exit")) {
-        if (!checkArgs(ctx, arguments, { TYPE_INT })) {
-            assert(0);
-        }
-        Integer arg1 = *toInt(arguments[0]);
-        result = arg1;
-        exit(mpz_get_ui(arg1.i));
     } else if (strEquals(identifier, "filter")) {
         if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
             assert(0);
@@ -1387,15 +1458,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         Integer r;
         mpz_init_set_ui(r.i, arg1.size());
         result = r;
-    } else if (strEquals(identifier, "sleep")) {
-        if (!checkArgs(ctx, arguments, { TYPE_INT })) {
-            assert(0);
-        }
-#ifdef SUPPORT_SLEEP
-        Integer arg1 = *toInt(arguments[0]);
-        std::this_thread::sleep_for(std::chrono::milliseconds(mpz_get_ui(arg1.i)));
-#endif
-        result = true;
     } else if (strEquals(identifier, "split")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR })) {
             assert(0);

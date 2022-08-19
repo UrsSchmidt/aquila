@@ -5,15 +5,22 @@ program
     ;
 
 statement
+    /* compound statements */
     : ifStatement
     | switchStatement
     | loopStatement
     | forStatement
+    /* simple statements */
     | callStatement
+    | exitStatement
+    | nowStatement
+    | randomStatement
     | readStatement
-    | writeStatement
     | removeStatement
     | runStatement
+    | sleepStatement
+    | writeStatement
+    /* assignment */
     | assignStatement
     ;
 
@@ -46,12 +53,20 @@ callStatement
     : 'call' functionCall ';'
     ;
 
-readStatement
-    : 'read' lhs ';'
+exitStatement
+    : 'exit' rhs=expression ';'
     ;
 
-writeStatement
-    : 'write' rhs=expression ';'
+nowStatement
+    : 'now' lhs ';'
+    ;
+
+randomStatement
+    : 'random' lhs 'from' from=expression 'to' to=expression ';'
+    ;
+
+readStatement
+    : 'read' lhs ';'
     ;
 
 removeStatement
@@ -60,6 +75,14 @@ removeStatement
 
 runStatement
     : 'run' rhs=expression ';'
+    ;
+
+sleepStatement
+    : 'sleep' rhs=expression ';'
+    ;
+
+writeStatement
+    : 'write' rhs=expression ';'
     ;
 
 assignStatement

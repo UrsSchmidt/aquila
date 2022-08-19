@@ -144,13 +144,13 @@ Functions are always written as lambdas: `\x, y -> x + y`
 
 You can assign functions to variables like any other value: `a := \x -> 2 * x;`
 
-You can write recursive functions by using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
+You can write recursive functions using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
 
 You can add additional runtime type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 
 Here you can also use `Any` to explicitly state, that the argument can take any type: `\x : Any -> x`
 
-You can write void functions by using code blocks: `a := \s -> (write s;);`
+You can write void functions using code blocks: `a := \s -> (write s;);`
 
 The following predefined functions are available on functions:
  * `foreach(d : Dictionary, f : Function)`
@@ -200,7 +200,7 @@ Type conversion functions:
 
 ### Checking for types
 
-You can check for types by using the predefined functions `boolean`, `dictionary`, `function`, `integer` and `string`:
+You can check for types using the predefined functions `boolean`, `dictionary`, `function`, `integer` and `string`:
 ```
 a := 123;
 write bool2str(integer(a)); # true
@@ -245,26 +245,32 @@ There can be 0..n `case` parts and the `default` part is mandatory.
 ### Misc. built-in functions
 
  * `error(a)` exits the current script with the error message `a` and exit code 1
- * `exit(a)` exits the current script with exit code `a`
- * `sleep(a)` sleeps/waits for `a` milliseconds
 
-## Statements
-
-### Assignments
+## Assignments
 
 You can assign values to variables using: `myVariable := myValue;`
 
+## Simple statements
+
 ### Call statements
 
-You can call a void function by using: `call myVoidFunction(p1, p2);`
+You can call a void `Function` using: `call myVoidFunction(p1, p2);`
+
+### Exit statements
+
+You can exit the current script with a specific exit code using: `exit myExitCode;`
+
+### Now statements
+
+You can put the current time in milliseconds into an `Integer` using: `now myTimeVariable;`
+
+### Random statements
+
+You can put a random number that is in a certain range into an `Integer` using: `random myVariable from 1 to 10;`
 
 ### Read statements
 
 You can read a line from the command line into a `String` using: `read myVariable;`
-
-### Write statements
-
-You can write a `String` as a line to the command line using: `write 'Hello, world!';`
 
 ### Remove statements
 
@@ -273,6 +279,16 @@ You can remove key/value pairs from dictionaries using: `remove myDictionary.myK
 ### Run statements
 
 You can run other external Aquila scripts using: `run 'script.aq';`
+
+### Sleep statements
+
+You can sleep/wait for a specific amount of milliseconds using: `sleep myVariableHoldingMilliseconds;`
+
+### Write statements
+
+You can write a `String` as a line to the command line using: `write 'Hello, world!';`
+
+## Compound statements
 
 ### If statements
 

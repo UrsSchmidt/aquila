@@ -45,6 +45,7 @@ private:
 
     char* script_caller;
     std::filesystem::path script_root;
+    gmp_randstate_t state;
 
     void handleLhs(AquilaParser::LhsContext* lhsc, std::function<void(Dictionary*, Key)> handler);
 
@@ -56,6 +57,8 @@ private:
 public:
 
     Interpreter(int argc, char* argv[]);
+
+    ~Interpreter();
 
     Any visitProgram(AquilaParser::ProgramContext *ctx);
 
@@ -73,13 +76,21 @@ public:
 
     Any visitCallStatement(AquilaParser::CallStatementContext *ctx);
 
-    Any visitReadStatement(AquilaParser::ReadStatementContext *ctx);
+    Any visitExitStatement(AquilaParser::ExitStatementContext *ctx);
 
-    Any visitWriteStatement(AquilaParser::WriteStatementContext *ctx);
+    Any visitNowStatement(AquilaParser::NowStatementContext *ctx);
+
+    Any visitRandomStatement(AquilaParser::RandomStatementContext *ctx);
+
+    Any visitReadStatement(AquilaParser::ReadStatementContext *ctx);
 
     Any visitRemoveStatement(AquilaParser::RemoveStatementContext *ctx);
 
     Any visitRunStatement(AquilaParser::RunStatementContext *ctx);
+
+    Any visitSleepStatement(AquilaParser::SleepStatementContext *ctx);
+
+    Any visitWriteStatement(AquilaParser::WriteStatementContext *ctx);
 
     Any visitAssignStatement(AquilaParser::AssignStatementContext *ctx);
 

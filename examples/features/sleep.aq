@@ -1,7 +1,5 @@
 #!/usr/local/bin/aq
 
-call sleep(2000);
+sleep 2000;
 
 write 'Hello, world!';
-
-call exit(1);

@@ -1,0 +1,5 @@
+#!/usr/local/bin/aq
+
+now n;
+
+write int2str(n);

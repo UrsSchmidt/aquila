@@ -45,7 +45,6 @@
           <keyword>dictionary</keyword>
           <keyword>error</keyword>
           <keyword>exists</keyword>
-          <keyword>exit</keyword>
           <keyword>filter</keyword>
           <keyword>findleft</keyword>
           <keyword>findright</keyword>
@@ -69,7 +68,6 @@
           <keyword>right</keyword>
           <keyword>sgn</keyword>
           <keyword>size</keyword>
-          <keyword>sleep</keyword>
           <keyword>split</keyword>
           <keyword>sqrt</keyword>
           <keyword>str2bool</keyword>
@@ -90,6 +88,7 @@
           <keyword>else</keyword>
           <keyword>eq</keyword>
           <keyword>ew</keyword>
+          <keyword>exit</keyword>
           <keyword>false</keyword>
           <keyword>for</keyword>
           <keyword>from</keyword>
@@ -100,11 +99,14 @@
           <keyword>mod</keyword>
           <keyword>ne</keyword>
           <keyword>not</keyword>
+          <keyword>now</keyword>
           <keyword>or</keyword>
+          <keyword>random</keyword>
           <keyword>read</keyword>
           <keyword>rem</keyword>
           <keyword>remove</keyword>
           <keyword>run</keyword>
+          <keyword>sleep</keyword>
           <keyword>step</keyword>
           <keyword>sw</keyword>
           <keyword>switch</keyword>
