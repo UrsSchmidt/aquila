@@ -3,6 +3,7 @@ rewrite the Interpreter in C++ as aquila4c
     make sure there is a `mpz_clear` for every `mpz_init`
     remove tests/example.aq
     rewrite the bashscripts used in aquila4c as Makefiles
+    look for occurrences of anyEquals and toString in aquila4c and decide whether to reduce or expand the amount of occurrences
 
 fix all TODOs/FIXMEs
 
@@ -12,16 +13,7 @@ use cpplint & cppcheck for aquila4c
 predefined functions:
     on strings:
         implement in Aquila as part of the prelude: matches (regex)
-    on maps (do these manipulate the map directly or return a new map?)
-        normalize([]) # fixes array indices to go from 0..length-1
-        reverse([])
-        shuffle([])
-        sort([])
-        on integer valued maps
-            max([])
-            min([])
-            sum([])
-            product([])
+    finish arrayfunctions.aq
     files and directories:
         pwd()
         chdir/cd()

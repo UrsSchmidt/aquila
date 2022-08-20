@@ -173,6 +173,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
     private static Map toDictionary(String s, ParserRuleContext ctx) {
         if (s != null) {
             try {
+                // FIXME rewrite this to not copy code from main
                 AquilaLexer lexer = new AquilaLexer(CharStreams.fromString(s));
                 AquilaParser parser = new AquilaParser(new CommonTokenStream(lexer));
                 DictAggregateContext dictAggregate = parser.dictAggregate();

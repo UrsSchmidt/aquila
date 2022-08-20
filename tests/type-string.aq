@@ -60,6 +60,14 @@ write replace('abcde', 'bcd', '_');
 write replace('abcde', '.', '_');
 
 # prelude functions
+write bool2str(isallprintableascii('This is all in printable ASCII.'));
+write bool2str(isallprintableascii('Thiś is nòt in pŕintâble ÁSCÌI.'));
+write bool2str(isnumeric('0123456789'));
+write bool2str(isnumeric('0123ab6789'));
+write bool2str(isalluppercase('HELLO'));
+write bool2str(isalluppercase('HeLlO'));
+write bool2str(isalllowercase('hello'));
+write bool2str(isalllowercase('HeLlO'));
 write bool2str(isblank(''));
 write bool2str(isblank(str));
 write chop('あいう');

@@ -26,6 +26,23 @@ islowercase := \c : String ->
 
 ## Functions on Strings
 
+isallprintableascii := \s : String ->
+    if s eq '': true
+    elif isprintableascii(head(s)): isallprintableascii(tail(s))
+    else: false;
+isnumeric := \s : String ->
+    if s eq '': true
+    elif isdigit(head(s)): isnumeric(tail(s))
+    else: false;
+isalluppercase := \s : String ->
+    if s eq '': true
+    elif isuppercase(head(s)): isalluppercase(tail(s))
+    else: false;
+isalllowercase := \s : String ->
+    if s eq '': true
+    elif islowercase(head(s)): isalllowercase(tail(s))
+    else: false;
+
 isblank := \s : String ->
     if s eq '': true
     elif char2ord(s) <= char2ord(' '): isblank(tail(s))

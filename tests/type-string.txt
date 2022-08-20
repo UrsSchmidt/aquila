@@ -42,6 +42,14 @@ a_e
 abcde
 true
 false
+true
+false
+true
+false
+true
+false
+true
+false
 あい
 true
 false

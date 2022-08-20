@@ -1,0 +1,71 @@
+#!/usr/local/bin/aq
+
+
+
+# TODO this file is a work in progress
+#all dictionaries
+#    normalize
+#normalized dictionary where all values are integers or strings:
+#    sort
+#    set (sort + uniq)
+#normalized dictionary where all values are integers or strings and they are sorted:
+#    uniq
+#normalized dictionary where all values are integers or strings and they are sorted and unique:
+#    union
+#    intersection
+#    difference \
+
+
+
+isnormalizedarray := \d : Dictionary ->
+    ;
+
+isintegerarray := \d : Dictionary ->
+    forall(d, \k, v -> integer(v));
+
+normalize := \d : Dictionary ->
+    if size(d) = 0: {}
+    else: ;
+
+# normalized arrays only
+
+reverseaux := \na : Dictionary, i : Integer ->
+    if i < 0: error('Illegal argument')
+    elif i > size(na) / 2: na
+    else reverseaux(na, i + 1);
+reverse := \na : Dictionary ->
+    if not isnormalizedarray(na): error('Illegal argument')
+    elif size(na) = 0: {}
+    else: reverseaux(na, 0);
+
+sortaux := \na : Dictionary, comparator : Function, begin : Integer, end : Integer ->
+    if begin < 0 or end < 0: error('Illegal argument')
+    elif end - begin <= 1: na
+    else: ;
+sort := \na : Dictionary, comparator : Function ->
+    if not isnormalizedarray(na): error('Illegal argument')
+    elif: size(na) = 0: {}
+    else: sortaux(na, comparator, 0, size(na));
+
+# integer array only
+
+# FIXME these two are really bad
+max := \ia : Dictionary ->
+    if not isintegerarray(ia): error('Illegal argument')
+    elif size(ia) = 0: 0
+    else: fold(ia, -1000000, \a, b ->
+        if a > b: a
+        else: b;
+min := \ia : Dictionary ->
+    if not isintegerarray(ia): error('Illegal argument')
+    elif size(ia) = 0: 0
+    else: fold(ia, +1000000, \a, b ->
+        if a < b: a
+        else: b;
+
+sum := \ia : Dictionary ->
+    if not isintegerarray(ia): error('Illegal argument')
+    else: fold(ia, 0, \a, b -> a + b);
+product := \ia : Dictionary ->
+    if not isintegerarray(ia): error('Illegal argument')
+    else: fold(ia, 1, \a, b -> a * b);

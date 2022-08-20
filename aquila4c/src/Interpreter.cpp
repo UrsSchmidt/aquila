@@ -136,14 +136,7 @@ String toString(const Any& o) {
 Dictionary toDictionary(const String& s, antlr4::ParserRuleContext* ctx) {
     Dictionary result;
     try {
-        /* TODO
-        AquilaLexer lexer = new AquilaLexer(CharStreams.fromString(s));
-        AquilaParser parser = new AquilaParser(new CommonTokenStream(lexer));
-        DictAggregateContext dictAggregate = parser.dictAggregate();
-        if (parser.getNumberOfSyntaxErrors() == 0) {
-            result = (Map) new Interpreter(new std::string[0]).visit(dictAggregate);
-        }
-        */
+        // TODO implement
     } catch (...) {
         /* do nothing */
     }
