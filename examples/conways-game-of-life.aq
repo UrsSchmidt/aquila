@@ -1,0 +1,70 @@
+#!/usr/local/bin/aq
+
+run '../prelude/stringfunctions.aq';
+
+# set the size of your console window here
+width := 79;
+height := 23;
+
+# set the command for clearing the screen here
+clearscreen := ord2char(0x1b) & '[2J';
+
+pad := \s : String ->
+    if length(s) >= width: s
+    else: s & space(width - length(s));
+
+board := {};
+board[0] := pad('    ');
+board[1] := pad('  * ');
+board[2] := pad('   *');
+board[3] := pad(' ***');
+for y from 4 to height - 1 (
+    board[y] := space(width);
+)
+
+iterate := \-> (
+    newboard := {};
+    for y from 0 to height - 1 (
+        newboard[y] := '';
+    )
+    for y from 0 to height - 1 (
+        for x from 0 to width - 1 (
+            live := 0;
+            for ry from -1 to 1 (
+                for rx from -1 to 1 (
+                    if rx <> 0 or ry <> 0 (
+                        ax := x + rx;
+                        ay := y + ry;
+                        if 0 <= ax and ax < width and
+                           0 <= ay and ay < height (
+                            neighbor := charat(board[ay], ax);
+                            if neighbor eq '*' (live := live + 1;)
+                            elif neighbor ne ' ' (call error('Illegal neighbor encountered: ' & neighbor);)
+                        )
+                    )
+                )
+            )
+            self := charat(board[y], x);
+            if self eq ' ' (if live = 3 (self := '*';))
+            elif self eq '*' (if live < 2 or live > 3 (self := ' ';))
+            else (call error('Illegal self encountered: ' & self);)
+            newboard[y] := newboard[y] & self;
+        )
+    )
+    for y from 0 to height - 1 (
+        board[y] := newboard[y];
+    )
+);
+
+print := \-> (
+    write clearscreen;
+    for y from 0 to height - 1 (
+        write board[y] & '|';
+    )
+);
+
+for i from 1 to 50 (
+    call print();
+    call iterate();
+)
+call print();
