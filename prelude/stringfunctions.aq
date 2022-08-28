@@ -2,7 +2,7 @@
 
 ## Characters
 
-NUL  := ord2char(0x00);
+NUL  := ord2char(0x00); # \0
 BEL  := ord2char(0x07); # \a
 BS   := ord2char(0x08); # \b
 HT   := ord2char(0x09); # \t
@@ -11,6 +11,7 @@ VT   := ord2char(0x0b); # \v
 FF   := ord2char(0x0c); # \f
 CR   := ord2char(0x0d); # \r
 CRLF := CR & LF;
+ESC  := ord2char(0x1b);
 APOS := ord2char(0x27);
 
 ## Functions on characters (Strings with length = 1)

@@ -3,11 +3,11 @@
 run '../prelude/stringfunctions.aq';
 
 # set the size of your console window here
-width := 79;
+width := 80 - 1;
 height := 23;
 
 # set the command for clearing the screen here
-clearscreen := ord2char(0x1b) & '[2J';
+clearscreen := ESC & '[2J';
 
 pad := \s : String ->
     if length(s) >= width: s
