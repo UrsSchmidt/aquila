@@ -3,6 +3,7 @@ rewrite the Interpreter in C++ as aquila4c
     make sure there is a `mpz_clear` for every `mpz_init`
     remove tests/example.aq
     look for occurrences of anyEquals and toString in aquila4c and decide whether to reduce or expand the amount of occurrences
+        maybe make write take multiple arguments with comma separated that can be of any type and are implicitly cast to strings?
 
 fix all TODOs/FIXMEs
 
