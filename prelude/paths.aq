@@ -1,0 +1,44 @@
+#!/usr/local/bin/aq
+
+# TODO this file is a work in progress
+
+count := \s : String, t : String ->
+    size(split(t, s)) - 1;
+
+addslash := \s : String ->
+    if s ew '/': s
+    else: s & '/';
+dropslash := \s : String ->
+    if s ew '/': left(s, length(s) - 1)
+    else: s;
+
+base := \s : String ->
+    let t = dropslash(s): (
+        if '/' in t: substring1(t, findright(t, '/', length(t)) + 1)
+        else: t
+    );
+extension := \s : String ->
+    if s ew '/': error('Illegal argument')
+    elif '.' in s: substring1(s, findright(s, '.', length(s)) + 1)
+    else: '';
+parent := \s : String ->
+    if not s sw '/': error('Illegal argument')
+    else: left(s, findright(dropslash(s), '/', length(s)) + 1);
+
+absolute := \root : String, s : String ->
+    if not root sw '/' or not root ew '/': error('Illegal argument')
+    elif s sw '/': s
+    elif s sw './': root & substring1(s, 2)
+    elif s sw '../': parent(root) & substring1(s, 3)
+    else: root & s;
+relative := \root : String, s : String ->
+    if not root sw '/' or not root ew '/': error('Illegal argument')
+    elif not s sw '/': s
+    elif s sw root: substring1(s, length(root))
+    else: (
+        let f = \t : String, u : String ->
+                if head(t) eq head(u): 1 + f(tail(t), tail(u))
+                else: 0,
+            l = f(root, s):
+            repeat('../', count(substring1(root, l), '/')) & substring1(s, l)
+    );

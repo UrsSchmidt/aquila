@@ -1,0 +1,18 @@
+#!/usr/local/bin/aq
+
+# there is also the gcd() function available
+# this file only serves as an examples as to how to implement it on your own
+
+owngcd := \m : Integer, n : Integer ->
+    if m < 0 or n < 0:
+        error('Illegal argument')
+    elif n = 0:
+        m
+    else:
+        owngcd(n, m mod n);
+
+for m from 2 to 5 (
+    for n from 2 to 5 (
+        write 'gcd(' & int2str(m) & ', ' & int2str(n) & ') = ' & int2str(owngcd(m, n));
+    )
+)

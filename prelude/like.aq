@@ -5,12 +5,9 @@ run 'stringfunctions.aq';
 # a very simplistic implementation of like()
 # handles ?, * and #
 like := \s : String, p : String ->
-    if s eq '':
-        containsonly(p, '*')
-    elif p eq '':
-        false
-    elif containsonly(p, '*'):
-        true
+    if s eq '': containsonly(p, '*')
+    elif p eq '': false
+    elif containsonly(p, '*'): true
     else: (
         let hs = head(s), ts = tail(s),
             hp = head(p), tp = tail(p),

@@ -5,6 +5,12 @@ rewrite the Interpreter in C++ as aquila4c
     look for occurrences of anyEquals and toString in aquila4c and decide whether to reduce or expand the amount of occurrences
         maybe make write take multiple arguments with comma separated that can be of any type and are implicitly cast to strings?
 
+finish all work in progresses
+    examples/conways-game-of-life.aq
+    examples/zebra-puzzle.aq
+    prelude/arrayfunctions.aq
+    prelude/paths.aq
+
 fix all TODOs/FIXMEs
 
 use checkstyle for aquila4j

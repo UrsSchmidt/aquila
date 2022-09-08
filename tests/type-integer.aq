@@ -50,5 +50,5 @@ write int2str(sqrt(0));
 write int2str(sqrt(49));
 
 # prelude functions
-write int2str(bin(2, 2));
+write int2str(binomial(2, 2));
 write int2str(lcm(5, 2));

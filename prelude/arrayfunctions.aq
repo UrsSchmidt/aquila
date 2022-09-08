@@ -55,13 +55,13 @@ max := \ia : Dictionary ->
     elif size(ia) = 0: 0
     else: fold(ia, -1000000, \a, b ->
         if a > b: a
-        else: b;
+        else: b);
 min := \ia : Dictionary ->
     if not isintegerarray(ia): error('Illegal argument')
     elif size(ia) = 0: 0
     else: fold(ia, +1000000, \a, b ->
         if a < b: a
-        else: b;
+        else: b);
 
 sum := \ia : Dictionary ->
     if not isintegerarray(ia): error('Illegal argument')
