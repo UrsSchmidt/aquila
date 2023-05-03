@@ -8,7 +8,7 @@ This is the C++ 17 implementation of Aquila. See [here](aquila4c/README.md) for 
 
 ## aquila4j
 
-This is the Java 11 implementation of Aquila. See [here](aquila4j/README.md) for details on how to build `aquila4j`.
+This is the Java 17 implementation of Aquila. See [here](aquila4j/README.md) for details on how to build `aquila4j`.
 
 ## Running the test suite on Ubuntu
 

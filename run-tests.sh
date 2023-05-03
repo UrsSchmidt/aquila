@@ -5,7 +5,7 @@
 command -v aq >/dev/null 2>&1 || { echo >&2 "Install Aquila first!"; exit 1; }
 
 root='tests/'
-temp="$root/~temp.txt"
+temp=$(mktemp /tmp/aq.XXXXXX)
 
 for f in "$root"*.aq; do
     echo "$f"

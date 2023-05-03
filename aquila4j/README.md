@@ -1,6 +1,6 @@
 # aquila4j
 
-This is the Java 11 implementation of Aquila.
+This is the Java 17 implementation of Aquila.
 
 ## Building the interpreter
 
