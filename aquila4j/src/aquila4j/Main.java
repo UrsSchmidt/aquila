@@ -33,7 +33,7 @@ public class Main {
 
         final int nose = parser.getNumberOfSyntaxErrors();
         if (nose > 0) {
-            System.err.println("ERROR: There were " + nose + " syntax errors");
+            System.err.println("ERROR: There were " + nose + " syntax errors!");
             System.exit(1);
             return;
         }

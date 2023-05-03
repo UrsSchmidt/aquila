@@ -29,7 +29,7 @@ int run(int argc, char* argv[]) {
 
     const size_t nose = parser->getNumberOfSyntaxErrors();
     if (nose > 0) {
-        std::cerr << "ERROR: There were syntax errors!" << std::endl;
+        std::cerr << "ERROR: There were " << nose << " syntax errors!" << std::endl;
         return EXIT_FAILURE;
     }
 
