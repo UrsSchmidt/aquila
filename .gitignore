@@ -4,7 +4,6 @@
 /aquila4j/bin/
 /aquila4j/src/aquila4j/antlr/
 /aquila4j/aquila4j.jar
-/etc/
 *.class
 *.jar
 *.o

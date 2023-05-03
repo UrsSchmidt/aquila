@@ -13,7 +13,7 @@ mkdir -p "$gen/"
 mkdir -p "$dst/"
 
 parent=$(dirname "$PWD")
-java -jar '../../antlr-4.10.1-complete.jar' "$parent/Aquila.g4" -Dlanguage=Cpp -visitor -no-listener -encoding utf8 -o "$gen/"
+java -jar '../../antlr-4.12.0-complete.jar' "$parent/Aquila.g4" -Dlanguage=Cpp -visitor -no-listener -encoding utf8 -o "$gen/"
 
 comp_ops_gen='-c -std=c++17 -I/usr/local/include/antlr4-runtime'
 comp_ops_src="$comp_ops_gen -pedantic -Wall"

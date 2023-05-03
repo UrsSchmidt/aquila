@@ -14,7 +14,7 @@
     <property name="src.gen.dir" value="${src.dir}/${main.package}/antlr" />
 
     <!-- specific files -->
-    <property name="antlr.file"   value="${grand.parent.dir}/antlr-4.10.1-complete.jar" />
+    <property name="antlr.file"   value="${grand.parent.dir}/antlr-4.12.0-complete.jar" />
     <property name="grammar.file" value="${parent.dir}/Aquila.g4" />
     <property name="jar.file"     value="${ant.project.name}.jar" />
 
