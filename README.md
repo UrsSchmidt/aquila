@@ -274,7 +274,7 @@ You can read a line from the command line into a `String` using: `read myVariabl
 
 ### Remove statements
 
-You can remove key/value pairs from dictionaries using: `remove myDictionary.myKey;`
+You can remove variables or key/value pairs from dictionaries using: `remove myVariable;` and `remove myDictionary.myKey;` respectively
 
 ### Run statements
 
