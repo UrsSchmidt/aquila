@@ -21,4 +21,4 @@ levenshtein := \a : String, b : String ->
         EndLet
     EndIf;
 
-Write int2str(levenshtein('kitten', 'sitting')); # 3
+Write IntToStr(levenshtein('kitten', 'sitting')); # 3

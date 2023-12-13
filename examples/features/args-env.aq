@@ -1,5 +1,5 @@
 #!/usr/local/bin/aq
 
-Write dict2str(args);
+Write DictToStr(args);
 
-Write dict2str(env);
+Write DictToStr(env);

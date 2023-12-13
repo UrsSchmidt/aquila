@@ -15,12 +15,12 @@ Write 'part 2';
 
 b.a := '43';
 Write b.a;
-Write dict2str(b);
+Write DictToStr(b);
 
 b.b.a := '44';
 Write b.b.a;
-Write dict2str(b.b);
-Write dict2str(b);
+Write DictToStr(b.b);
+Write DictToStr(b);
 
 Remove b;
 

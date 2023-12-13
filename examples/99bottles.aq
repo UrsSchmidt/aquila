@@ -3,7 +3,7 @@
 n := 99;
 
 f := \n : Integer ->
-    If n = 0: 'No more' Else: int2str(n) EndIf & ' bottle' & If n <> 1: 's' Else: '' EndIf & ' of beer';
+    If n = 0: 'No more' Else: IntToStr(n) EndIf & ' bottle' & If n <> 1: 's' Else: '' EndIf & ' of beer';
 
 s := f(n);
 For i From n To 1 Step -1:

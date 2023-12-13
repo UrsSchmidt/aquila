@@ -37,15 +37,20 @@
           <keyword>args</keyword>
           <keyword>env</keyword>
           <!-- functions: -->
+          <keyword>BoolToStr</keyword>
+          <keyword>CharToOrd</keyword>
+          <keyword>DictToStr</keyword>
+          <keyword>IntToStr</keyword>
           <keyword>IsBoolean</keyword>
           <keyword>IsDictionary</keyword>
           <keyword>IsFunction</keyword>
           <keyword>IsInteger</keyword>
           <keyword>IsString</keyword>
-          <keyword>bool2str</keyword>
-          <keyword>char2ord</keyword>
+          <keyword>OrdToChar</keyword>
+          <keyword>StrToBool</keyword>
+          <keyword>StrToDict</keyword>
+          <keyword>StrToInt</keyword>
           <keyword>charat</keyword>
-          <keyword>dict2str</keyword>
           <keyword>error</keyword>
           <keyword>exists</keyword>
           <keyword>filter</keyword>
@@ -56,13 +61,11 @@
           <keyword>foreach</keyword>
           <keyword>gcd</keyword>
           <keyword>head</keyword>
-          <keyword>int2str</keyword>
           <keyword>join</keyword>
           <keyword>left</keyword>
           <keyword>length</keyword>
           <keyword>map</keyword>
           <keyword>mid</keyword>
-          <keyword>ord2char</keyword>
           <keyword>pow</keyword>
           <keyword>repeat</keyword>
           <keyword>replace</keyword>
@@ -71,9 +74,6 @@
           <keyword>size</keyword>
           <keyword>split</keyword>
           <keyword>sqrt</keyword>
-          <keyword>str2bool</keyword>
-          <keyword>str2dict</keyword>
-          <keyword>str2int</keyword>
           <keyword>substring1</keyword>
           <keyword>substring2</keyword>
           <keyword>tail</keyword>

@@ -1,8 +1,8 @@
 move predefined functions to CamelCase
-type conversion functions should use "To" instead of "2"
+move all remaining local variables to CamelCase (except one letter variables like `i` etc)
 
 on a new branch:
-add hex() oct() bin() ord() asc() odd() etc functions?
+add hex() oct() bin() odd() etc functions?
 add a ForEach key,value In map structure?
 
 rewrite the Interpreter in C++ as aquila4c

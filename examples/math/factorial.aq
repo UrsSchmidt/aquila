@@ -13,5 +13,5 @@ factorial := \n : Integer ->
     EndIf;
 
 For n From 1 To 10:
-    Write int2str(n) & '! = ' & int2str(factorial(n));
+    Write IntToStr(n) & '! = ' & IntToStr(factorial(n));
 EndFor

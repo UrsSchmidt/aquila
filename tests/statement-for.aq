@@ -1,13 +1,13 @@
 #!/usr/local/bin/aq
 
 For i From 1 To 3:
-    Write int2str(i);
+    Write IntToStr(i);
 EndFor
 
 For i From 1 To 10 Step 2:
-    Write int2str(i);
+    Write IntToStr(i);
 EndFor
 
 For i From 10 To 1 Step -3:
-    Write int2str(i);
+    Write IntToStr(i);
 EndFor

@@ -14,6 +14,6 @@ owngcd := \m : Integer, n : Integer ->
 
 For m From 2 To 5:
     For n From 2 To 5:
-        Write 'gcd(' & int2str(m) & ', ' & int2str(n) & ') = ' & int2str(owngcd(m, n));
+        Write 'gcd(' & IntToStr(m) & ', ' & IntToStr(n) & ') = ' & IntToStr(owngcd(m, n));
     EndFor
 EndFor

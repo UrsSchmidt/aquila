@@ -2,5 +2,5 @@
 
 For i From 1 To 10:
     Random n From 1 To 10;
-    Write int2str(n);
+    Write IntToStr(n);
 EndFor

@@ -16,6 +16,6 @@ ownpow := \m : Integer, n : Integer ->
 
 For m From 0 To 3:
     For n From 0 To 3:
-        Write int2str(m) & '^' & int2str(n) & ' = ' & int2str(ownpow(m, n));
+        Write IntToStr(m) & '^' & IntToStr(n) & ' = ' & IntToStr(ownpow(m, n));
     EndFor
 EndFor

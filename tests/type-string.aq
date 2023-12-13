@@ -12,22 +12,22 @@ Write str;
 Write '' & 'あいう';
 Write 'あいう' & '';
 Write 'あいう' & 'えおか';
-Write bool2str('あいう' eq 'あいう');
-Write bool2str('あいう' eq 'えおか');
-Write bool2str('あいう' ne 'あいう');
-Write bool2str('あいう' ne 'えおか');
-Write bool2str('あいう' in 'あいうえお');
-Write bool2str('えおか' in 'あいうえお');
-Write bool2str('あいうえお' sw 'あいう');
-Write bool2str('あいうえお' sw 'いうえ');
-Write bool2str('あいうえお' ew 'うえお');
-Write bool2str('あいうえお' ew 'いうえ');
+Write BoolToStr('あいう' eq 'あいう');
+Write BoolToStr('あいう' eq 'えおか');
+Write BoolToStr('あいう' ne 'あいう');
+Write BoolToStr('あいう' ne 'えおか');
+Write BoolToStr('あいう' in 'あいうえお');
+Write BoolToStr('えおか' in 'あいうえお');
+Write BoolToStr('あいうえお' sw 'あいう');
+Write BoolToStr('あいうえお' sw 'いうえ');
+Write BoolToStr('あいうえお' ew 'うえお');
+Write BoolToStr('あいうえお' ew 'いうえ');
 
 # functions
-Write int2str(length(str));
+Write IntToStr(length(str));
 
-Write int2str(char2ord(str));
-Write int2str(char2ord(right(str, 1)));
+Write IntToStr(CharToOrd(str));
+Write IntToStr(CharToOrd(right(str, 1)));
 
 Write charat(str, 1);
 Write substring1(str, 5);
@@ -40,15 +40,15 @@ Write right(str, 5);
 Write head(str);
 Write tail(str);
 
-Write int2str(findleft(str, 'He', 0));
-Write int2str(findleft(str, 'lO', 0));
-Write int2str(findright(str, 'He', length(str)));
-Write int2str(findright(str, 'lO', length(str)));
+Write IntToStr(findleft(str, 'He', 0));
+Write IntToStr(findleft(str, 'lO', 0));
+Write IntToStr(findright(str, 'He', length(str)));
+Write IntToStr(findright(str, 'lO', length(str)));
 
 s := '1;2;3';
 Write s;
 p := split(';', s);
-Write dict2str(p);
+Write DictToStr(p);
 t := join(',', p);
 Write t;
 
@@ -60,19 +60,19 @@ Write replace('abcde', 'bcd', '_');
 Write replace('abcde', '.', '_');
 
 # prelude functions
-Write bool2str(IsAllPrintableASCII('This is all in printable ASCII.'));
-Write bool2str(IsAllPrintableASCII('Thiś is nòt in pŕintâble ÁSCÌI.'));
-Write bool2str(IsNumeric('0123456789'));
-Write bool2str(IsNumeric('0123ab6789'));
-Write bool2str(IsAllUppercase('HELLO'));
-Write bool2str(IsAllUppercase('HeLlO'));
-Write bool2str(IsAllLowercase('hello'));
-Write bool2str(IsAllLowercase('HeLlO'));
-Write bool2str(IsBlank(''));
-Write bool2str(IsBlank(str));
+Write BoolToStr(IsAllPrintableASCII('This is all in printable ASCII.'));
+Write BoolToStr(IsAllPrintableASCII('Thiś is nòt in pŕintâble ÁSCÌI.'));
+Write BoolToStr(IsNumeric('0123456789'));
+Write BoolToStr(IsNumeric('0123ab6789'));
+Write BoolToStr(IsAllUppercase('HELLO'));
+Write BoolToStr(IsAllUppercase('HeLlO'));
+Write BoolToStr(IsAllLowercase('hello'));
+Write BoolToStr(IsAllLowercase('HeLlO'));
+Write BoolToStr(IsBlank(''));
+Write BoolToStr(IsBlank(str));
 Write Chop('あいう');
-Write bool2str(ContainsOnly('***', '*'));
-Write bool2str(ContainsOnly('*+*', '*'));
+Write BoolToStr(ContainsOnly('***', '*'));
+Write BoolToStr(ContainsOnly('*+*', '*'));
 Write StrReverse(str);
 Write Space(5);
 Write ToLowercase(str);

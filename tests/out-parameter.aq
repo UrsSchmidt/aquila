@@ -1,11 +1,11 @@
 #!/usr/local/bin/aq
 
 out := { before: 'before' };
-Write dict2str(out);
+Write DictToStr(out);
 
 f := \out : Dictionary -> {
     out.after := 'after';
-    Write dict2str(out);
+    Write DictToStr(out);
 };
 Call f(out);
-Write dict2str(out);
+Write DictToStr(out);

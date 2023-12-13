@@ -1,20 +1,32 @@
 #!/usr/local/bin/aq
 
+f := \i : Integer, j : Integer ->
+    If j < 2:
+        error('Illegal argument')
+    ElseIf i mod j = 0:
+        i
+    ElseIf j > 2:
+        f(i, j - 1)
+    Else:
+        -1
+    EndIf;
+
+# initialize sieve
+numbers := {};
 For i From 2 To 100:
     numbers[i] := true;
-    f := \i : Integer, j : Integer -> {
-        If j < 2:
-            Call error('Illegal argument');
-        ElseIf i mod j = 0:
-            numbers[i] := false;
-        ElseIf j > 2:
-            Call f(i, j - 1);
-        EndIf
-    };
+EndFor
+
+# sieve out non-primes
+For i From 2 To 100:
     sq := sqrt(i);
     If sq >= 2:
-        Call f(i, sq);
+        i2 := f(i, sq);
+        If i2 >= 2:
+            numbers[i2] := false;
+        EndIf
     EndIf
 EndFor
 
-Write dict2str(numbers);
+# print remaining numbers (the primes)
+Write DictToStr(numbers);

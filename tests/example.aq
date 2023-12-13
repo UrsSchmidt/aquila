@@ -1,22 +1,22 @@
 #!/usr/local/bin/aq
 
 abc.def := 2;
-Write int2str(abc.def);
+Write IntToStr(abc.def);
 
 a := {
     mykey: 'myvalue',
     ['mystringkey']: 'myvalue2',
     [2 + 3 * 4]: 42 * 3,
 };
-Write int2str(size(a));
-Write dict2str(a);
+Write IntToStr(size(a));
+Write DictToStr(a);
 Write a.mykey;
-Write bool2str('myvalue' : a);
+Write BoolToStr('myvalue' : a);
 
 Remove a['mystringkey'];
 Call foreach(a, \k, v -> {
     If IsInteger(v):
-        Write k & ': ' & int2str(v);
+        Write k & ': ' & IntToStr(v);
     ElseIf IsString(v):
         Write k & ': ' & v;
     Else:
@@ -28,7 +28,7 @@ Call foreach(a, \k, v -> {
 array := { 5, 4, 3, 2, 1 };
 array[4] := 42;
 Remove array[2];
-Write dict2str(array);
+Write DictToStr(array);
 Call foreach(array, \k, v -> {
-    Write int2str(v);
+    Write IntToStr(v);
 });

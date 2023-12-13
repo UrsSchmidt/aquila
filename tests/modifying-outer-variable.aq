@@ -3,4 +3,4 @@
 d := { 'a' };
 v := \-> {d[0] := 'b';};
 Call v();
-Write dict2str(d);
+Write DictToStr(d);

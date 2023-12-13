@@ -10,7 +10,7 @@ For i From 1 To 100:
         s := s & 'Buzz';
     EndIf
     If s eq '':
-        s := int2str(i);
+        s := IntToStr(i);
     EndIf
     Write s;
 EndFor

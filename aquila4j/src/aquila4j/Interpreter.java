@@ -1122,6 +1122,34 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         }
         Object result;
         switch (identifier) {
+        case "BoolToStr": {
+            if (!checkArgs(ctx, arguments, TYPE_BOOL)) {
+                return null;
+            }
+            final Boolean arg1 = (Boolean) arguments.get(0);
+            result = toString(arg1);
+        }   break;
+        case "CharToOrd": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = BigInteger.valueOf((long) arg1.charAt(0));
+        }   break;
+        case "DictToStr": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT)) {
+                return null;
+            }
+            final Map arg1 = (Map) arguments.get(0);
+            result = toString(arg1);
+        }   break;
+        case "IntToStr": {
+            if (!checkArgs(ctx, arguments, TYPE_INT)) {
+                return null;
+            }
+            final BigInteger arg1 = (BigInteger) arguments.get(0);
+            result = toString(arg1);
+        }   break;
         case "IsBoolean":
             result = checkArgsNoFail(ctx, arguments, TYPE_BOOL);
             break;
@@ -1137,19 +1165,33 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "IsString":
             result = checkArgsNoFail(ctx, arguments, TYPE_STR);
             break;
-        case "bool2str": {
-            if (!checkArgs(ctx, arguments, TYPE_BOOL)) {
+        case "OrdToChar": {
+            if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
             }
-            final Boolean arg1 = (Boolean) arguments.get(0);
-            result = toString(arg1);
+            final BigInteger arg1 = (BigInteger) arguments.get(0);
+            result = Character.toString((char) arg1.intValueExact());
         }   break;
-        case "char2ord": {
+        case "StrToBool": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
             }
             final String arg1 = (String) arguments.get(0);
-            result = BigInteger.valueOf((long) arg1.charAt(0));
+            result = toBoolean(arg1, ctx);
+        }   break;
+        case "StrToDict": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = toDictionary(arg1, ctx);
+        }   break;
+        case "StrToInt": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = toInteger(arg1, ctx);
         }   break;
         case "charat": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
@@ -1158,13 +1200,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             result = Character.toString(arg1.charAt(arg2.intValueExact()));
-        }   break;
-        case "dict2str": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT)) {
-                return null;
-            }
-            final Map arg1 = (Map) arguments.get(0);
-            result = toString(arg1);
         }   break;
         case "error": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
@@ -1297,13 +1332,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             result = arg1.isEmpty() ? "" : arg1.substring(0, 1);
         }   break;
-        case "int2str": {
-            if (!checkArgs(ctx, arguments, TYPE_INT)) {
-                return null;
-            }
-            final BigInteger arg1 = (BigInteger) arguments.get(0);
-            result = toString(arg1);
-        }   break;
         case "join": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_DICT)) {
                 return null;
@@ -1354,13 +1382,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             final BigInteger arg3 = (BigInteger) arguments.get(2);
             result = arg1.substring(arg2.intValueExact(), arg2.intValueExact() + arg3.intValueExact());
-        }   break;
-        case "ord2char": {
-            if (!checkArgs(ctx, arguments, TYPE_INT)) {
-                return null;
-            }
-            final BigInteger arg1 = (BigInteger) arguments.get(0);
-            result = Character.toString((char) arg1.intValueExact());
         }   break;
         case "pow": {
             if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
@@ -1428,27 +1449,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             final BigInteger arg1 = (BigInteger) arguments.get(0);
             result = arg1.sqrt();
-        }   break;
-        case "str2bool": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            result = toBoolean(arg1, ctx);
-        }   break;
-        case "str2dict": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            result = toDictionary(arg1, ctx);
-        }   break;
-        case "str2int": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            result = toInteger(arg1, ctx);
         }   break;
         case "substring1": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {

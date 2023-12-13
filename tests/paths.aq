@@ -2,7 +2,7 @@
 
 Run '../prelude/Paths.aq';
 
-Write int2str(Count('aaaabbbbaaaa', 'a'));
+Write IntToStr(Count('aaaabbbbaaaa', 'a'));
 
 Write AddSlash('abc');
 Write AddSlash('abc/');

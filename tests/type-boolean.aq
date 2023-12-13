@@ -1,28 +1,28 @@
 #!/usr/local/bin/aq
 
 # literals
-Write bool2str(false);
-Write bool2str(true);
+Write BoolToStr(false);
+Write BoolToStr(true);
 
 # operations
-Write bool2str(not false);
-Write bool2str(not true);
+Write BoolToStr(not false);
+Write BoolToStr(not true);
 
-Write bool2str(false and false);
-Write bool2str(false and true);
-Write bool2str(true and false);
-Write bool2str(true and true);
+Write BoolToStr(false and false);
+Write BoolToStr(false and true);
+Write BoolToStr(true and false);
+Write BoolToStr(true and true);
 
-Write bool2str(false or false);
-Write bool2str(false or true);
-Write bool2str(true or false);
-Write bool2str(true or true);
+Write BoolToStr(false or false);
+Write BoolToStr(false or true);
+Write BoolToStr(true or false);
+Write BoolToStr(true or true);
 
-Write bool2str(false xor false);
-Write bool2str(false xor true);
-Write bool2str(true xor false);
-Write bool2str(true xor true);
+Write BoolToStr(false xor false);
+Write BoolToStr(false xor true);
+Write BoolToStr(true xor false);
+Write BoolToStr(true xor true);
 
 # functions
-Write bool2str(str2bool('false'));
-Write bool2str(str2bool('true'));
+Write BoolToStr(StrToBool('false'));
+Write BoolToStr(StrToBool('true'));

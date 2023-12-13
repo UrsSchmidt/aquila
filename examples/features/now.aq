@@ -2,4 +2,4 @@
 
 Now n;
 
-Write int2str(n);
+Write IntToStr(n);

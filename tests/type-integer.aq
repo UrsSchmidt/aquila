@@ -3,52 +3,52 @@
 Run '../prelude/IntegerFunctions.aq';
 
 # literals
-Write int2str(000);
-Write int2str(12345);
-Write int2str(0b10101010);
-Write int2str(0o755);
-Write int2str(0xabcd);
+Write IntToStr(000);
+Write IntToStr(12345);
+Write IntToStr(0b10101010);
+Write IntToStr(0o755);
+Write IntToStr(0xabcd);
 
 # operations
-Write int2str(1 + 2 * 3);
-Write int2str(+72);
-Write int2str(-72);
-Write int2str(2 + 3);
-Write int2str(2 - 3);
-Write int2str(2 * 3);
-Write int2str(3 / 2);
-Write int2str(4 mod 3);
-Write int2str(-4 mod 3);
-#Write int2str(4 mod -3);
-#Write int2str(-4 mod -3);
-Write int2str(4 rem 3);
-Write int2str(-4 rem 3);
-Write int2str(4 rem -3);
-Write int2str(-4 rem -3);
-Write bool2str(2 = 2);
-Write bool2str(2 = 3);
-Write bool2str(2 <> 2);
-Write bool2str(2 <> 3);
-Write int2str(1!);
-Write int2str(6!);
-Write int2str(|0|);
-Write int2str(|72|);
-Write int2str(|-72|);
+Write IntToStr(1 + 2 * 3);
+Write IntToStr(+72);
+Write IntToStr(-72);
+Write IntToStr(2 + 3);
+Write IntToStr(2 - 3);
+Write IntToStr(2 * 3);
+Write IntToStr(3 / 2);
+Write IntToStr(4 mod 3);
+Write IntToStr(-4 mod 3);
+#Write IntToStr(4 mod -3);
+#Write IntToStr(-4 mod -3);
+Write IntToStr(4 rem 3);
+Write IntToStr(-4 rem 3);
+Write IntToStr(4 rem -3);
+Write IntToStr(-4 rem -3);
+Write BoolToStr(2 = 2);
+Write BoolToStr(2 = 3);
+Write BoolToStr(2 <> 2);
+Write BoolToStr(2 <> 3);
+Write IntToStr(1!);
+Write IntToStr(6!);
+Write IntToStr(|0|);
+Write IntToStr(|72|);
+Write IntToStr(|-72|);
 
 # functions
-Write int2str(str2int('00'));
-Write int2str(str2int('42'));
-Write int2str(gcd(8, 4));
-Write int2str(pow(0, 0));
-Write int2str(pow(0, 1));
-Write int2str(pow(1, 0));
-Write int2str(pow(2, 3));
-Write int2str(sgn(0));
-Write int2str(sgn(72));
-Write int2str(sgn(-72));
-Write int2str(sqrt(0));
-Write int2str(sqrt(49));
+Write IntToStr(StrToInt('00'));
+Write IntToStr(StrToInt('42'));
+Write IntToStr(gcd(8, 4));
+Write IntToStr(pow(0, 0));
+Write IntToStr(pow(0, 1));
+Write IntToStr(pow(1, 0));
+Write IntToStr(pow(2, 3));
+Write IntToStr(sgn(0));
+Write IntToStr(sgn(72));
+Write IntToStr(sgn(-72));
+Write IntToStr(sqrt(0));
+Write IntToStr(sqrt(49));
 
 # prelude functions
-Write int2str(Binomial(2, 2));
-Write int2str(LCM(5, 2));
+Write IntToStr(Binomial(2, 2));
+Write IntToStr(LCM(5, 2));

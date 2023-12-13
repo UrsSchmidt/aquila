@@ -20,7 +20,7 @@ board[1] := pad('  * ');
 board[2] := pad('   *');
 board[3] := pad(' ***');
 For y From 4 To height - 1:
-    board[y] := space(width);
+    board[y] := Space(width);
 EndFor
 
 iterate := \-> {
@@ -70,7 +70,7 @@ iterate := \-> {
 
 print := \-> {
     Write clearscreen;
-    For y From 0 To height - 1 (
+    For y From 0 To height - 1:
         Write board[y] & '|';
     EndFor
 };

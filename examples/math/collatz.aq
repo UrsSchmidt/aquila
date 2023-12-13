@@ -12,5 +12,5 @@ collatz := \n : Integer ->
     EndIf;
 
 For i From 1 To 10:
-    Write 'collatz(' & int2str(i) & ') = ' & int2str(collatz(i));
+    Write 'collatz(' & IntToStr(i) & ') = ' & IntToStr(collatz(i));
 EndFor

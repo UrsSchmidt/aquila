@@ -45,7 +45,7 @@ The following operations are available on booleans:
 The following predefined functions are available on booleans:
 
 Type conversion functions:
- * `bool2str(a)` returns `a` as a `String`
+ * `BoolToStr(a)` returns `a` as a `String`
 
 ### Integer
 
@@ -76,8 +76,8 @@ The following operations are available on integers:
 The following predefined functions are available on integers:
 
 Type conversion functions:
- * `int2str(a)` returns `a` as a `String`
- * `ord2char(a)` returns a `String` containing the Unicode character with codepoint `a`
+ * `IntToStr(a)` returns `a` as a `String`
+ * `OrdToChar(a)` returns a `String` containing the Unicode character with codepoint `a`
 
 Numerical functions:
  * `gcd(a, b)` returns the greatest common divisor of `a` and `b`
@@ -85,7 +85,7 @@ Numerical functions:
  * `sgn(a)` returns the sign of `a`
  * `sqrt(a)` returns the square root of `a`
 
-There are also predefined `Integer` functions available under `prelude/integerfunctions.aq`, which can be used by first running `run 'prelude/integerfunctions.aq';`.
+There are also predefined `Integer` functions available under `prelude/IntegerFunctions.aq`, which can be used by first running `run 'prelude/IntegerFunctions.aq';`.
 
 ### String
 
@@ -105,10 +105,10 @@ General functions:
  * `length(a)` returns the number of characters in `a`
 
 Type conversion functions:
- * `char2ord(a)` returns the Unicode value of the first character of `a` as an `Integer`
- * `str2bool(a)` parsing `a` to a `Boolean`
- * `str2dict(a)` parsing `a` to a `Dictionary`
- * `str2int(a)` parsing `a` to an `Integer`
+ * `CharToOrd(a)` returns the Unicode value of the first character of `a` as an `Integer`
+ * `StrToBool(a)` parsing `a` to a `Boolean`
+ * `StrToDict(a)` parsing `a` to a `Dictionary`
+ * `StrToInt(a)` parsing `a` to an `Integer`
 
 Java style charat/substring functions:
  * `charat(a, b)` returns the character with the index `b` in `a`
@@ -136,7 +136,7 @@ Other functions:
  * `repeat(a, b)` returns `a` repeated `b` times
  * `replace(a, b, c)` replace all occurrences of `b` in `a` with `c`
 
-There are also predefined `String` functions available under `prelude/stringfunctions.aq`, which can be used by first running `run 'prelude/stringfunctions.aq';`.
+There are also predefined `String` functions available under `prelude/StringFunctions.aq`, which can be used by first running `run 'prelude/StringFunctions.aq';`.
 
 ### Function
 
@@ -196,14 +196,14 @@ General functions:
  * `size(a)` returns the number of key/value pairs in `a`
  
 Type conversion functions:
- * `dict2str(a)` returns `a` as a `String`
+ * `DictToStr(a)` returns `a` as a `String`
 
 ### Checking for types
 
 You can check for types using the predefined functions `IsBoolean`, `IsDictionary`, `IsFunction`, `IsInteger` and `IsString`:
 ```
 a := 123;
-Write bool2str(IsInteger(a)); # true
+Write BoolToStr(IsInteger(a)); # true
 ```
 
 ## Other operations and functions

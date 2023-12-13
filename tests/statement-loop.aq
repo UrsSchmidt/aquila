@@ -2,20 +2,20 @@
 
 n := 3;
 Loop:
-    Write int2str(n);
+    Write IntToStr(n);
     n := n - 1;
 While n > 0:
-    Write int2str(n);
+    Write IntToStr(n);
 EndLoop
 
 n := 3;
 Loop:
-    Write int2str(n);
+    Write IntToStr(n);
     n := n - 1;
 While n > 0 EndLoop
 
 n := 3;
 While n > 0:
-    Write int2str(n);
+    Write IntToStr(n);
     n := n - 1;
 EndWhile

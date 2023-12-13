@@ -2,8 +2,8 @@
 
 # src: https://en.wikipedia.org/wiki/Zebra_Puzzle
 
-# FIXME move to prelude/arrayfunctions.aq
-pop := \m -> {remove m[size(m) - 1];};
+# FIXME move to prelude/ArrayFunctions.aq
+pop := \m -> {Remove m[size(m) - 1];};
 push := \m, v -> {m[size(m)] := v;};
 
 constraints := {};
@@ -106,14 +106,14 @@ Call push(constraints, {
 constraintself := \k, v, constraint, a, b -> {
     If not constraint.used and v : a:
         Call foreach(b, \k2, v2 -> {houses[j][k2] := v2;});
-        Write 'used constraint: ' & dict2str(constraint);
+        Write 'used constraint: ' & DictToStr(constraint);
         constraint.used := true;
     EndIf
 };
 constraintrightto := \k, v, constraint, a, b -> {
     If not constraint.used and v : a:
         Call foreach(b, \k2, v2 -> {houses[j + 1][k2] := v2;});
-        Write 'used constraint: ' & dict2str(constraint);
+        Write 'used constraint: ' & DictToStr(constraint);
         constraint.used := true;
     EndIf
 };
@@ -124,9 +124,10 @@ constraintnextto := \k, v, constraint, a, b -> {
         ElseIf j = 4: l := j - 1;
         ElseIf forall(b, \k2, v2 -> v2 : houses[j - 1] and not v2 : houses[j + 1]): l := j + 1;
         ElseIf forall(b, \k2, v2 -> not v2 : houses[j - 1] and v2 : houses[j + 1]): l := j - 1;
+        EndIf
         If l <> -1:
-            Call foreach(b, \k2, v2 -> {houses[l][k2] := v2;)};
-            Write 'used constraint: ' & dict2str(constraint);
+            Call foreach(b, \k2, v2 -> {houses[l][k2] := v2;});
+            Write 'used constraint: ' & DictToStr(constraint);
             constraint.used := true;
         EndIf
     EndIf
@@ -134,7 +135,7 @@ constraintnextto := \k, v, constraint, a, b -> {
 Call foreach(constraints, \i, constraint -> {constraint.used := false;});
 unusedconstraints := size(constraints);
 Loop:
-    Write 'unused constraints: ' & int2str(unusedconstraints);
+    Write 'unused constraints: ' & IntToStr(unusedconstraints);
     Call foreach(constraints, \i, constraint -> {
         If not constraint.used:
             Write 'testing constraint with relation ' & constraint.relation;
@@ -163,12 +164,12 @@ Loop:
             Default:
                 Call error('Illegal relation ' & constraint.relation);
             EndSwitch
-        )
+        EndIf
     });
     newunusedconstraints := size(filter(constraints, \i, constraint -> not constraint.used));
 While newunusedconstraints < unusedconstraints:
     unusedconstraints := newunusedconstraints;
-EndWhile
+EndLoop
 
 # Now, who drinks water?
 r := filter(houses, \i, house -> exists(house, \k, v -> k eq 'beverage' and v eq 'water'));

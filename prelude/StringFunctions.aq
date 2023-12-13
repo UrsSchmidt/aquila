@@ -2,28 +2,28 @@
 
 ## Characters
 
-NUL  := ord2char(0x00); # \0
-BEL  := ord2char(0x07); # \a
-BS   := ord2char(0x08); # \b
-HT   := ord2char(0x09); # \t
-LF   := ord2char(0x0a); # \n
-VT   := ord2char(0x0b); # \v
-FF   := ord2char(0x0c); # \f
-CR   := ord2char(0x0d); # \r
+NUL  := OrdToChar(0x00); # \0
+BEL  := OrdToChar(0x07); # \a
+BS   := OrdToChar(0x08); # \b
+HT   := OrdToChar(0x09); # \t
+LF   := OrdToChar(0x0a); # \n
+VT   := OrdToChar(0x0b); # \v
+FF   := OrdToChar(0x0c); # \f
+CR   := OrdToChar(0x0d); # \r
 CRLF := CR & LF;
-ESC  := ord2char(0x1b);
-APOS := ord2char(0x27);
+ESC  := OrdToChar(0x1b);
+APOS := OrdToChar(0x27);
 
 ## Functions on characters (Strings with length = 1)
 
 IsPrintableASCII := \c : String ->
-    Let o = char2ord(c): char2ord(' ') <= o and o <= char2ord('~') EndLet;
+    Let o = CharToOrd(c): CharToOrd(' ') <= o and o <= CharToOrd('~') EndLet;
 IsDigit := \c : String ->
-    Let o = char2ord(c): char2ord('0') <= o and o <= char2ord('9') EndLet;
+    Let o = CharToOrd(c): CharToOrd('0') <= o and o <= CharToOrd('9') EndLet;
 IsUppercase := \c : String ->
-    Let o = char2ord(c): char2ord('A') <= o and o <= char2ord('Z') EndLet;
+    Let o = CharToOrd(c): CharToOrd('A') <= o and o <= CharToOrd('Z') EndLet;
 IsLowercase := \c : String ->
-    Let o = char2ord(c): char2ord('a') <= o and o <= char2ord('z') EndLet;
+    Let o = CharToOrd(c): CharToOrd('a') <= o and o <= CharToOrd('z') EndLet;
 
 ## Functions on Strings
 
@@ -50,7 +50,7 @@ IsAllLowercase := \s : String ->
 
 IsBlank := \s : String ->
     If s eq '': true
-    ElseIf char2ord(s) <= char2ord(' '): IsBlank(tail(s))
+    ElseIf CharToOrd(s) <= CharToOrd(' '): IsBlank(tail(s))
     Else: false
     EndIf;
 
@@ -80,7 +80,7 @@ Space := \n : Integer ->
 ToLowercase := \s : String ->
     If s eq '': ''
     Else:
-        If IsUppercase(s): ord2char(char2ord(head(s)) + 0x20)
+        If IsUppercase(s): OrdToChar(CharToOrd(head(s)) + 0x20)
         Else: head(s)
         EndIf
         & ToLowercase(tail(s))
@@ -88,7 +88,7 @@ ToLowercase := \s : String ->
 ToUppercase := \s : String ->
     If s eq '': ''
     Else:
-        If IsLowercase(s): ord2char(char2ord(head(s)) - 0x20)
+        If IsLowercase(s): OrdToChar(CharToOrd(head(s)) - 0x20)
         Else: head(s)
         EndIf
         & ToUppercase(tail(s))
@@ -96,13 +96,13 @@ ToUppercase := \s : String ->
 
 TrimLeft := \s : String ->
     If s eq '': ''
-    # the left(s, 1) is implied by char2ord():
-    ElseIf char2ord(s) <= char2ord(' '): TrimLeft(tail(s))
+    # the left(s, 1) is implied by CharToOrd():
+    ElseIf CharToOrd(s) <= CharToOrd(' '): TrimLeft(tail(s))
     Else: s
     EndIf;
 TrimRight := \s : String ->
     If s eq '': ''
-    ElseIf char2ord(right(s, 1)) <= char2ord(' '): TrimRight(Chop(s))
+    ElseIf CharToOrd(right(s, 1)) <= CharToOrd(' '): TrimRight(Chop(s))
     Else: s
     EndIf;
 Trim := \s : String ->

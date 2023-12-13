@@ -1175,7 +1175,33 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         arguments.push_back(visit(ec));
     }
     Any result;
-    if (strEquals(identifier, "IsBoolean")) {
+    if (strEquals(identifier, "BoolToStr")) {
+        if (!checkArgs(ctx, arguments, { TYPE_BOOL })) {
+            assert(0);
+        }
+        Boolean arg1 = *toBool(arguments[0]);
+        result = toString(arg1);
+    } else if (strEquals(identifier, "CharToOrd")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer resultInt;
+        mpz_init_set_ui(resultInt.i, arg1.at(0));
+        result = resultInt;
+    } else if (strEquals(identifier, "DictToStr")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        result = toString(arg1);
+    } else if (strEquals(identifier, "IntToStr")) {
+        if (!checkArgs(ctx, arguments, { TYPE_INT })) {
+            assert(0);
+        }
+        Integer arg1 = *toInt(arguments[0]);
+        result = toString(arg1);
+    } else if (strEquals(identifier, "IsBoolean")) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_BOOL });
     } else if (strEquals(identifier, "IsDictionary")) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_DICT });
@@ -1185,20 +1211,30 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_INT });
     } else if (strEquals(identifier, "IsString")) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_STR });
-    } else if (strEquals(identifier, "bool2str")) {
-        if (!checkArgs(ctx, arguments, { TYPE_BOOL })) {
+    } else if (strEquals(identifier, "OrdToChar")) {
+        if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
         }
-        Boolean arg1 = *toBool(arguments[0]);
-        result = toString(arg1);
-    } else if (strEquals(identifier, "char2ord")) {
+        Integer arg1 = *toInt(arguments[0]);
+        result = std::string(1, (char) mpz_get_ui(arg1.i));
+    } else if (strEquals(identifier, "StrToBool")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
         }
         String arg1 = *toStr(arguments[0]);
-        Integer resultInt;
-        mpz_init_set_ui(resultInt.i, arg1.at(0));
-        result = resultInt;
+        result = toBoolean(arg1, ctx);
+    } else if (strEquals(identifier, "StrToDict")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        result = toDictionary(arg1, ctx);
+    } else if (strEquals(identifier, "StrToInt")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        result = toInteger(arg1, ctx);
     } else if (strEquals(identifier, "charat")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
             assert(0);
@@ -1206,12 +1242,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         String arg1 = *toStr(arguments[0]);
         Integer arg2 = *toInt(arguments[1]);
         result = arg1.substr(mpz_get_ui(arg2.i), 1);
-    } else if (strEquals(identifier, "dict2str")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        result = toString(arg1);
     } else if (strEquals(identifier, "error")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
@@ -1338,12 +1368,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         String arg1 = *toStr(arguments[0]);
         result = arg1.empty() ? "" : arg1.substr(0, 1);
-    } else if (strEquals(identifier, "int2str")) {
-        if (!checkArgs(ctx, arguments, { TYPE_INT })) {
-            assert(0);
-        }
-        Integer arg1 = *toInt(arguments[0]);
-        result = toString(arg1);
     } else if (strEquals(identifier, "join")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_DICT })) {
             assert(0);
@@ -1399,12 +1423,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         Integer arg2 = *toInt(arguments[1]);
         Integer arg3 = *toInt(arguments[2]);
         result = arg1.substr(mpz_get_ui(arg2.i), mpz_get_ui(arg3.i));
-    } else if (strEquals(identifier, "ord2char")) {
-        if (!checkArgs(ctx, arguments, { TYPE_INT })) {
-            assert(0);
-        }
-        Integer arg1 = *toInt(arguments[0]);
-        result = std::string(1, (char) mpz_get_ui(arg1.i));
     } else if (strEquals(identifier, "pow")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT, TYPE_INT })) {
             assert(0);
@@ -1485,24 +1503,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         mpz_init(r.i);
         mpz_sqrt(r.i, arg1.i);
         result = r;
-    } else if (strEquals(identifier, "str2bool")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        result = toBoolean(arg1, ctx);
-    } else if (strEquals(identifier, "str2dict")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        result = toDictionary(arg1, ctx);
-    } else if (strEquals(identifier, "str2int")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        result = toInteger(arg1, ctx);
     } else if (strEquals(identifier, "substring1")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
             assert(0);
