@@ -28,8 +28,8 @@ parent := \s : String ->
 absolute := \root : String, s : String ->
     if not root sw '/' or not root ew '/': error('Illegal argument')
     elif s sw '/': s
-    elif s sw './': root & substring1(s, 2)
-    elif s sw '../': parent(root) & substring1(s, 3)
+    elif s sw './': absolute(root, substring1(s, 2))
+    elif s sw '../': absolute(parent(root), substring1(s, 3))
     else: root & s;
 relative := \root : String, s : String ->
     if not root sw '/' or not root ew '/': error('Illegal argument')
