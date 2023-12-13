@@ -1,6 +1,6 @@
 #!/usr/local/bin/aq
 
 d := { 'a' };
-v := \-> (d[0] := 'b';);
-call v();
-write dict2str(d);
+v := \-> {d[0] := 'b';};
+Call v();
+Write dict2str(d);

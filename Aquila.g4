@@ -25,15 +25,17 @@ statement
     ;
 
 ifStatement
-    :   'if' condition+=expression then+=block
-     ('elif' condition+=expression then+=block)*
-     ('else' elseBlock=block)?
+    :     'If' condition+=expression ':' then+=block
+     ('ElseIf' condition+=expression ':' then+=block)*
+     ('Else' ':' elseBlock=block)?
+       'EndIf'
     ;
 
 switchStatement
-    : 'switch' switchHeadExpression=expression ':'
-     ('case' labels+=switchStatementLabels then+=block)*
-     ('default' defaultBlock=block)?
+    : 'Switch' switchHeadExpression=expression ':'
+     ('Case' labels+=switchStatementLabels ':' then+=block)*
+     ('Default' ':' defaultBlock=block)?
+      'EndSwitch'
     ;
 
 switchStatementLabels
@@ -41,48 +43,48 @@ switchStatementLabels
     ;
 
 loopStatement
-    : 'while' expression bottom=block
-    | 'loop' top=block 'while' expression (';' | bottom=block)
+    : 'While' expression ':' bottom=block 'EndWhile'
+    | 'Loop' ':' top=block 'While' expression (':' bottom=block)? 'EndLoop'
     ;
 
 forStatement
-    : 'for' Identifier 'from' from=expression 'to' to=expression ('step' step=expression)? block
+    : 'For' Identifier 'From' from=expression 'To' to=expression ('Step' step=expression)? ':' block 'EndFor'
     ;
 
 callStatement
-    : 'call' functionCall ';'
+    : 'Call' functionCall ';'
     ;
 
 exitStatement
-    : 'exit' rhs=expression ';'
+    : 'Exit' rhs=expression ';'
     ;
 
 nowStatement
-    : 'now' lhs ';'
+    : 'Now' lhs ';'
     ;
 
 randomStatement
-    : 'random' lhs 'from' from=expression 'to' to=expression ';'
+    : 'Random' lhs 'From' from=expression 'To' to=expression ';'
     ;
 
 readStatement
-    : 'read' lhs ';'
+    : 'Read' lhs ';'
     ;
 
 removeStatement
-    : 'remove' lhs ';'
+    : 'Remove' lhs ';'
     ;
 
 runStatement
-    : 'run' rhs=expression ';'
+    : 'Run' rhs=expression ';'
     ;
 
 sleepStatement
-    : 'sleep' rhs=expression ';'
+    : 'Sleep' rhs=expression ';'
     ;
 
 writeStatement
-    : 'write' rhs=expression ';'
+    : 'Write' rhs=expression ';'
     ;
 
 assignStatement
@@ -90,7 +92,7 @@ assignStatement
     ;
 
 block
-    : '(' statement* ')'
+    : statement*
     ;
 
 lhs
@@ -103,20 +105,19 @@ lhsPart
     ;
 
 expression
-    : ifExpression
-    | letExpression
-    | switchExpression
-    | logicalOperation
+    : logicalOperation
     ;
 
 ifExpression
-    :   'if' condition+=expression ':' then+=expression
-     ('elif' condition+=expression ':' then+=expression)*
-      'else' ':' elseExpression=logicalOperation
+    :     'If' condition+=expression ':' then+=expression
+     ('ElseIf' condition+=expression ':' then+=expression)*
+      'Else' ':' elseExpression=logicalOperation
+       'EndIf'
     ;
 
 letExpression
-    : 'let' letBindExpression (',' letBindExpression)* ':' body=logicalOperation
+    :    'Let' letBindExpression (',' letBindExpression)* ':' body=logicalOperation
+      'EndLet'
     ;
 
 letBindExpression
@@ -124,9 +125,10 @@ letBindExpression
     ;
 
 switchExpression
-    : 'switch' switchHeadExpression=expression ':'
-     ('case' labels+=switchExpressionLabels ':' then+=expression)*
-      'default' ':' defaultExpression=logicalOperation
+    : 'Switch' switchHeadExpression=expression ':'
+     ('Case' labels+=switchExpressionLabels ':' then+=expression)*
+      'Default' ':' defaultExpression=logicalOperation
+      'EndSwitch'
     ;
 
 switchExpressionLabels
@@ -209,7 +211,10 @@ factorialOperator
     ;
 
 factor
-    : bracketExpression
+    : ifExpression
+    | letExpression
+    | switchExpression
+    | bracketExpression
     | absExpression
     | dictAggregate
     | lambdaExpression
@@ -240,7 +245,7 @@ dictAggregateKey
     ;
 
 lambdaExpression
-    : '\\' (lambdaExpressionParameter (',' lambdaExpressionParameter)*)? '->' (expression | block)
+    : '\\' (lambdaExpressionParameter (',' lambdaExpressionParameter)*)? '->' (expression | '{' block '}')
     ;
 
 lambdaExpressionParameter

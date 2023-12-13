@@ -1,17 +1,18 @@
 #!/usr/local/bin/aq
 
 ackermann := \m : Integer, n : Integer ->
-    if m = 0:
+    If m = 0:
         n + 1
-    elif m > 0 and n = 0:
+    ElseIf m > 0 and n = 0:
         ackermann(m - 1, 1)
-    elif m > 0 and n > 0:
+    ElseIf m > 0 and n > 0:
         ackermann(m - 1, ackermann(m, n - 1))
-    else:
-        error('Illegal argument');
+    Else:
+        error('Illegal argument')
+    EndIf;
 
-for n from 0 to 3 (
-    for m from 0 to 4 (
-        write 'A(' & int2str(n) & ', ' & int2str(m) & ') = ' & int2str(ackermann(n, m));
-    )
-)
+For n From 0 To 3:
+    For m From 0 To 4:
+        Write 'A(' & int2str(n) & ', ' & int2str(m) & ') = ' & int2str(ackermann(n, m));
+    EndFor
+EndFor

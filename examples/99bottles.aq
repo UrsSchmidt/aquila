@@ -3,13 +3,13 @@
 n := 99;
 
 f := \n : Integer ->
-    (if n = 0: 'No more' else: int2str(n)) & ' bottle' & (if n <> 1: 's' else: '') & ' of beer';
+    If n = 0: 'No more' Else: int2str(n) EndIf & ' bottle' & If n <> 1: 's' Else: '' EndIf & ' of beer';
 
 s := f(n);
-for i from n to 1 step -1 (
-    write s & ' on the wall,';
-    write s & '.';
+For i From n To 1 Step -1:
+    Write s & ' on the wall,';
+    Write s & '.';
     s := f(i - 1);
-    write 'Take one down, pass it around,';
-    write s & ' on the wall.';
-)
+    Write 'Take one down, pass it around,';
+    Write s & ' on the wall.';
+EndFor

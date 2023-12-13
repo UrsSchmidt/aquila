@@ -3,8 +3,8 @@
 # src: https://en.wikipedia.org/wiki/Zebra_Puzzle
 
 # FIXME move to prelude/arrayfunctions.aq
-pop := \m -> (remove m[size(m) - 1];);
-push := \m, v -> (m[size(m)] := v;);
+pop := \m -> {remove m[size(m) - 1];};
+push := \m, v -> {m[size(m)] := v;};
 
 constraints := {};
 
@@ -12,49 +12,49 @@ constraints := {};
 houses := { {}, {}, {}, {}, {} };
 
 # The Englishman lives in the red house.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { nationality : 'Englishman' },
     b : { color : 'red' },
 });
 
 # The Spaniard owns the dog.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { nationality : 'Spaniard' },
     b : { pet : 'dog' },
 });
 
 # Coffee is drunk in the green house.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { beverage : 'coffee' },
     b : { color : 'green' },
 });
 
 # The Ukrainian drinks tea.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { nationality : 'Ukrainian' },
     b : { beverage : 'tea' },
 });
 
 # The green house is immediately to the right of the ivory house.
-call push(constraints, {
+Call push(constraints, {
     relation : 'right to',
     a : { color : 'ivory' },
     b : { color : 'green' },
 });
 
 # The Old Gold smoker owns snails.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { smoke : 'Old Gold' },
     b : { pet : 'snail' },
 });
 
 # Kools are smoked in the yellow house.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { smoke : 'Kools' },
     b : { color : 'yellow' },
@@ -67,35 +67,35 @@ houses[2].beverage := 'milk';
 houses[0].nationality := 'Norwegian';
 
 # The man who smokes Chesterfields lives in the house next to the man with the fox.
-call push(constraints, {
+Call push(constraints, {
     relation : 'next to',
     a : { pet : 'fox' },
     b : { smoke : 'Chesterfields' },
 });
 
 # Kools are smoked in the house next to the house where the horse is kept.
-call push(constraints, {
+Call push(constraints, {
     relation : 'next to',
     a : { pet : 'horse' },
     b : { smoke : 'Kools' },
 });
 
 # The Lucky Strike smoker drinks orange juice.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { smoke : 'Lucky Strike' },
     b : { beverage : 'orange juice' },
 });
 
 # The Japanese smokes Parliaments.
-call push(constraints, {
+Call push(constraints, {
     relation : 'self',
     a : { nationality : 'Japanese' },
     b : { smoke : 'Parliaments' },
 });
 
 # The Norwegian lives next to the blue house.
-call push(constraints, {
+Call push(constraints, {
     relation : 'next to',
     a : { color : 'blue' },
     b : { nationality : 'Norwegian' },
@@ -103,78 +103,77 @@ call push(constraints, {
 
 # Solve!
 # TODO this algorithm doesn't work yet
-constraintself := \k, v, constraint, a, b -> (
-    if not constraint.used and v : a (
-        call foreach(b, \k2, v2 -> (houses[j][k2] := v2;));
-        write 'used constraint: ' & dict2str(constraint);
+constraintself := \k, v, constraint, a, b -> {
+    If not constraint.used and v : a:
+        Call foreach(b, \k2, v2 -> {houses[j][k2] := v2;});
+        Write 'used constraint: ' & dict2str(constraint);
         constraint.used := true;
-    )
-);
-constraintrightto := \k, v, constraint, a, b -> (
-    if not constraint.used and v : a (
-        call foreach(b, \k2, v2 -> (houses[j + 1][k2] := v2;));
-        write 'used constraint: ' & dict2str(constraint);
+    EndIf
+};
+constraintrightto := \k, v, constraint, a, b -> {
+    If not constraint.used and v : a:
+        Call foreach(b, \k2, v2 -> {houses[j + 1][k2] := v2;});
+        Write 'used constraint: ' & dict2str(constraint);
         constraint.used := true;
-    )
-);
-constraintnextto := \k, v, constraint, a, b -> (
-    if not constraint.used and v : a (
+    EndIf
+};
+constraintnextto := \k, v, constraint, a, b -> {
+    If not constraint.used and v : a:
         l := -1;
-        if j = 0 (l := j + 1;)
-        elif j = 4 (l := j - 1;)
-        elif forall(b, \k2, v2 -> v2 : houses[j - 1] and not v2 : houses[j + 1]) (l := j + 1;)
-        elif forall(b, \k2, v2 -> not v2 : houses[j - 1] and v2 : houses[j + 1]) (l := j - 1;)
-        if l <> -1 (
-            call foreach(b, \k2, v2 -> (houses[l][k2] := v2;));
-            write 'used constraint: ' & dict2str(constraint);
+        If j = 0: l := j + 1;
+        ElseIf j = 4: l := j - 1;
+        ElseIf forall(b, \k2, v2 -> v2 : houses[j - 1] and not v2 : houses[j + 1]): l := j + 1;
+        ElseIf forall(b, \k2, v2 -> not v2 : houses[j - 1] and v2 : houses[j + 1]): l := j - 1;
+        If l <> -1:
+            Call foreach(b, \k2, v2 -> {houses[l][k2] := v2;)};
+            Write 'used constraint: ' & dict2str(constraint);
             constraint.used := true;
-        )
-    )
-);
-call foreach(constraints, \i, constraint -> (constraint.used := false;));
+        EndIf
+    EndIf
+};
+Call foreach(constraints, \i, constraint -> {constraint.used := false;});
 unusedconstraints := size(constraints);
-loop (
-    write 'unused constraints: ' & int2str(unusedconstraints);
-    call foreach(constraints, \i, constraint -> (
-        if not constraint.used (
-            write 'testing constraint with relation ' & constraint.relation;
-            switch constraint.relation:
-            case 'self' (
-                for j from 0 to 4 (
-                    call foreach(houses[j], \k, v -> (
-                        call constraintself(k, v, constraint, constraint.a, constraint.b);
-                        call constraintself(k, v, constraint, constraint.b, constraint.a);
-                    ));
-                )
-            )
-            case 'right to' (
-                for j from 0 to 4 (
-                    call foreach(houses[j], \k, v -> (
-                        call constraintrightto(k, v, constraint, constraint.a, constraint.b);
-                        call constraintrightto(k, v, constraint, constraint.b, constraint.a);
-                    ));
-                )
-            )
-            case 'next to' (
-                for j from 0 to 4 (
-                    call foreach(houses[j], \k, v -> (
-                        call constraintnextto(k, v, constraint, constraint.a, constraint.b);
-                        call constraintnextto(k, v, constraint, constraint.b, constraint.a);
-                    ));
-                )
-            )
-            default (call error('Illegal relation ' & constraint.relation);)
+Loop:
+    Write 'unused constraints: ' & int2str(unusedconstraints);
+    Call foreach(constraints, \i, constraint -> {
+        If not constraint.used:
+            Write 'testing constraint with relation ' & constraint.relation;
+            Switch constraint.relation:
+            Case 'self':
+                For j From 0 To 4:
+                    Call foreach(houses[j], \k, v -> {
+                        Call constraintself(k, v, constraint, constraint.a, constraint.b);
+                        Call constraintself(k, v, constraint, constraint.b, constraint.a);
+                    });
+                EndFor
+            Case 'right to':
+                For j From 0 To 4:
+                    Call foreach(houses[j], \k, v -> {
+                        Call constraintrightto(k, v, constraint, constraint.a, constraint.b);
+                        Call constraintrightto(k, v, constraint, constraint.b, constraint.a);
+                    });
+                EndFor
+            Case 'next to':
+                For j From 0 To 4:
+                    Call foreach(houses[j], \k, v -> {
+                        Call constraintnextto(k, v, constraint, constraint.a, constraint.b);
+                        Call constraintnextto(k, v, constraint, constraint.b, constraint.a);
+                    });
+                EndFor
+            Default:
+                Call error('Illegal relation ' & constraint.relation);
+            EndSwitch
         )
-    ));
+    });
     newunusedconstraints := size(filter(constraints, \i, constraint -> not constraint.used));
-) while newunusedconstraints < unusedconstraints (
+While newunusedconstraints < unusedconstraints:
     unusedconstraints := newunusedconstraints;
-)
+EndWhile
 
 # Now, who drinks water?
 r := filter(houses, \i, house -> exists(house, \k, v -> k eq 'beverage' and v eq 'water'));
-write 'The ' & r[0].nationality & ' drinks water.';
+Write 'The ' & r[0].nationality & ' drinks water.';
 
 # Who owns the zebra?
 r := filter(houses, \i, house -> exists(house, \k, v -> k eq 'pet' and v eq 'zebra'));
-write 'The ' & r[0].nationality & ' owns the zebra.';
+Write 'The ' & r[0].nationality & ' owns the zebra.';

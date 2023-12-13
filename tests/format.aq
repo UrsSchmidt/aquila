@@ -1,7 +1,7 @@
 #!/usr/local/bin/aq
 
-run '../prelude/format.aq';
+Run '../prelude/format.aq';
 
-write format('abc %% def', {});
-write format('abc %0 ghi', { 'def' });
-write format('abc %0 %1 jkl', { 'def', 'ghi' });
+Write format('abc %% def', {});
+Write format('abc %0 ghi', { 'def' });
+Write format('abc %0 %1 jkl', { 'def', 'ghi' });

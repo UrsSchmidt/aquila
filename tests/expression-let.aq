@@ -1,5 +1,5 @@
 #!/usr/local/bin/aq
 
-write let k = 'K': 'O' & k;
+Write Let k = 'K': 'O' & k EndLet;
 
-write let o = 'O', k = 'K': o & k;
+Write Let o = 'O', k = 'K': o & k EndLet;

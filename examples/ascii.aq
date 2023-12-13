@@ -1,11 +1,11 @@
 #!/usr/local/bin/aq
 
 l := '';
-for c from char2ord(' ') to char2ord('~') (
+For c From char2ord(' ') To char2ord('~'):
     l := l & ord2char(c);
-    if c mod 0x10 = 0x0f (
-        write l;
+    If c mod 0x10 = 0x0f:
+        Write l;
         l := '';
-    )
-)
-write l;
+    EndIf
+EndFor
+Write l;

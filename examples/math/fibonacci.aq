@@ -2,12 +2,12 @@
 
 m := 0;
 n := 1;
-write int2str(n);
-for i from 1 to 10 (
+Write int2str(n);
+For i From 1 To 10:
     # TODO support parallel assignment?
     # m, n := n, m + n;
     s := m + n;
     m := n;
     n := s;
-    write int2str(n);
-)
+    Write int2str(n);
+EndFor

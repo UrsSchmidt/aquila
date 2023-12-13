@@ -1,20 +1,20 @@
 #!/usr/local/bin/aq
 
-for i from 2 to 100 (
+For i From 2 To 100:
     numbers[i] := true;
-    f := \i : Integer, j : Integer -> (
-        if j < 2 (
-            call error('Illegal argument');
-        ) elif i mod j = 0 (
+    f := \i : Integer, j : Integer -> {
+        If j < 2:
+            Call error('Illegal argument');
+        ElseIf i mod j = 0:
             numbers[i] := false;
-        ) elif j > 2 (
-            call f(i, j - 1);
-        )
-    );
+        ElseIf j > 2:
+            Call f(i, j - 1);
+        EndIf
+    };
     sq := sqrt(i);
-    if sq >= 2 (
-        call f(i, sq);
-    )
-)
+    If sq >= 2:
+        Call f(i, sq);
+    EndIf
+EndFor
 
-write dict2str(numbers);
+Write dict2str(numbers);

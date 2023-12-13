@@ -1,7 +1,7 @@
 #!/usr/local/bin/aq
 
-loop (
-    read line;
-) while line ne '' (
-    write line;
-)
+Loop:
+    Read line;
+While line ne '':
+    Write line;
+EndWhile

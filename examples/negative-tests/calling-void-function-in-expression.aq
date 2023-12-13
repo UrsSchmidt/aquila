@@ -1,7 +1,7 @@
 #!/usr/local/bin/aq
 
-f := \s : String -> (write s;);
+f := \s : String -> {Write s;};
 
-call f('Hello, world!'); # ok
+Call f('Hello, world!'); # ok
 
-write f('Hello, world!'); # error
+Write f('Hello, world!'); # error

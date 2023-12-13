@@ -1,24 +1,25 @@
 #!/usr/local/bin/aq
 
-run 'stringfunctions.aq';
+Run 'stringfunctions.aq';
 
 # a very simplistic implementation of like()
 # handles ?, * and #
 like := \s : String, p : String ->
-    if s eq '': containsonly(p, '*')
-    elif p eq '': false
-    elif containsonly(p, '*'): true
-    else: (
-        let hs = head(s), ts = tail(s),
+    If s eq '': containsonly(p, '*')
+    ElseIf p eq '': false
+    ElseIf containsonly(p, '*'): true
+    Else:
+        Let hs = head(s), ts = tail(s),
             hp = head(p), tp = tail(p),
             likeh = \t : String, q : String ->
                 # TODO can't use `and` here because it does not short circuit (yet?)
                 #t ne '' and (like(t, q) or likeh(tail(t), q));
-                if t ne '': like(t, q) or likeh(tail(t), q) else: false: (
-            switch hp:
-            case '?', hs: like(ts, tp)
-            case '*': likeh(s, tp)
-            case '#': isdigit(hs) and like(ts, tp)
-            default: false
-        )
-    );
+                If t ne '': like(t, q) or likeh(tail(t), q) Else: false EndIf:
+            Switch hp:
+            Case '?', hs: like(ts, tp)
+            Case '*': likeh(s, tp)
+            Case '#': isdigit(hs) and like(ts, tp)
+            Default: false
+            EndSwitch
+        EndLet
+    EndIf;

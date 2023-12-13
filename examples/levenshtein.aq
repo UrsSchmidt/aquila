@@ -1,22 +1,24 @@
 #!/usr/local/bin/aq
 
 min3 := \a : Integer, b : Integer, c : Integer ->
-    let x =
-        (if a < b: a else: b):
-        (if x < c: x else: c);
+    Let x =
+        If a < b: a Else: b EndIf:
+        If x < c: x Else: c EndIf
+    EndLet;
 
 levenshtein := \a : String, b : String ->
-    if b eq '':
+    If b eq '':
         length(a)
-    elif a eq '':
+    ElseIf a eq '':
         length(b)
-    elif head(a) eq head(b):
+    ElseIf head(a) eq head(b):
         levenshtein(tail(a), tail(b))
-    else: (
-        let ta = tail(a), tb = tail(b):
+    Else:
+        Let ta = tail(a), tb = tail(b):
             1 + min3(levenshtein(ta, b),
                      levenshtein(a, tb),
                      levenshtein(ta, tb))
-    );
+        EndLet
+    EndIf;
 
-write int2str(levenshtein('kitten', 'sitting')); # 3
+Write int2str(levenshtein('kitten', 'sitting')); # 3

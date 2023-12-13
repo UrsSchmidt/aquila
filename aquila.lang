@@ -79,41 +79,50 @@
           <keyword>tail</keyword>
         </context>
 
-        <context id="keyword" style-ref="keyword">
+        <context id="keyword1" style-ref="keyword">
+          <keyword>Default</keyword>
+          <keyword>Call</keyword>
+          <keyword>Case</keyword>
+          <keyword>ElseIf</keyword>
+          <keyword>Else</keyword>
+          <keyword>EndFor</keyword>
+          <keyword>EndIf</keyword>
+          <keyword>EndLet</keyword>
+          <keyword>EndLoop</keyword>
+          <keyword>EndSwitch</keyword>
+          <keyword>EndWhile</keyword>
+          <keyword>Exit</keyword>
+          <keyword>For</keyword>
+          <keyword>From</keyword>
+          <keyword>If</keyword>
+          <keyword>Let</keyword>
+          <keyword>Loop</keyword>
+          <keyword>Now</keyword>
+          <keyword>Random</keyword>
+          <keyword>Read</keyword>
+          <keyword>Remove</keyword>
+          <keyword>Run</keyword>
+          <keyword>Sleep</keyword>
+          <keyword>Step</keyword>
+          <keyword>Switch</keyword>
+          <keyword>To</keyword>
+          <keyword>While</keyword>
+          <keyword>Write</keyword>
+        </context>
+
+        <context id="keyword2" style-ref="keyword">
           <keyword>and</keyword>
-          <keyword>call</keyword>
-          <keyword>case</keyword>
-          <keyword>default</keyword>
-          <keyword>elif</keyword>
-          <keyword>else</keyword>
           <keyword>eq</keyword>
           <keyword>ew</keyword>
-          <keyword>exit</keyword>
           <keyword>false</keyword>
-          <keyword>for</keyword>
-          <keyword>from</keyword>
-          <keyword>if</keyword>
           <keyword>in</keyword>
-          <keyword>let</keyword>
-          <keyword>loop</keyword>
           <keyword>mod</keyword>
           <keyword>ne</keyword>
           <keyword>not</keyword>
-          <keyword>now</keyword>
           <keyword>or</keyword>
-          <keyword>random</keyword>
-          <keyword>read</keyword>
           <keyword>rem</keyword>
-          <keyword>remove</keyword>
-          <keyword>run</keyword>
-          <keyword>sleep</keyword>
-          <keyword>step</keyword>
           <keyword>sw</keyword>
-          <keyword>switch</keyword>
-          <keyword>to</keyword>
           <keyword>true</keyword>
-          <keyword>while</keyword>
-          <keyword>write</keyword>
           <keyword>xor</keyword>
         </context>
 

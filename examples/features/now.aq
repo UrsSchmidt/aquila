@@ -1,5 +1,5 @@
 #!/usr/local/bin/aq
 
-now n;
+Now n;
 
-write int2str(n);
+Write int2str(n);

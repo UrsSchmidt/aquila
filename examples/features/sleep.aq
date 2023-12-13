@@ -1,5 +1,5 @@
 #!/usr/local/bin/aq
 
-sleep 2000;
+Sleep 2000;
 
-write 'Hello, world!';
+Write 'Hello, world!';

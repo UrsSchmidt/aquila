@@ -1,17 +1,20 @@
 #!/usr/local/bin/aq
 
-write if false: 'NOT OK' else: 'OK';
+Write If false: 'NOT OK' Else: 'OK' EndIf;
 
-write if true: 'OK' else: 'NOT OK';
+Write If true: 'OK' Else: 'NOT OK' EndIf;
 
-write if true: 'OK'
-      elif true: 'NOT OK'
-      else: 'NOT OK';
+Write If true: 'OK'
+      ElseIf true: 'NOT OK'
+      Else: 'NOT OK'
+      EndIf;
 
-write if false: 'NOT OK'
-      elif true: 'OK'
-      else: 'NOT OK';
+Write If false: 'NOT OK'
+      ElseIf true: 'OK'
+      Else: 'NOT OK'
+      EndIf;
 
-write if false: 'NOT OK'
-      elif false: 'NOT OK'
-      else: 'OK';
+Write If false: 'NOT OK'
+      ElseIf false: 'NOT OK'
+      Else: 'OK'
+      EndIf;

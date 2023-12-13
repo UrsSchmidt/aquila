@@ -1,3 +1,11 @@
+move prelude functions to CamelCase
+type check functions should start with "Is"
+type conversion functions should use "To" instead of "2"
+
+on a new branch:
+add hex() oct() bin() ord() asc() odd() etc functions?
+add a ForEach key,value In map structure?
+
 rewrite the Interpreter in C++ as aquila4c
     make sure that there is a `delete` for every `new`
     make sure there is a `mpz_clear` for every `mpz_init`

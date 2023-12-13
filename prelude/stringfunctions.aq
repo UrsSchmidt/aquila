@@ -17,88 +17,102 @@ APOS := ord2char(0x27);
 ## Functions on characters (Strings with length = 1)
 
 isprintableascii := \c : String ->
-    let o = char2ord(c): char2ord(' ') <= o and o <= char2ord('~');
+    Let o = char2ord(c): char2ord(' ') <= o and o <= char2ord('~') EndLet;
 isdigit := \c : String ->
-    let o = char2ord(c): char2ord('0') <= o and o <= char2ord('9');
+    Let o = char2ord(c): char2ord('0') <= o and o <= char2ord('9') EndLet;
 isuppercase := \c : String ->
-    let o = char2ord(c): char2ord('A') <= o and o <= char2ord('Z');
+    Let o = char2ord(c): char2ord('A') <= o and o <= char2ord('Z') EndLet;
 islowercase := \c : String ->
-    let o = char2ord(c): char2ord('a') <= o and o <= char2ord('z');
+    Let o = char2ord(c): char2ord('a') <= o and o <= char2ord('z') EndLet;
 
 ## Functions on Strings
 
 isallprintableascii := \s : String ->
-    if s eq '': true
-    elif isprintableascii(head(s)): isallprintableascii(tail(s))
-    else: false;
+    If s eq '': true
+    ElseIf isprintableascii(head(s)): isallprintableascii(tail(s))
+    Else: false
+    EndIf;
 isnumeric := \s : String ->
-    if s eq '': true
-    elif isdigit(head(s)): isnumeric(tail(s))
-    else: false;
+    If s eq '': true
+    ElseIf isdigit(head(s)): isnumeric(tail(s))
+    Else: false
+    EndIf;
 isalluppercase := \s : String ->
-    if s eq '': true
-    elif isuppercase(head(s)): isalluppercase(tail(s))
-    else: false;
+    If s eq '': true
+    ElseIf isuppercase(head(s)): isalluppercase(tail(s))
+    Else: false
+    EndIf;
 isalllowercase := \s : String ->
-    if s eq '': true
-    elif islowercase(head(s)): isalllowercase(tail(s))
-    else: false;
+    If s eq '': true
+    ElseIf islowercase(head(s)): isalllowercase(tail(s))
+    Else: false
+    EndIf;
 
 isblank := \s : String ->
-    if s eq '': true
-    elif char2ord(s) <= char2ord(' '): isblank(tail(s))
-    else: false;
+    If s eq '': true
+    ElseIf char2ord(s) <= char2ord(' '): isblank(tail(s))
+    Else: false
+    EndIf;
 
 chop := \s : String ->
-    if s eq '': ''
-    else: left(s, length(s) - 1);
+    If s eq '': ''
+    Else: left(s, length(s) - 1)
+    EndIf;
 
 containsonly := \s : String, t : String ->
-    if s eq '': true
-    elif s sw t: containsonly(substring1(s, length(t)), t)
-    else: false;
+    If s eq '': true
+    ElseIf s sw t: containsonly(substring1(s, length(t)), t)
+    Else: false
+    EndIf;
 
 lines := \s : String ->
     split(LF, replace(replace(s, CRLF, LF), CR, LF));
 
 # can't name this `reverse` because that is already reserved for reversing Dictionaries
 strreverse := \s : String ->
-    if s eq '': ''
-    else: strreverse(tail(s)) & head(s);
+    If s eq '': ''
+    Else: strreverse(tail(s)) & head(s)
+    EndIf;
 
 space := \n : Integer ->
     repeat(' ', n);
 
 tolowercase := \s : String ->
-    if s eq '': ''
-    else:
-        (if isuppercase(s): ord2char(char2ord(head(s)) + 0x20)
-         else: head(s))
-        & tolowercase(tail(s));
+    If s eq '': ''
+    Else:
+        If isuppercase(s): ord2char(char2ord(head(s)) + 0x20)
+        Else: head(s)
+        EndIf
+        & tolowercase(tail(s))
+    EndIf;
 touppercase := \s : String ->
-    if s eq '': ''
-    else:
-        (if islowercase(s): ord2char(char2ord(head(s)) - 0x20)
-         else: head(s))
-        & touppercase(tail(s));
+    If s eq '': ''
+    Else:
+        If islowercase(s): ord2char(char2ord(head(s)) - 0x20)
+        Else: head(s)
+        EndIf
+        & touppercase(tail(s))
+    EndIf;
 
 trimleft := \s : String ->
-    if s eq '': ''
+    If s eq '': ''
     # the left(s, 1) is implied by char2ord():
-    elif char2ord(s) <= char2ord(' '): trimleft(tail(s))
-    else: s;
+    ElseIf char2ord(s) <= char2ord(' '): trimleft(tail(s))
+    Else: s
+    EndIf;
 trimright := \s : String ->
-    if s eq '': ''
-    elif char2ord(right(s, 1)) <= char2ord(' '): trimright(chop(s))
-    else: s;
+    If s eq '': ''
+    ElseIf char2ord(right(s, 1)) <= char2ord(' '): trimright(chop(s))
+    Else: s
+    EndIf;
 trim := \s : String ->
     trimright(trimleft(s));
 
-foreachchar := \s : String, f : Function -> (
-    for i from 0 to length(s) - 1 (
-        call f(charat(s, i));
-    )
-);
-foreachline := \s : String, f : Function -> (
-    call foreach(lines(s), f);
-);
+foreachchar := \s : String, f : Function -> {
+    For i From 0 To length(s) - 1:
+        Call f(charat(s, i));
+    EndFor
+};
+foreachline := \s : String, f : Function -> {
+    Call foreach(lines(s), f);
+};

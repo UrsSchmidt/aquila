@@ -5,4 +5,4 @@ a := 42;
 # this should fail in `strict` mode
 a := 'abc';
 
-write a;
+Write a;

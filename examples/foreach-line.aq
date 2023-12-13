@@ -1,7 +1,7 @@
 #!/usr/local/bin/aq
 
-run '../prelude/stringfunctions.aq';
+Run '../prelude/stringfunctions.aq';
 
 multilinestr := 'line 1' & LF & 'line 2' & LF;
 
-call foreachline(multilinestr, \k, line -> (write line;));
+Call foreachline(multilinestr, \k, line -> {Write line;});

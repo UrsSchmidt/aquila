@@ -1049,7 +1049,13 @@ Any Interpreter::visitFactorialOperator(AquilaParser::FactorialOperatorContext *
 }
 
 Any Interpreter::visitFactor(AquilaParser::FactorContext *ctx) {
-    if (ctx->bracketExpression()) {
+    if (ctx->ifExpression()) {
+        return visit(ctx->ifExpression());
+    } else if (ctx->letExpression()) {
+        return visit(ctx->letExpression());
+    } else if (ctx->switchExpression()) {
+        return visit(ctx->switchExpression());
+    } else if (ctx->bracketExpression()) {
         return visit(ctx->bracketExpression());
     } else if (ctx->absExpression()) {
         return visit(ctx->absExpression());

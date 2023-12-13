@@ -1,57 +1,57 @@
 #!/usr/local/bin/aq
 
-if true (
-    write 'OK';
-)
+If true:
+    Write 'OK';
+EndIf
 
-if false (
-    write 'NOT OK';
-)
+If false:
+    Write 'NOT OK';
+EndIf
 
-if true (
-    write 'OK';
-) else (
-    write 'NOT OK';
-)
+If true:
+    Write 'OK';
+Else:
+    Write 'NOT OK';
+EndIf
 
-if false (
-    write 'NOT OK';
-) else (
-    write 'OK';
-)
+If false:
+    Write 'NOT OK';
+Else:
+    Write 'OK';
+EndIf
 
-if true (
-    write 'OK';
-) elif false (
-    write 'NOT OK';
-)
+If true:
+    Write 'OK';
+ElseIf false:
+    Write 'NOT OK';
+EndIf
 
-if false (
-    write 'NOT OK';
-) elif true (
-    write 'OK';
-)
+If false:
+    Write 'NOT OK';
+ElseIf true:
+    Write 'OK';
+EndIf
 
-if true (
-    write 'OK';
-) elif false (
-    write 'NOT OK';
-) else (
-    write 'NOT OK';
-)
+If true:
+    Write 'OK';
+ElseIf false:
+    Write 'NOT OK';
+Else:
+    Write 'NOT OK';
+EndIf
 
-if false (
-    write 'NOT OK';
-) elif true (
-    write 'OK';
-) else (
-    write 'NOT OK';
-)
+If false:
+    Write 'NOT OK';
+ElseIf true:
+    Write 'OK';
+Else:
+    Write 'NOT OK';
+EndIf
 
-if false (
-    write 'NOT OK';
-) elif false (
-    write 'NOT OK';
-) else (
-    write 'OK';
-)
+If false:
+    Write 'NOT OK';
+ElseIf false:
+    Write 'NOT OK';
+Else:
+    Write 'OK';
+EndIf

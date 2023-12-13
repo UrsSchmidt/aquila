@@ -1,83 +1,83 @@
 #!/usr/local/bin/aq
 
-run '../prelude/stringfunctions.aq';
+Run '../prelude/stringfunctions.aq';
 
 str := 'HeLlO, WoRlD! こんにちは！';
 
 # literals
-write '';
-write str;
+Write '';
+Write str;
 
 # operations
-write '' & 'あいう';
-write 'あいう' & '';
-write 'あいう' & 'えおか';
-write bool2str('あいう' eq 'あいう');
-write bool2str('あいう' eq 'えおか');
-write bool2str('あいう' ne 'あいう');
-write bool2str('あいう' ne 'えおか');
-write bool2str('あいう' in 'あいうえお');
-write bool2str('えおか' in 'あいうえお');
-write bool2str('あいうえお' sw 'あいう');
-write bool2str('あいうえお' sw 'いうえ');
-write bool2str('あいうえお' ew 'うえお');
-write bool2str('あいうえお' ew 'いうえ');
+Write '' & 'あいう';
+Write 'あいう' & '';
+Write 'あいう' & 'えおか';
+Write bool2str('あいう' eq 'あいう');
+Write bool2str('あいう' eq 'えおか');
+Write bool2str('あいう' ne 'あいう');
+Write bool2str('あいう' ne 'えおか');
+Write bool2str('あいう' in 'あいうえお');
+Write bool2str('えおか' in 'あいうえお');
+Write bool2str('あいうえお' sw 'あいう');
+Write bool2str('あいうえお' sw 'いうえ');
+Write bool2str('あいうえお' ew 'うえお');
+Write bool2str('あいうえお' ew 'いうえ');
 
 # functions
-write int2str(length(str));
+Write int2str(length(str));
 
-write int2str(char2ord(str));
-write int2str(char2ord(right(str, 1)));
+Write int2str(char2ord(str));
+Write int2str(char2ord(right(str, 1)));
 
-write charat(str, 1);
-write substring1(str, 5);
-write substring2(str, 1, 6);
+Write charat(str, 1);
+Write substring1(str, 5);
+Write substring2(str, 1, 6);
 
-write left(str, 5);
-write mid(str, 1, 5);
-write right(str, 5);
+Write left(str, 5);
+Write mid(str, 1, 5);
+Write right(str, 5);
 
-write head(str);
-write tail(str);
+Write head(str);
+Write tail(str);
 
-write int2str(findleft(str, 'He', 0));
-write int2str(findleft(str, 'lO', 0));
-write int2str(findright(str, 'He', length(str)));
-write int2str(findright(str, 'lO', length(str)));
+Write int2str(findleft(str, 'He', 0));
+Write int2str(findleft(str, 'lO', 0));
+Write int2str(findright(str, 'He', length(str)));
+Write int2str(findright(str, 'lO', length(str)));
 
 s := '1;2;3';
-write s;
+Write s;
 p := split(';', s);
-write dict2str(p);
+Write dict2str(p);
 t := join(',', p);
-write t;
+Write t;
 
-write repeat(' ', 10);
-write repeat('あいう', 0);
-write repeat('あいう', 3);
+Write repeat(' ', 10);
+Write repeat('あいう', 0);
+Write repeat('あいう', 3);
 
-write replace('abcde', 'bcd', '_');
-write replace('abcde', '.', '_');
+Write replace('abcde', 'bcd', '_');
+Write replace('abcde', '.', '_');
 
 # prelude functions
-write bool2str(isallprintableascii('This is all in printable ASCII.'));
-write bool2str(isallprintableascii('Thiś is nòt in pŕintâble ÁSCÌI.'));
-write bool2str(isnumeric('0123456789'));
-write bool2str(isnumeric('0123ab6789'));
-write bool2str(isalluppercase('HELLO'));
-write bool2str(isalluppercase('HeLlO'));
-write bool2str(isalllowercase('hello'));
-write bool2str(isalllowercase('HeLlO'));
-write bool2str(isblank(''));
-write bool2str(isblank(str));
-write chop('あいう');
-write bool2str(containsonly('***', '*'));
-write bool2str(containsonly('*+*', '*'));
-write strreverse(str);
-write space(5);
-write tolowercase(str);
-write touppercase(str);
-write trimleft(' あいう ');
-write trimright(' あいう ');
-write trim(' あいう ');
-call foreachchar('あいう', \c -> (write '>' & c;));
+Write bool2str(isallprintableascii('This is all in printable ASCII.'));
+Write bool2str(isallprintableascii('Thiś is nòt in pŕintâble ÁSCÌI.'));
+Write bool2str(isnumeric('0123456789'));
+Write bool2str(isnumeric('0123ab6789'));
+Write bool2str(isalluppercase('HELLO'));
+Write bool2str(isalluppercase('HeLlO'));
+Write bool2str(isalllowercase('hello'));
+Write bool2str(isalllowercase('HeLlO'));
+Write bool2str(isblank(''));
+Write bool2str(isblank(str));
+Write chop('あいう');
+Write bool2str(containsonly('***', '*'));
+Write bool2str(containsonly('*+*', '*'));
+Write strreverse(str);
+Write space(5);
+Write tolowercase(str);
+Write touppercase(str);
+Write trimleft(' あいう ');
+Write trimright(' あいう ');
+Write trim(' あいう ');
+Call foreachchar('あいう', \c -> {Write '>' & c;});

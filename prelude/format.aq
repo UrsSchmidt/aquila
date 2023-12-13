@@ -1,15 +1,17 @@
 #!/usr/local/bin/aq
 
-run 'stringfunctions.aq';
+Run 'stringfunctions.aq';
 
 # a very simplistic implementation of format()
 # handles %% and %0-%1
 format := \s : String, d : Dictionary ->
-    if s eq '': ''
-    elif s sw '%':
-        (let nextchar = charat(s, 1): (
-            if isdigit(nextchar): d[nextchar]
-            else: nextchar
-        ))
+    If s eq '': ''
+    ElseIf s sw '%':
+        Let nextchar = charat(s, 1):
+            If isdigit(nextchar): d[nextchar]
+            Else: nextchar
+            EndIf
+        EndLet
         & format(substring1(s, 2), d)
-    else: head(s) & format(tail(s), d);
+    Else: head(s) & format(tail(s), d)
+    EndIf;

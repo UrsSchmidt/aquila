@@ -4,15 +4,16 @@
 # this file only serves as an examples as to how to implement it on your own
 
 owngcd := \m : Integer, n : Integer ->
-    if m < 0 or n < 0:
+    If m < 0 or n < 0:
         error('Illegal argument')
-    elif n = 0:
+    ElseIf n = 0:
         m
-    else:
-        owngcd(n, m mod n);
+    Else:
+        owngcd(n, m mod n)
+    EndIf;
 
-for m from 2 to 5 (
-    for n from 2 to 5 (
-        write 'gcd(' & int2str(m) & ', ' & int2str(n) & ') = ' & int2str(owngcd(m, n));
-    )
-)
+For m From 2 To 5:
+    For n From 2 To 5:
+        Write 'gcd(' & int2str(m) & ', ' & int2str(n) & ') = ' & int2str(owngcd(m, n));
+    EndFor
+EndFor

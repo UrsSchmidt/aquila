@@ -144,13 +144,13 @@ Functions are always written as lambdas: `\x, y -> x + y`
 
 You can assign functions to variables like any other value: `a := \x -> 2 * x;`
 
-You can write recursive functions using the variable that you assign the function to: `factorial := \n -> if n = 0: 1 else: n * factorial(n - 1);`
+You can write recursive functions using the variable that you assign the function to: `factorial := \n -> If n = 0: 1 Else: n * factorial(n - 1) EndIf;`
 
 You can add additional runtime type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 
 Here you can also use `Any` to explicitly state, that the argument can take any type: `\x : Any -> x`
 
-You can write void functions using code blocks: `a := \s -> (write s;);`
+You can write void functions using code blocks: `a := \s -> {Write s;};`
 
 The following predefined functions are available on functions:
  * `foreach(d : Dictionary, f : Function)`
@@ -203,44 +203,47 @@ Type conversion functions:
 You can check for types using the predefined functions `boolean`, `dictionary`, `function`, `integer` and `string`:
 ```
 a := 123;
-write bool2str(integer(a)); # true
+Write bool2str(integer(a)); # true
 ```
 
 ## Other operations and functions
 
 ### If expressions
 
-`if` expressions are written like this:
+`If` expressions are written like this:
 ```
-if expression:
+If expression:
     # expression
-elif expression:
+ElseIf expression:
     # expression
-else:
+Else:
     # expression
+EndIf
 ```
-There can be 0..n `elif` (short for else if) parts and the `else` part is mandatory.
+There can be 0..n `ElseIf` parts and the `Else` part is mandatory.
 
 ### Let expressions
 
-`let` expressions are written like this:
+`Let` expressions are written like this:
 ```
-let a = 1 + 2, b = 3 * 4:
+Let a = 1 + 2, b = 3 * 4:
     # expression
+EndLet
 ```
-There can be 1..n bindings after the `let`.
+There can be 1..n bindings after the `Let`.
 
 ### Switch expressions
 
-`switch` expressions are written like this:
+`Switch` expressions are written like this:
 ```
-switch expression:
-case expression1, expression2:
+Switch expression:
+Case expression1, expression2:
     # expression
-default:
+Default:
     # expression
+EndSwitch
 ```
-There can be 0..n `case` parts and the `default` part is mandatory.
+There can be 0..n `Case` parts and the `Default` part is mandatory.
 
 ### Misc. built-in functions
 
@@ -254,105 +257,104 @@ You can assign values to variables using: `myVariable := myValue;`
 
 ### Call statements
 
-You can call a void `Function` using: `call myVoidFunction(p1, p2);`
+You can call a void `Function` using: `Call myVoidFunction(p1, p2);`
 
 ### Exit statements
 
-You can exit the current script with a specific exit code using: `exit myExitCode;`
+You can exit the current script with a specific exit code using: `Exit myExitCode;`
 
 ### Now statements
 
-You can put the current time in milliseconds into an `Integer` using: `now myTimeVariable;`
+You can put the current time in milliseconds into an `Integer` using: `Now myTimeVariable;`
 
 ### Random statements
 
-You can put a random number that is in a certain range into an `Integer` using: `random myVariable from 1 to 10;`
+You can put a random number that is in a certain range into an `Integer` using: `Random myVariable From 1 To 10;`
 
 ### Read statements
 
-You can read a line from the command line into a `String` using: `read myVariable;`
+You can read a line from the command line into a `String` using: `Read myVariable;`
 
 ### Remove statements
 
-You can remove variables or key/value pairs from dictionaries using: `remove myVariable;` and `remove myDictionary.myKey;` respectively
+You can remove variables or key/value pairs from dictionaries using: `Remove myVariable;` and `Remove myDictionary.myKey;` respectively
 
 ### Run statements
 
-You can run other external Aquila scripts using: `run 'script.aq';`
+You can run other external Aquila scripts using: `Run 'script.aq';`
 
 ### Sleep statements
 
-You can sleep/wait for a specific amount of milliseconds using: `sleep myVariableHoldingMilliseconds;`
+You can sleep/wait for a specific amount of milliseconds using: `Sleep myVariableHoldingMilliseconds;`
 
 ### Write statements
 
-You can write a `String` as a line to the command line using: `write 'Hello, world!';`
+You can write a `String` as a line to the command line using: `Write 'Hello, world!';`
 
 ## Compound statements
 
 ### If statements
 
-`if` statements are written like this:
+`If` statements are written like this:
 ```
-if expression (
+If expression:
     # code
-) elif expression (
+ElseIf expression:
     # code
-) else (
+Else:
     # code
-)
+EndIf
 ```
-There can be 0..n `elif` (short for else if) parts and if not needed, the `else` part can be omitted.
+There can be 0..n `ElseIf` parts and if not needed, the `Else` part can be omitted.
 
 ### Switch statements
 
-`switch` statements are written like this:
+`Switch` statements are written like this:
 ```
-switch expression:
-case expression1, expression2 (
+Switch expression:
+Case expression1, expression2:
     # code
-)
-default (
+Default:
     # code
-)
+EndSwitch
 ```
-There can be 0..n `case` parts and if not needed, the `default` part can be omitted.
+There can be 0..n `Case` parts and if not needed, the `Default` part can be omitted.
 
 ### Loop statements
 
-`loop` statements are written like this:
+`Loop` statements are written like this:
 ```
-loop (
+Loop:
     # code
-) while expression (
+While expression:
     # code
-)
+EndLoop
 ```
-If not needed, either the `loop` part or the `while` part can be omitted, but not both.
+If not needed, either the `Loop` part or the part after the `While` can be omitted, but not both.
 
-Omitting the loop part:
+Omitting the `Loop` part:
 ```
-while expression (
+While expression:
     # code
-)
+EndWhile
 ```
 
-Omitting the while part:
+Omitting the part after the `While`:
 ```
-loop (
+Loop:
     # code
-) while expression;
+While expression EndLoop
 ```
 
 ### For statements
 
-`for` statements are written like this (in this example iterating over the odd numbers from 1 to 100):
+`For` statements are written like this (in this example iterating over the odd numbers from 1 to 100):
 ```
-for i from 1 to 100 step 2 (
+For i From 1 To 100 Step 2:
     # code
-)
+EndFor
 ```
-If not needed, the `step` part can be omitted, it will default to `step 1`.
+If not needed, the `Step` part can be omitted, it will default to `Step 1`.
 
 ## Using command line arguments
 

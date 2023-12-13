@@ -1,6 +1,6 @@
 #!/usr/local/bin/aq
 
-run '../prelude/stringfunctions.aq';
+Run '../prelude/stringfunctions.aq';
 
 # set the size of your console window here
 width := 80 - 1;
@@ -10,61 +10,73 @@ height := 23;
 clearscreen := ESC & '[2J';
 
 pad := \s : String ->
-    if length(s) >= width: s
-    else: s & space(width - length(s));
+    If length(s) >= width: s
+    Else: s & space(width - length(s))
+    EndIf;
 
 board := {};
 board[0] := pad('    ');
 board[1] := pad('  * ');
 board[2] := pad('   *');
 board[3] := pad(' ***');
-for y from 4 to height - 1 (
+For y From 4 To height - 1:
     board[y] := space(width);
-)
+EndFor
 
-iterate := \-> (
+iterate := \-> {
     newboard := {};
-    for y from 0 to height - 1 (
+    For y From 0 To height - 1:
         newboard[y] := '';
-    )
-    for y from 0 to height - 1 (
-        for x from 0 to width - 1 (
+    EndFor
+    For y From 0 To height - 1:
+        For x From 0 To width - 1:
             live := 0;
-            for ry from -1 to 1 (
-                for rx from -1 to 1 (
-                    if rx <> 0 or ry <> 0 (
+            For ry From -1 To 1:
+                For rx From -1 To 1:
+                    If rx <> 0 or ry <> 0:
                         ax := x + rx;
                         ay := y + ry;
-                        if 0 <= ax and ax < width and
-                           0 <= ay and ay < height (
+                        If 0 <= ax and ax < width and
+                           0 <= ay and ay < height:
                             neighbor := charat(board[ay], ax);
-                            if neighbor eq '*' (live := live + 1;)
-                            elif neighbor ne ' ' (call error('Illegal neighbor encountered: ' & neighbor);)
-                        )
-                    )
-                )
-            )
+                            If neighbor eq '*':
+                                live := live + 1;
+                            ElseIf neighbor ne ' ':
+                                Call error('Illegal neighbor encountered: ' & neighbor);
+                            EndIf
+                        EndIf
+                    EndIf
+                EndFor
+            EndFor
             self := charat(board[y], x);
-            if self eq ' ' (if live = 3 (self := '*';))
-            elif self eq '*' (if live < 2 or live > 3 (self := ' ';))
-            else (call error('Illegal self encountered: ' & self);)
+            If self eq ' ':
+                If live = 3:
+                    self := '*';
+                EndIf
+            ElseIf self eq '*':
+                If live < 2 or live > 3:
+                    self := ' ';
+                EndIf
+            Else:
+                Call error('Illegal self encountered: ' & self);
+            EndIf
             newboard[y] := newboard[y] & self;
-        )
-    )
-    for y from 0 to height - 1 (
+        EndFor
+    EndFor
+    For y From 0 To height - 1:
         board[y] := newboard[y];
-    )
-);
+    EndFor
+};
 
-print := \-> (
-    write clearscreen;
-    for y from 0 to height - 1 (
-        write board[y] & '|';
-    )
-);
+print := \-> {
+    Write clearscreen;
+    For y From 0 To height - 1 (
+        Write board[y] & '|';
+    EndFor
+};
 
-for i from 1 to 50 (
-    call print();
-    call iterate();
-)
-call print();
+For i From 1 To 50:
+    Call print();
+    Call iterate();
+EndFor
+Call print();

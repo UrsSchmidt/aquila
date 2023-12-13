@@ -1,27 +1,33 @@
 #!/usr/local/bin/aq
 
-write switch 'a':
-    default: 'OK';
+Write Switch 'a':
+    Default: 'OK'
+    EndSwitch;
 
-write switch 'a':
-    case 'a': 'OK'
-    default: 'NOT OK';
+Write Switch 'a':
+    Case 'a': 'OK'
+    Default: 'NOT OK'
+    EndSwitch;
 
-write switch 'b':
-    case 'a': 'NOT OK'
-    default: 'OK';
+Write Switch 'b':
+    Case 'a': 'NOT OK'
+    Default: 'OK'
+    EndSwitch;
 
-write switch 'a':
-    case 'a': 'OK'
-    case 'b': 'NOT OK'
-    default: 'NOT OK';
+Write Switch 'a':
+    Case 'a': 'OK'
+    Case 'b': 'NOT OK'
+    Default: 'NOT OK'
+    EndSwitch;
 
-write switch 'b':
-    case 'a': 'NOT OK'
-    case 'b': 'OK'
-    default: 'NOT OK';
+Write Switch 'b':
+    Case 'a': 'NOT OK'
+    Case 'b': 'OK'
+    Default: 'NOT OK'
+    EndSwitch;
 
-write switch 'c':
-    case 'a': 'NOT OK'
-    case 'b': 'NOT OK'
-    default: 'OK';
+Write Switch 'c':
+    Case 'a': 'NOT OK'
+    Case 'b': 'NOT OK'
+    Default: 'OK'
+    EndSwitch;

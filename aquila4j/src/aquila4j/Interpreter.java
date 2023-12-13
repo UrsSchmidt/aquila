@@ -996,7 +996,13 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
 
     @Override
     public Object visitFactor(FactorContext ctx) {
-        if (ctx.bracketExpression() != null) {
+        if (ctx.ifExpression() != null) {
+            return visit(ctx.ifExpression());
+        } else if (ctx.letExpression() != null) {
+            return visit(ctx.letExpression());
+        } else if (ctx.switchExpression() != null) {
+            return visit(ctx.switchExpression());
+        } else if (ctx.bracketExpression() != null) {
             return visit(ctx.bracketExpression());
         } else if (ctx.absExpression() != null) {
             return visit(ctx.absExpression());

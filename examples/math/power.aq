@@ -4,17 +4,18 @@
 # this file only serves as an examples as to how to implement it on your own
 
 ownpow := \m : Integer, n : Integer ->
-    if m < 0 or n < 0:
+    If m < 0 or n < 0:
         error('Illegal argument')
-    elif n = 0:
+    ElseIf n = 0:
         1
-    elif m <= 1 or n = 1:
+    ElseIf m <= 1 or n = 1:
         m
-    else:
-        m * ownpow(m, n - 1);
+    Else:
+        m * ownpow(m, n - 1)
+    EndIf;
 
-for m from 0 to 3 (
-    for n from 0 to 3 (
-        write int2str(m) & '^' & int2str(n) & ' = ' & int2str(ownpow(m, n));
-    )
-)
+For m From 0 To 3:
+    For n From 0 To 3:
+        Write int2str(m) & '^' & int2str(n) & ' = ' & int2str(ownpow(m, n));
+    EndFor
+EndFor

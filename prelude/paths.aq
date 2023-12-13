@@ -6,39 +6,47 @@ count := \s : String, t : String ->
     size(split(t, s)) - 1;
 
 addslash := \s : String ->
-    if s ew '/': s
-    else: s & '/';
+    If s ew '/': s
+    Else: s & '/'
+    EndIf;
 dropslash := \s : String ->
-    if s ew '/': left(s, length(s) - 1)
-    else: s;
+    If s ew '/': left(s, length(s) - 1)
+    Else: s
+    EndIf;
 
 base := \s : String ->
-    let t = dropslash(s): (
-        if '/' in t: substring1(t, findright(t, '/', length(t)) + 1)
-        else: t
-    );
+    Let t = dropslash(s):
+        If '/' in t: substring1(t, findright(t, '/', length(t)) + 1)
+        Else: t
+        EndIf
+    EndLet;
 extension := \s : String ->
-    if s ew '/': error('Illegal argument')
-    elif '.' in s: substring1(s, findright(s, '.', length(s)) + 1)
-    else: '';
+    If s ew '/': error('Illegal argument')
+    ElseIf '.' in s: substring1(s, findright(s, '.', length(s)) + 1)
+    Else: ''
+    EndIf;
 parent := \s : String ->
-    if not s sw '/': error('Illegal argument')
-    else: left(s, findright(dropslash(s), '/', length(s)) + 1);
+    If not s sw '/': error('Illegal argument')
+    Else: left(s, findright(dropslash(s), '/', length(s)) + 1)
+    EndIf;
 
 absolute := \root : String, s : String ->
-    if not root sw '/' or not root ew '/': error('Illegal argument')
-    elif s sw '/': s
-    elif s sw './': absolute(root, substring1(s, 2))
-    elif s sw '../': absolute(parent(root), substring1(s, 3))
-    else: root & s;
+    If not root sw '/' or not root ew '/': error('Illegal argument')
+    ElseIf s sw '/': s
+    ElseIf s sw './': absolute(root, substring1(s, 2))
+    ElseIf s sw '../': absolute(parent(root), substring1(s, 3))
+    Else: root & s
+    EndIf;
 relative := \root : String, s : String ->
-    if not root sw '/' or not root ew '/': error('Illegal argument')
-    elif not s sw '/': s
-    elif s sw root: substring1(s, length(root))
-    else: (
-        let f = \t : String, u : String ->
-                if head(t) eq head(u): 1 + f(tail(t), tail(u))
-                else: 0,
+    If not root sw '/' or not root ew '/': error('Illegal argument')
+    ElseIf not s sw '/': s
+    ElseIf s sw root: substring1(s, length(root))
+    Else:
+        Let f = \t : String, u : String ->
+                If head(t) eq head(u): 1 + f(tail(t), tail(u))
+                Else: 0
+                EndIf,
             l = f(root, s):
             repeat('../', count(substring1(root, l), '/')) & substring1(s, l)
-    );
+        EndLet
+    EndIf;

@@ -1,5 +1,5 @@
 #!/usr/local/bin/aq
 
-read line;
+Read line;
 
-write line;
+Write line;

@@ -11,25 +11,25 @@ d := \x : Any -> x;
 
 # functions
 dictForeach := { 'Hello, world!', 'abc' };
-funcForeach := \k, v -> (if string(v) (write v;));
-call foreach(dictForeach, funcForeach);
+funcForeach := \k, v -> {If string(v): Write v; EndIf};
+Call foreach(dictForeach, funcForeach);
 
 dictForall := { 'Hello, world!', 'abc' };
 funcForall := \k, v : String -> length(v) > 3;
-write bool2str(forall(dictForall, funcForall));
+Write bool2str(forall(dictForall, funcForall));
 
 dictExists := { 'Hello, world!', 'abc' };
 funcExists := \k, v : String -> length(v) > 3;
-write bool2str(exists(dictExists, funcExists));
+Write bool2str(exists(dictExists, funcExists));
 
 dictFilter := { 'Hello, world!', 'abc' };
 funcFilter := \k, v : String -> length(v) > 3;
-write dict2str(filter(dictFilter, funcFilter));
+Write dict2str(filter(dictFilter, funcFilter));
 
 dictMap := { 'Hello, world!', 'abc' };
 funcMap := \k, v : String -> length(v);
-write dict2str(map(dictMap, funcMap));
+Write dict2str(map(dictMap, funcMap));
 
 dictFold := { 'Hello, world!', 'abc' };
 funcFold := \l : String, r : String -> l & r;
-write fold(dictFold, '', funcFold);
+Write fold(dictFold, '', funcFold);

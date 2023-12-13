@@ -1,34 +1,34 @@
 #!/usr/local/bin/aq
 
 abc.def := 2;
-write int2str(abc.def);
+Write int2str(abc.def);
 
 a := {
     mykey: 'myvalue',
     ['mystringkey']: 'myvalue2',
     [2 + 3 * 4]: 42 * 3,
 };
-write int2str(size(a));
-write dict2str(a);
-write a.mykey;
-write bool2str('myvalue' : a);
+Write int2str(size(a));
+Write dict2str(a);
+Write a.mykey;
+Write bool2str('myvalue' : a);
 
-remove a['mystringkey'];
-call foreach(a, \k, v -> (
-    if integer(v) (
-        write k & ': ' & int2str(v);
-    ) elif string(v) (
-        write k & ': ' & v;
-    ) else (
-        write k & ': ?';
-    )
-));
+Remove a['mystringkey'];
+Call foreach(a, \k, v -> {
+    If integer(v):
+        Write k & ': ' & int2str(v);
+    ElseIf string(v):
+        Write k & ': ' & v;
+    Else:
+        Write k & ': ?';
+    EndIf
+});
 
 # array example
 array := { 5, 4, 3, 2, 1 };
 array[4] := 42;
-remove array[2];
-write dict2str(array);
-call foreach(array, \k, v -> (
-    write int2str(v);
-));
+Remove array[2];
+Write dict2str(array);
+Call foreach(array, \k, v -> {
+    Write int2str(v);
+});

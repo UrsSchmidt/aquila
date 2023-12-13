@@ -1,7 +1,7 @@
 #!/usr/local/bin/aq
 
-run '../prelude/stringfunctions.aq';
+Run '../prelude/stringfunctions.aq';
 
 str := 'Hello, world!';
 
-call foreachchar(str, \c -> (write c;));
+Call foreachchar(str, \c -> {Write c;});

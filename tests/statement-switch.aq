@@ -1,73 +1,64 @@
 #!/usr/local/bin/aq
 
-switch 'a':
-case 'a' (
-    write 'OK';
-)
+Switch 'a':
+Case 'a':
+    Write 'OK';
+EndSwitch
 
-switch 'a':
-case 'b' (
-    write 'NOT OK';
-)
+Switch 'a':
+Case 'b':
+    Write 'NOT OK';
+EndSwitch
 
-switch 'a':
-case 'a' (
-    write 'OK';
-)
-default (
-    write 'NOT OK';
-)
+Switch 'a':
+Case 'a':
+    Write 'OK';
+Default:
+    Write 'NOT OK';
+EndSwitch
 
-switch 'a':
-case 'b' (
-    write 'NOT OK';
-)
-default (
-    write 'OK';
-)
+Switch 'a':
+Case 'b':
+    Write 'NOT OK';
+Default:
+    Write 'OK';
+EndSwitch
 
-switch 'a':
-case 'a' (
-    write 'OK';
-)
-case 'b' (
-    write 'NOT OK';
-)
+Switch 'a':
+Case 'a':
+    Write 'OK';
+Case 'b':
+    Write 'NOT OK';
+EndSwitch
 
-switch 'a':
-case 'a' (
-    write 'OK';
-)
-case 'b' (
-    write 'NOT OK';
-)
+Switch 'a':
+Case 'a':
+    Write 'OK';
+Case 'b':
+    Write 'NOT OK';
+EndSwitch
 
-switch 'a':
-case 'a' (
-    write 'OK';
-)
-case 'b' (
-    write 'NOT OK';
-)
-default (
-    write 'NOT OK';
-)
+Switch 'a':
+Case 'a':
+    Write 'OK';
+Case 'b':
+    Write 'NOT OK';
+Default:
+    Write 'NOT OK';
+EndSwitch
 
-switch 'a':
-case 'a' (
-    write 'OK';
-)
-case 'b' (
-    write 'NOT OK';
-)
-default (
-    write 'NOT OK';
-)
+Switch 'a':
+Case 'a':
+    Write 'OK';
+Case 'b':
+    Write 'NOT OK';
+Default:
+    Write 'NOT OK';
+EndSwitch
 
-switch 'd':
-case 'a', 'b' (
-    write 'NOT OK';
-)
-case 'c', 'd' (
-    write 'OK';
-)
+Switch 'd':
+Case 'a', 'b':
+    Write 'NOT OK';
+Case 'c', 'd':
+    Write 'OK';
+EndSwitch
