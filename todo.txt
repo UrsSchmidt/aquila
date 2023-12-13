@@ -1,4 +1,5 @@
 move prelude functions to CamelCase
+move predefined functions to CamelCase
 type check functions should start with "Is"
 type conversion functions should use "To" instead of "2"
 

@@ -1,19 +1,19 @@
 #!/usr/local/bin/aq
 
-Run '../prelude/like.aq';
+Run '../prelude/Like.aq';
 
-Write bool2str(like('abc', '*'));
-Write bool2str(like('abc', '**'));
-Write bool2str(like('abc', '??'));
-Write bool2str(like('abc', '???'));
-Write bool2str(like('abc', 'a*'));
-Write bool2str(like('abc', 'a*c'));
-Write bool2str(like('abc', 'a??'));
-Write bool2str(like('abc', 'a?c'));
-Write bool2str(like('abc', 'abx'));
-Write bool2str(like('abc', 'x*'));
-Write bool2str(like('abc', 'x??'));
-Write bool2str(like('abc', 'xyz'));
-Write bool2str(like('abc', '###'));
-Write bool2str(like('123', '##'));
-Write bool2str(like('123', '###'));
+Write bool2str(Like('abc', '*'));
+Write bool2str(Like('abc', '**'));
+Write bool2str(Like('abc', '??'));
+Write bool2str(Like('abc', '???'));
+Write bool2str(Like('abc', 'a*'));
+Write bool2str(Like('abc', 'a*c'));
+Write bool2str(Like('abc', 'a??'));
+Write bool2str(Like('abc', 'a?c'));
+Write bool2str(Like('abc', 'abx'));
+Write bool2str(Like('abc', 'x*'));
+Write bool2str(Like('abc', 'x??'));
+Write bool2str(Like('abc', 'xyz'));
+Write bool2str(Like('abc', '###'));
+Write bool2str(Like('123', '##'));
+Write bool2str(Like('123', '###'));

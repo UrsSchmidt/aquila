@@ -1,6 +1,6 @@
 #!/usr/local/bin/aq
 
-Run '../prelude/stringfunctions.aq';
+Run '../prelude/StringFunctions.aq';
 
 # set the size of your console window here
 width := 80 - 1;
@@ -11,7 +11,7 @@ clearscreen := ESC & '[2J';
 
 pad := \s : String ->
     If length(s) >= width: s
-    Else: s & space(width - length(s))
+    Else: s & Space(width - length(s))
     EndIf;
 
 board := {};

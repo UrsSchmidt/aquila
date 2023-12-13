@@ -1,6 +1,6 @@
 #!/usr/local/bin/aq
 
-Run '../prelude/stringfunctions.aq';
+Run '../prelude/StringFunctions.aq';
 
 str := 'HeLlO, WoRlD! こんにちは！';
 
@@ -60,24 +60,24 @@ Write replace('abcde', 'bcd', '_');
 Write replace('abcde', '.', '_');
 
 # prelude functions
-Write bool2str(isallprintableascii('This is all in printable ASCII.'));
-Write bool2str(isallprintableascii('Thiś is nòt in pŕintâble ÁSCÌI.'));
-Write bool2str(isnumeric('0123456789'));
-Write bool2str(isnumeric('0123ab6789'));
-Write bool2str(isalluppercase('HELLO'));
-Write bool2str(isalluppercase('HeLlO'));
-Write bool2str(isalllowercase('hello'));
-Write bool2str(isalllowercase('HeLlO'));
-Write bool2str(isblank(''));
-Write bool2str(isblank(str));
-Write chop('あいう');
-Write bool2str(containsonly('***', '*'));
-Write bool2str(containsonly('*+*', '*'));
-Write strreverse(str);
-Write space(5);
-Write tolowercase(str);
-Write touppercase(str);
-Write trimleft(' あいう ');
-Write trimright(' あいう ');
-Write trim(' あいう ');
-Call foreachchar('あいう', \c -> {Write '>' & c;});
+Write bool2str(IsAllPrintableASCII('This is all in printable ASCII.'));
+Write bool2str(IsAllPrintableASCII('Thiś is nòt in pŕintâble ÁSCÌI.'));
+Write bool2str(IsNumeric('0123456789'));
+Write bool2str(IsNumeric('0123ab6789'));
+Write bool2str(IsAllUppercase('HELLO'));
+Write bool2str(IsAllUppercase('HeLlO'));
+Write bool2str(IsAllLowercase('hello'));
+Write bool2str(IsAllLowercase('HeLlO'));
+Write bool2str(IsBlank(''));
+Write bool2str(IsBlank(str));
+Write Chop('あいう');
+Write bool2str(ContainsOnly('***', '*'));
+Write bool2str(ContainsOnly('*+*', '*'));
+Write StrReverse(str);
+Write Space(5);
+Write ToLowercase(str);
+Write ToUppercase(str);
+Write TrimLeft(' あいう ');
+Write TrimRight(' あいう ');
+Write Trim(' あいう ');
+Call ForEachChar('あいう', \c -> {Write '>' & c;});

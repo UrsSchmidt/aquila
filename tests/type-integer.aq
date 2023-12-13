@@ -1,6 +1,6 @@
 #!/usr/local/bin/aq
 
-Run '../prelude/integerfunctions.aq';
+Run '../prelude/IntegerFunctions.aq';
 
 # literals
 Write int2str(000);
@@ -50,5 +50,5 @@ Write int2str(sqrt(0));
 Write int2str(sqrt(49));
 
 # prelude functions
-Write int2str(binomial(2, 2));
-Write int2str(lcm(5, 2));
+Write int2str(Binomial(2, 2));
+Write int2str(LCM(5, 2));

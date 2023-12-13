@@ -4,4 +4,4 @@ Loop:
     Read line;
 While line ne '':
     Write line;
-EndWhile
+EndLoop
