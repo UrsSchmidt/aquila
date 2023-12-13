@@ -11,7 +11,7 @@ d := \x : Any -> x;
 
 # functions
 dictForeach := { 'Hello, world!', 'abc' };
-funcForeach := \k, v -> {If string(v): Write v; EndIf};
+funcForeach := \k, v -> {If IsString(v): Write v; EndIf};
 Call foreach(dictForeach, funcForeach);
 
 dictForall := { 'Hello, world!', 'abc' };

@@ -37,12 +37,15 @@
           <keyword>args</keyword>
           <keyword>env</keyword>
           <!-- functions: -->
+          <keyword>IsBoolean</keyword>
+          <keyword>IsDictionary</keyword>
+          <keyword>IsFunction</keyword>
+          <keyword>IsInteger</keyword>
+          <keyword>IsString</keyword>
           <keyword>bool2str</keyword>
-          <keyword>boolean</keyword>
           <keyword>char2ord</keyword>
           <keyword>charat</keyword>
           <keyword>dict2str</keyword>
-          <keyword>dictionary</keyword>
           <keyword>error</keyword>
           <keyword>exists</keyword>
           <keyword>filter</keyword>
@@ -51,11 +54,9 @@
           <keyword>fold</keyword>
           <keyword>forall</keyword>
           <keyword>foreach</keyword>
-          <keyword>function</keyword>
           <keyword>gcd</keyword>
           <keyword>head</keyword>
           <keyword>int2str</keyword>
-          <keyword>integer</keyword>
           <keyword>join</keyword>
           <keyword>left</keyword>
           <keyword>length</keyword>
@@ -73,7 +74,6 @@
           <keyword>str2bool</keyword>
           <keyword>str2dict</keyword>
           <keyword>str2int</keyword>
-          <keyword>string</keyword>
           <keyword>substring1</keyword>
           <keyword>substring2</keyword>
           <keyword>tail</keyword>

@@ -1,12 +1,12 @@
 #!/usr/local/bin/aq
 
-Write bool2str(boolean(true));
-Write bool2str(boolean('abc'));
-Write bool2str(dictionary({}));
-Write bool2str(dictionary(true));
-Write bool2str(function(\x -> x));
-Write bool2str(function({}));
-Write bool2str(integer(1));
-Write bool2str(integer(\x -> x));
-Write bool2str(string('abc'));
-Write bool2str(string(1));
+Write bool2str(IsBoolean(true));
+Write bool2str(IsBoolean('abc'));
+Write bool2str(IsDictionary({}));
+Write bool2str(IsDictionary(true));
+Write bool2str(IsFunction(\x -> x));
+Write bool2str(IsFunction({}));
+Write bool2str(IsInteger(1));
+Write bool2str(IsInteger(\x -> x));
+Write bool2str(IsString('abc'));
+Write bool2str(IsString(1));

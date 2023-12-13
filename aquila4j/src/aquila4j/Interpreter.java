@@ -1122,6 +1122,21 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         }
         Object result;
         switch (identifier) {
+        case "IsBoolean":
+            result = checkArgsNoFail(ctx, arguments, TYPE_BOOL);
+            break;
+        case "IsDictionary":
+            result = checkArgsNoFail(ctx, arguments, TYPE_DICT);
+            break;
+        case "IsFunction":
+            result = checkArgsNoFail(ctx, arguments, TYPE_FUNC);
+            break;
+        case "IsInteger":
+            result = checkArgsNoFail(ctx, arguments, TYPE_INT);
+            break;
+        case "IsString":
+            result = checkArgsNoFail(ctx, arguments, TYPE_STR);
+            break;
         case "bool2str": {
             if (!checkArgs(ctx, arguments, TYPE_BOOL)) {
                 return null;
@@ -1129,9 +1144,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final Boolean arg1 = (Boolean) arguments.get(0);
             result = toString(arg1);
         }   break;
-        case "boolean":
-            result = checkArgsNoFail(ctx, arguments, TYPE_BOOL);
-            break;
         case "char2ord": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
@@ -1154,9 +1166,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final Map arg1 = (Map) arguments.get(0);
             result = toString(arg1);
         }   break;
-        case "dictionary":
-            result = checkArgsNoFail(ctx, arguments, TYPE_DICT);
-            break;
         case "error": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
@@ -1273,9 +1282,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             result = null;
         }   break;
-        case "function":
-            result = checkArgsNoFail(ctx, arguments, TYPE_FUNC);
-            break;
         case "gcd": {
             if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
                 return null;
@@ -1298,9 +1304,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg1 = (BigInteger) arguments.get(0);
             result = toString(arg1);
         }   break;
-        case "integer":
-            result = checkArgsNoFail(ctx, arguments, TYPE_INT);
-            break;
         case "join": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_DICT)) {
                 return null;
@@ -1447,9 +1450,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             result = toInteger(arg1, ctx);
         }   break;
-        case "string":
-            result = checkArgsNoFail(ctx, arguments, TYPE_STR);
-            break;
         case "substring1": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
                 return null;

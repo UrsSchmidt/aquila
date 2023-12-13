@@ -1175,14 +1175,22 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         arguments.push_back(visit(ec));
     }
     Any result;
-    if (strEquals(identifier, "bool2str")) {
+    if (strEquals(identifier, "IsBoolean")) {
+        result = checkArgsNoFail(ctx, arguments, { TYPE_BOOL });
+    } else if (strEquals(identifier, "IsDictionary")) {
+        result = checkArgsNoFail(ctx, arguments, { TYPE_DICT });
+    } else if (strEquals(identifier, "IsFunction")) {
+        result = checkArgsNoFail(ctx, arguments, { TYPE_FUNC });
+    } else if (strEquals(identifier, "IsInteger")) {
+        result = checkArgsNoFail(ctx, arguments, { TYPE_INT });
+    } else if (strEquals(identifier, "IsString")) {
+        result = checkArgsNoFail(ctx, arguments, { TYPE_STR });
+    } else if (strEquals(identifier, "bool2str")) {
         if (!checkArgs(ctx, arguments, { TYPE_BOOL })) {
             assert(0);
         }
         Boolean arg1 = *toBool(arguments[0]);
         result = toString(arg1);
-    } else if (strEquals(identifier, "boolean")) {
-        result = checkArgsNoFail(ctx, arguments, { TYPE_BOOL });
     } else if (strEquals(identifier, "char2ord")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
@@ -1204,8 +1212,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         Dictionary arg1 = *toDict(arguments[0]);
         result = toString(arg1);
-    } else if (strEquals(identifier, "dictionary")) {
-        result = checkArgsNoFail(ctx, arguments, { TYPE_DICT });
     } else if (strEquals(identifier, "error")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
@@ -1316,8 +1322,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
             callFunction(ctx, arg2, localArguments);
         }
         result = POISON;
-    } else if (strEquals(identifier, "function")) {
-        result = checkArgsNoFail(ctx, arguments, { TYPE_FUNC });
     } else if (strEquals(identifier, "gcd")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT, TYPE_INT })) {
             assert(0);
@@ -1340,8 +1344,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         Integer arg1 = *toInt(arguments[0]);
         result = toString(arg1);
-    } else if (strEquals(identifier, "integer")) {
-        result = checkArgsNoFail(ctx, arguments, { TYPE_INT });
     } else if (strEquals(identifier, "join")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_DICT })) {
             assert(0);
@@ -1501,8 +1503,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         String arg1 = *toStr(arguments[0]);
         result = toInteger(arg1, ctx);
-    } else if (strEquals(identifier, "string")) {
-        result = checkArgsNoFail(ctx, arguments, { TYPE_STR });
     } else if (strEquals(identifier, "substring1")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
             assert(0);

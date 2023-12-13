@@ -15,9 +15,9 @@ Write bool2str('myvalue' : a);
 
 Remove a['mystringkey'];
 Call foreach(a, \k, v -> {
-    If integer(v):
+    If IsInteger(v):
         Write k & ': ' & int2str(v);
-    ElseIf string(v):
+    ElseIf IsString(v):
         Write k & ': ' & v;
     Else:
         Write k & ': ?';

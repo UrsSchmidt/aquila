@@ -200,10 +200,10 @@ Type conversion functions:
 
 ### Checking for types
 
-You can check for types using the predefined functions `boolean`, `dictionary`, `function`, `integer` and `string`:
+You can check for types using the predefined functions `IsBoolean`, `IsDictionary`, `IsFunction`, `IsInteger` and `IsString`:
 ```
 a := 123;
-Write bool2str(integer(a)); # true
+Write bool2str(IsInteger(a)); # true
 ```
 
 ## Other operations and functions
