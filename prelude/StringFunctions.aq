@@ -29,90 +29,90 @@ IsLowercase := \c : String ->
 
 IsAllPrintableASCII := \s : String ->
     If s eq '': true
-    ElseIf IsPrintableASCII(head(s)): IsAllPrintableASCII(tail(s))
+    ElseIf IsPrintableASCII(Head(s)): IsAllPrintableASCII(Tail(s))
     Else: false
     EndIf;
 IsNumeric := \s : String ->
     If s eq '': true
-    ElseIf IsDigit(head(s)): IsNumeric(tail(s))
+    ElseIf IsDigit(Head(s)): IsNumeric(Tail(s))
     Else: false
     EndIf;
 IsAllUppercase := \s : String ->
     If s eq '': true
-    ElseIf IsUppercase(head(s)): IsAllUppercase(tail(s))
+    ElseIf IsUppercase(Head(s)): IsAllUppercase(Tail(s))
     Else: false
     EndIf;
 IsAllLowercase := \s : String ->
     If s eq '': true
-    ElseIf IsLowercase(head(s)): IsAllLowercase(tail(s))
+    ElseIf IsLowercase(Head(s)): IsAllLowercase(Tail(s))
     Else: false
     EndIf;
 
 IsBlank := \s : String ->
     If s eq '': true
-    ElseIf CharToOrd(s) <= CharToOrd(' '): IsBlank(tail(s))
+    ElseIf CharToOrd(s) <= CharToOrd(' '): IsBlank(Tail(s))
     Else: false
     EndIf;
 
 Chop := \s : String ->
     If s eq '': ''
-    Else: left(s, length(s) - 1)
+    Else: Left(s, Length(s) - 1)
     EndIf;
 
 ContainsOnly := \s : String, t : String ->
     If s eq '': true
-    ElseIf s sw t: ContainsOnly(substring1(s, length(t)), t)
+    ElseIf s sw t: ContainsOnly(SubString1(s, Length(t)), t)
     Else: false
     EndIf;
 
 Lines := \s : String ->
-    split(LF, replace(replace(s, CRLF, LF), CR, LF));
+    Split(LF, Replace(Replace(s, CRLF, LF), CR, LF));
 
 # can't name this `Reverse` because that is already reserved for reversing Dictionaries
 StrReverse := \s : String ->
     If s eq '': ''
-    Else: StrReverse(tail(s)) & head(s)
+    Else: StrReverse(Tail(s)) & Head(s)
     EndIf;
 
 Space := \n : Integer ->
-    repeat(' ', n);
+    Repeat(' ', n);
 
 ToLowercase := \s : String ->
     If s eq '': ''
     Else:
-        If IsUppercase(s): OrdToChar(CharToOrd(head(s)) + 0x20)
-        Else: head(s)
+        If IsUppercase(s): OrdToChar(CharToOrd(Head(s)) + 0x20)
+        Else: Head(s)
         EndIf
-        & ToLowercase(tail(s))
+        & ToLowercase(Tail(s))
     EndIf;
 ToUppercase := \s : String ->
     If s eq '': ''
     Else:
-        If IsLowercase(s): OrdToChar(CharToOrd(head(s)) - 0x20)
-        Else: head(s)
+        If IsLowercase(s): OrdToChar(CharToOrd(Head(s)) - 0x20)
+        Else: Head(s)
         EndIf
-        & ToUppercase(tail(s))
+        & ToUppercase(Tail(s))
     EndIf;
 
 TrimLeft := \s : String ->
     If s eq '': ''
     # the left(s, 1) is implied by CharToOrd():
-    ElseIf CharToOrd(s) <= CharToOrd(' '): TrimLeft(tail(s))
+    ElseIf CharToOrd(s) <= CharToOrd(' '): TrimLeft(Tail(s))
     Else: s
     EndIf;
 TrimRight := \s : String ->
     If s eq '': ''
-    ElseIf CharToOrd(right(s, 1)) <= CharToOrd(' '): TrimRight(Chop(s))
+    ElseIf CharToOrd(Right(s, 1)) <= CharToOrd(' '): TrimRight(Chop(s))
     Else: s
     EndIf;
 Trim := \s : String ->
     TrimRight(TrimLeft(s));
 
 ForEachChar := \s : String, f : Function -> {
-    For i From 0 To length(s) - 1:
-        Call f(charat(s, i));
+    For i From 0 To Length(s) - 1:
+        Call f(CharAt(s, i));
     EndFor
 };
 ForEachLine := \s : String, f : Function -> {
-    Call foreach(Lines(s), f);
+    Call ForEach(Lines(s), f);
 };

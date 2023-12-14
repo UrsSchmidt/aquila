@@ -3,15 +3,15 @@
 # there is also the n! operator available
 # this file only serves as an examples as to how to implement it on your own
 
-factorial := \n : Integer ->
+Factorial := \n : Integer ->
     If n < 1:
-        error('Illegal argument')
+        Error('Illegal argument')
     ElseIf n = 1:
         1
     Else:
-        n * factorial(n - 1)
+        n * Factorial(n - 1)
     EndIf;
 
 For n From 1 To 10:
-    Write IntToStr(n) & '! = ' & IntToStr(factorial(n));
+    Write IntToStr(n) & '! = ' & IntToStr(Factorial(n));
 EndFor

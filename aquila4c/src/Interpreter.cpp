@@ -251,7 +251,7 @@ Interpreter::Interpreter(int argc, char* argv[]) {
     for (int i = 0; i < argc; i++) {
         dArgs[std::to_string(i)] = std::string(argv[i]);
     }
-    (*d)["args"] = dArgs;
+    (*d)["Args"] = dArgs;
 
     /* passing environment variables */
     Dictionary dEnv;
@@ -264,7 +264,7 @@ Interpreter::Interpreter(int argc, char* argv[]) {
             dEnv[key] = value;
         }
     }
-    (*d)["env"] = dEnv;
+    (*d)["Env"] = dEnv;
 
     variables.push_back(d);
     DEBUG_CTX();
@@ -1181,6 +1181,13 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         Boolean arg1 = *toBool(arguments[0]);
         result = toString(arg1);
+    } else if (strEquals(identifier, "CharAt")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer arg2 = *toInt(arguments[1]);
+        result = arg1.substr(mpz_get_ui(arg2.i), 1);
     } else if (strEquals(identifier, "CharToOrd")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
@@ -1195,6 +1202,122 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         Dictionary arg1 = *toDict(arguments[0]);
         result = toString(arg1);
+    } else if (strEquals(identifier, "Error")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        error(arg1, ctx);
+        result = arg1;
+    } else if (strEquals(identifier, "Exists")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Function arg2 = *toFunc(arguments[1]);
+        std::vector<Any> localArguments;
+        result = false;
+        for (const auto& [key, value] : arg1) {
+            localArguments.clear();
+            localArguments.push_back(key);
+            localArguments.push_back(value);
+            Any condition = callFunction(ctx, arg2, localArguments);
+            if (isTrue(condition)) {
+                result = true;
+                break;
+            }
+        }
+    } else if (strEquals(identifier, "Filter")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Function arg2 = *toFunc(arguments[1]);
+        std::vector<Any> localArguments;
+        Dictionary d;
+        for (const auto& [key, value] : arg1) {
+            localArguments.clear();
+            localArguments.push_back(key);
+            localArguments.push_back(value);
+            Any condition = callFunction(ctx, arg2, localArguments);
+            if (isTrue(condition)) {
+                d[key] = value;
+            }
+        }
+        result = d;
+    } else if (strEquals(identifier, "FindLeft")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        String arg2 = *toStr(arguments[1]);
+        Integer arg3 = *toInt(arguments[2]);
+        Integer r;
+        mpz_init_set_si(r.i, arg1.find(arg2, mpz_get_ui(arg3.i)));
+        result = r;
+    } else if (strEquals(identifier, "FindRight")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        String arg2 = *toStr(arguments[1]);
+        Integer arg3 = *toInt(arguments[2]);
+        Integer r;
+        mpz_init_set_si(r.i, arg1.rfind(arg2, mpz_get_ui(arg3.i)));
+        result = r;
+    } else if (strEquals(identifier, "Fold")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_ANY, TYPE_FUNC })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Any arg2 = arguments[1];
+        Function arg3 = *toFunc(arguments[2]);
+        std::vector<Any> localArguments;
+        result = arg2;
+        for (const auto& [key, value] : arg1) {
+            localArguments.clear();
+            localArguments.push_back(result);
+            localArguments.push_back(value);
+            result = callFunction(ctx, arg3, localArguments);
+        }
+    } else if (strEquals(identifier, "ForAll")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Function arg2 = *toFunc(arguments[1]);
+        std::vector<Any> localArguments;
+        result = true;
+        for (const auto& [key, value] : arg1) {
+            localArguments.clear();
+            localArguments.push_back(key);
+            localArguments.push_back(value);
+            Any condition = callFunction(ctx, arg2, localArguments);
+            if (isNotTrue(condition)) {
+                result = false;
+                break;
+            }
+        }
+    } else if (strEquals(identifier, "ForEach")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Function arg2 = *toFunc(arguments[1]);
+        std::vector<Any> localArguments;
+        for (const auto& [key, value] : arg1) {
+            localArguments.clear();
+            localArguments.push_back(key);
+            localArguments.push_back(value);
+            callFunction(ctx, arg2, localArguments);
+        }
+        result = POISON;
+    } else if (strEquals(identifier, "Head")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        result = arg1.empty() ? "" : arg1.substr(0, 1);
     } else if (strEquals(identifier, "IntToStr")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
@@ -1211,12 +1334,120 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_INT });
     } else if (strEquals(identifier, "IsString")) {
         result = checkArgsNoFail(ctx, arguments, { TYPE_STR });
+    } else if (strEquals(identifier, "Join")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_DICT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Dictionary arg2 = *toDict(arguments[1]);
+        std::stringstream ss;
+        bool first = true;
+        for (const auto& [key, value] : arg2) {
+            if (!first) {
+                ss << arg1;
+            }
+            ss << toString(value);
+            first = false;
+        }
+        result = ss.str();
+    } else if (strEquals(identifier, "Left")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer arg2 = *toInt(arguments[1]);
+        result = arg1.substr(0, mpz_get_ui(arg2.i));
+    } else if (strEquals(identifier, "Length")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer r;
+        mpz_init_set_ui(r.i, arg1.size());
+        result = r;
+    } else if (strEquals(identifier, "Map")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Function arg2 = *toFunc(arguments[1]);
+        std::vector<Any> localArguments;
+        Dictionary d;
+        for (const auto& [key, value] : arg1) {
+            localArguments.clear();
+            localArguments.push_back(key);
+            localArguments.push_back(value);
+            const Any newValue = callFunction(ctx, arg2, localArguments);
+            d[key] = newValue;
+        }
+        result = d;
+    } else if (strEquals(identifier, "Mid")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer arg2 = *toInt(arguments[1]);
+        Integer arg3 = *toInt(arguments[2]);
+        result = arg1.substr(mpz_get_ui(arg2.i), mpz_get_ui(arg3.i));
     } else if (strEquals(identifier, "OrdToChar")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
         }
         Integer arg1 = *toInt(arguments[0]);
         result = std::string(1, (char) mpz_get_ui(arg1.i));
+    } else if (strEquals(identifier, "Repeat")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer arg2 = *toInt(arguments[1]);
+        std::stringstream ss;
+        for (unsigned int i = 0; i < mpz_get_ui(arg2.i); i++) {
+            ss << arg1;
+        }
+        result = ss.str();
+    } else if (strEquals(identifier, "Replace")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        String arg2 = *toStr(arguments[1]);
+        String arg3 = *toStr(arguments[2]);
+        // FIXME this might overwrite arg1
+        strReplace(arg1, arg2, arg3);
+        result = arg1;
+    } else if (strEquals(identifier, "Right")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer arg2 = *toInt(arguments[1]);
+        result = arg1.substr(arg1.size() - mpz_get_ui(arg2.i));
+    } else if (strEquals(identifier, "Size")) {
+        if (!checkArgs(ctx, arguments, { TYPE_DICT })) {
+            assert(0);
+        }
+        Dictionary arg1 = *toDict(arguments[0]);
+        Integer r;
+        mpz_init_set_ui(r.i, arg1.size());
+        result = r;
+    } else if (strEquals(identifier, "Split")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        String arg2 = *toStr(arguments[1]);
+        Dictionary d;
+        auto start = 0U;
+        auto end = arg2.find(arg1);
+        int i = 0;
+        while (end != std::string::npos) {
+            d[std::to_string(i++)] = arg2.substr(start, end - start);
+            start = end + arg1.length();
+            end = arg2.find(arg1, start);
+        }
+        d[std::to_string(i++)] = arg2.substr(start, end);
+        result = d;
     } else if (strEquals(identifier, "StrToBool")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
@@ -1235,123 +1466,27 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         }
         String arg1 = *toStr(arguments[0]);
         result = toInteger(arg1, ctx);
-    } else if (strEquals(identifier, "charat")) {
+    } else if (strEquals(identifier, "SubString1")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
             assert(0);
         }
         String arg1 = *toStr(arguments[0]);
         Integer arg2 = *toInt(arguments[1]);
-        result = arg1.substr(mpz_get_ui(arg2.i), 1);
-    } else if (strEquals(identifier, "error")) {
+        result = arg1.substr(mpz_get_ui(arg2.i));
+    } else if (strEquals(identifier, "SubString2")) {
+        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT, TYPE_INT })) {
+            assert(0);
+        }
+        String arg1 = *toStr(arguments[0]);
+        Integer arg2 = *toInt(arguments[1]);
+        Integer arg3 = *toInt(arguments[2]);
+        result = arg1.substr(mpz_get_ui(arg2.i), mpz_get_ui(arg3.i) - mpz_get_ui(arg2.i));
+    } else if (strEquals(identifier, "Tail")) {
         if (!checkArgs(ctx, arguments, { TYPE_STR })) {
             assert(0);
         }
         String arg1 = *toStr(arguments[0]);
-        error(arg1, ctx);
-        result = arg1;
-    } else if (strEquals(identifier, "exists")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Function arg2 = *toFunc(arguments[1]);
-        std::vector<Any> localArguments;
-        result = false;
-        for (const auto& [key, value] : arg1) {
-            localArguments.clear();
-            localArguments.push_back(key);
-            localArguments.push_back(value);
-            Any condition = callFunction(ctx, arg2, localArguments);
-            if (isTrue(condition)) {
-                result = true;
-                break;
-            }
-        }
-    } else if (strEquals(identifier, "filter")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Function arg2 = *toFunc(arguments[1]);
-        std::vector<Any> localArguments;
-        Dictionary d;
-        for (const auto& [key, value] : arg1) {
-            localArguments.clear();
-            localArguments.push_back(key);
-            localArguments.push_back(value);
-            Any condition = callFunction(ctx, arg2, localArguments);
-            if (isTrue(condition)) {
-                d[key] = value;
-            }
-        }
-        result = d;
-    } else if (strEquals(identifier, "findleft")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        String arg2 = *toStr(arguments[1]);
-        Integer arg3 = *toInt(arguments[2]);
-        Integer r;
-        mpz_init_set_si(r.i, arg1.find(arg2, mpz_get_ui(arg3.i)));
-        result = r;
-    } else if (strEquals(identifier, "findright")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        String arg2 = *toStr(arguments[1]);
-        Integer arg3 = *toInt(arguments[2]);
-        Integer r;
-        mpz_init_set_si(r.i, arg1.rfind(arg2, mpz_get_ui(arg3.i)));
-        result = r;
-    } else if (strEquals(identifier, "fold")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_ANY, TYPE_FUNC })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Any arg2 = arguments[1];
-        Function arg3 = *toFunc(arguments[2]);
-        std::vector<Any> localArguments;
-        result = arg2;
-        for (const auto& [key, value] : arg1) {
-            localArguments.clear();
-            localArguments.push_back(result);
-            localArguments.push_back(value);
-            result = callFunction(ctx, arg3, localArguments);
-        }
-    } else if (strEquals(identifier, "forall")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Function arg2 = *toFunc(arguments[1]);
-        std::vector<Any> localArguments;
-        result = true;
-        for (const auto& [key, value] : arg1) {
-            localArguments.clear();
-            localArguments.push_back(key);
-            localArguments.push_back(value);
-            Any condition = callFunction(ctx, arg2, localArguments);
-            if (isNotTrue(condition)) {
-                result = false;
-                break;
-            }
-        }
-    } else if (strEquals(identifier, "foreach")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Function arg2 = *toFunc(arguments[1]);
-        std::vector<Any> localArguments;
-        for (const auto& [key, value] : arg1) {
-            localArguments.clear();
-            localArguments.push_back(key);
-            localArguments.push_back(value);
-            callFunction(ctx, arg2, localArguments);
-        }
-        result = POISON;
+        result = arg1.empty() ? "" : arg1.substr(1);
     } else if (strEquals(identifier, "gcd")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT, TYPE_INT })) {
             assert(0);
@@ -1362,67 +1497,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         mpz_init(r.i);
         mpz_gcd(r.i, arg1.i, arg2.i);
         result = r;
-    } else if (strEquals(identifier, "head")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        result = arg1.empty() ? "" : arg1.substr(0, 1);
-    } else if (strEquals(identifier, "join")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_DICT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Dictionary arg2 = *toDict(arguments[1]);
-        std::stringstream ss;
-        bool first = true;
-        for (const auto& [key, value] : arg2) {
-            if (!first) {
-                ss << arg1;
-            }
-            ss << toString(value);
-            first = false;
-        }
-        result = ss.str();
-    } else if (strEquals(identifier, "left")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer arg2 = *toInt(arguments[1]);
-        result = arg1.substr(0, mpz_get_ui(arg2.i));
-    } else if (strEquals(identifier, "length")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer r;
-        mpz_init_set_ui(r.i, arg1.size());
-        result = r;
-    } else if (strEquals(identifier, "map")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT, TYPE_FUNC })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Function arg2 = *toFunc(arguments[1]);
-        std::vector<Any> localArguments;
-        Dictionary d;
-        for (const auto& [key, value] : arg1) {
-            localArguments.clear();
-            localArguments.push_back(key);
-            localArguments.push_back(value);
-            const Any newValue = callFunction(ctx, arg2, localArguments);
-            d[key] = newValue;
-        }
-        result = d;
-    } else if (strEquals(identifier, "mid")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer arg2 = *toInt(arguments[1]);
-        Integer arg3 = *toInt(arguments[2]);
-        result = arg1.substr(mpz_get_ui(arg2.i), mpz_get_ui(arg3.i));
     } else if (strEquals(identifier, "pow")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT, TYPE_INT })) {
             assert(0);
@@ -1433,34 +1507,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         mpz_init(r.i);
         mpz_pow_ui(r.i, arg1.i, mpz_get_ui(arg2.i));
         result = r;
-    } else if (strEquals(identifier, "repeat")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer arg2 = *toInt(arguments[1]);
-        std::stringstream ss;
-        for (unsigned int i = 0; i < mpz_get_ui(arg2.i); i++) {
-            ss << arg1;
-        }
-        result = ss.str();
-    } else if (strEquals(identifier, "replace")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR, TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        String arg2 = *toStr(arguments[1]);
-        String arg3 = *toStr(arguments[2]);
-        // FIXME this might overwrite arg1
-        strReplace(arg1, arg2, arg3);
-        result = arg1;
-    } else if (strEquals(identifier, "right")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer arg2 = *toInt(arguments[1]);
-        result = arg1.substr(arg1.size() - mpz_get_ui(arg2.i));
     } else if (strEquals(identifier, "sgn")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
@@ -1469,31 +1515,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         Integer r;
         mpz_init_set_si(r.i, mpz_sgn(arg1.i));
         result = r;
-    } else if (strEquals(identifier, "size")) {
-        if (!checkArgs(ctx, arguments, { TYPE_DICT })) {
-            assert(0);
-        }
-        Dictionary arg1 = *toDict(arguments[0]);
-        Integer r;
-        mpz_init_set_ui(r.i, arg1.size());
-        result = r;
-    } else if (strEquals(identifier, "split")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        String arg2 = *toStr(arguments[1]);
-        Dictionary d;
-        auto start = 0U;
-        auto end = arg2.find(arg1);
-        int i = 0;
-        while (end != std::string::npos) {
-            d[std::to_string(i++)] = arg2.substr(start, end - start);
-            start = end + arg1.length();
-            end = arg2.find(arg1, start);
-        }
-        d[std::to_string(i++)] = arg2.substr(start, end);
-        result = d;
     } else if (strEquals(identifier, "sqrt")) {
         if (!checkArgs(ctx, arguments, { TYPE_INT })) {
             assert(0);
@@ -1503,27 +1524,6 @@ Any Interpreter::visitFunctionCall(AquilaParser::FunctionCallContext *ctx) {
         mpz_init(r.i);
         mpz_sqrt(r.i, arg1.i);
         result = r;
-    } else if (strEquals(identifier, "substring1")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer arg2 = *toInt(arguments[1]);
-        result = arg1.substr(mpz_get_ui(arg2.i));
-    } else if (strEquals(identifier, "substring2")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR, TYPE_INT, TYPE_INT })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        Integer arg2 = *toInt(arguments[1]);
-        Integer arg3 = *toInt(arguments[2]);
-        result = arg1.substr(mpz_get_ui(arg2.i), mpz_get_ui(arg3.i) - mpz_get_ui(arg2.i));
-    } else if (strEquals(identifier, "tail")) {
-        if (!checkArgs(ctx, arguments, { TYPE_STR })) {
-            assert(0);
-        }
-        String arg1 = *toStr(arguments[0]);
-        result = arg1.empty() ? "" : arg1.substr(1);
     } else {
         Dictionary& d = *variables.back();
         if (d.count(identifier)) {

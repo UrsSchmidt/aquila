@@ -50,5 +50,5 @@ Write IntToStr(sqrt(0));
 Write IntToStr(sqrt(49));
 
 # prelude functions
-Write IntToStr(Binomial(2, 2));
-Write IntToStr(LCM(5, 2));
+Write IntToStr(binomial(2, 2));
+Write IntToStr(lcm(5, 2));

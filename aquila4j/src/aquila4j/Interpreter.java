@@ -243,7 +243,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         for (int i = 0; i < args.length; i++) {
             dArgs.put(Integer.toString(i), args[i]);
         }
-        root.put("args", dArgs);
+        root.put("Args", dArgs);
 
         /* passing environment variables */
         Map dEnv = new TreeMap<>(DICT_COMPARATOR);
@@ -251,7 +251,7 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         for (String envName : env.keySet()) {
             dEnv.put(envName, env.get(envName));
         }
-        root.put("env", dEnv);
+        root.put("Env", dEnv);
 
         variables.push(root);
     }
@@ -1129,6 +1129,14 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final Boolean arg1 = (Boolean) arguments.get(0);
             result = toString(arg1);
         }   break;
+        case "CharAt": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = Character.toString(arg1.charAt(arg2.intValueExact()));
+        }   break;
         case "CharToOrd": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
@@ -1142,6 +1150,129 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             }
             final Map arg1 = (Map) arguments.get(0);
             result = toString(arg1);
+        }   break;
+        case "Error": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            error(arg1, ctx);
+            result = arg1;
+        }   break;
+        case "Exists": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
+                return null;
+            }
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
+            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
+            final List<Object> localArguments = new ArrayList<>();
+            result = false;
+            for (String key : arg1.keySet()) {
+                final Object value = arg1.get(key);
+                localArguments.clear();
+                localArguments.add(key);
+                localArguments.add(value);
+                if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
+                    result = true;
+                    break;
+                }
+            }
+        }   break;
+        case "Filter": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
+                return null;
+            }
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
+            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
+            final List<Object> localArguments = new ArrayList<>();
+            final Map d = new TreeMap<>(DICT_COMPARATOR);
+            for (String key : arg1.keySet()) {
+                final Object value = arg1.get(key);
+                localArguments.clear();
+                localArguments.add(key);
+                localArguments.add(value);
+                if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
+                    d.put(key, value);
+                }
+            }
+            result = d;
+        }   break;
+        case "FindLeft": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = BigInteger.valueOf(arg1.indexOf(arg2, arg3.intValueExact()));
+        }   break;
+        case "FindRight": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = BigInteger.valueOf(arg1.lastIndexOf(arg2, arg3.intValueExact()));
+        }   break;
+        case "Fold": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_ANY, TYPE_FUNC)) {
+                return null;
+            }
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
+            final Object arg2 = arguments.get(1);
+            final LambdaExpressionContext arg3 = (LambdaExpressionContext) arguments.get(2);
+            final List<Object> localArguments = new ArrayList<>();
+            result = arg2;
+            for (String key : arg1.keySet()) {
+                final Object value = arg1.get(key);
+                localArguments.clear();
+                localArguments.add(result);
+                localArguments.add(value);
+                result = callFunction(ctx, arg3, localArguments);
+            }
+        }   break;
+        case "ForAll": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
+                return null;
+            }
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
+            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
+            final List<Object> localArguments = new ArrayList<>();
+            result = true;
+            for (String key : arg1.keySet()) {
+                final Object value = arg1.get(key);
+                localArguments.clear();
+                localArguments.add(key);
+                localArguments.add(value);
+                if (!Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
+                    result = false;
+                    break;
+                }
+            }
+        }   break;
+        case "ForEach": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
+                return null;
+            }
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
+            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
+            final List<Object> localArguments = new ArrayList<>();
+            for (String key : arg1.keySet()) {
+                final Object value = arg1.get(key);
+                localArguments.clear();
+                localArguments.add(key);
+                localArguments.add(value);
+                callFunction(ctx, arg2, localArguments);
+            }
+            result = null;
+        }   break;
+        case "Head": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = arg1.isEmpty() ? "" : arg1.substring(0, 1);
         }   break;
         case "IntToStr": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
@@ -1165,12 +1296,108 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
         case "IsString":
             result = checkArgsNoFail(ctx, arguments, TYPE_STR);
             break;
+        case "Join": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_DICT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final Map arg2 = (Map) arguments.get(1);
+            // FIXME this won't call my custom toString() method on the individual values
+            result = String.join(arg1, arg2.values());
+        }   break;
+        case "Left": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.substring(0, arg2.intValueExact());
+        }   break;
+        case "Length": {
+            if (!checkArgs(ctx, arguments, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            result = BigInteger.valueOf(arg1.length());
+        }   break;
+        case "Map": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
+                return null;
+            }
+            final Map<String, Object> arg1 = (Map) arguments.get(0);
+            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
+            final List<Object> localArguments = new ArrayList<>();
+            final Map d = new TreeMap<>(DICT_COMPARATOR);
+            for (String key : arg1.keySet()) {
+                final Object value = arg1.get(key);
+                localArguments.clear();
+                localArguments.add(key);
+                localArguments.add(value);
+                final Object newValue = callFunction(ctx, arg2, localArguments);
+                d.put(key, newValue);
+            }
+            result = d;
+        }   break;
+        case "Mid": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = arg1.substring(arg2.intValueExact(), arg2.intValueExact() + arg3.intValueExact());
+        }   break;
         case "OrdToChar": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
             }
             final BigInteger arg1 = (BigInteger) arguments.get(0);
             result = Character.toString((char) arg1.intValueExact());
+        }   break;
+        case "Repeat": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.repeat(arg2.intValueExact());
+        }   break;
+        case "Replace": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final String arg3 = (String) arguments.get(2);
+            result = arg1.replace(arg2, arg3);
+        }   break;
+        case "Right": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            result = arg1.substring(arg1.length() - arg2.intValueExact());
+        }   break;
+        case "Size": {
+            if (!checkArgs(ctx, arguments, TYPE_DICT)) {
+                return null;
+            }
+            final Map arg1 = (Map) arguments.get(0);
+            result = BigInteger.valueOf(arg1.size());
+        }   break;
+        case "Split": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final String arg2 = (String) arguments.get(1);
+            final String[] parts = arg2.split(arg1, -1);
+            final Map d = new TreeMap<>(DICT_COMPARATOR);
+            for (int i = 0; i < parts.length; i++) {
+                d.put(Integer.toString(i), parts[i]);
+            }
+            result = d;
         }   break;
         case "StrToBool": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
@@ -1193,129 +1420,29 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final String arg1 = (String) arguments.get(0);
             result = toInteger(arg1, ctx);
         }   break;
-        case "charat": {
+        case "SubString1": {
             if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
                 return null;
             }
             final String arg1 = (String) arguments.get(0);
             final BigInteger arg2 = (BigInteger) arguments.get(1);
-            result = Character.toString(arg1.charAt(arg2.intValueExact()));
+            result = arg1.substring(arg2.intValueExact());
         }   break;
-        case "error": {
+        case "SubString2": {
+            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
+                return null;
+            }
+            final String arg1 = (String) arguments.get(0);
+            final BigInteger arg2 = (BigInteger) arguments.get(1);
+            final BigInteger arg3 = (BigInteger) arguments.get(2);
+            result = arg1.substring(arg2.intValueExact(), arg3.intValueExact());
+        }   break;
+        case "Tail": {
             if (!checkArgs(ctx, arguments, TYPE_STR)) {
                 return null;
             }
             final String arg1 = (String) arguments.get(0);
-            error(arg1, ctx);
-            result = arg1;
-        }   break;
-        case "exists": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
-                return null;
-            }
-            final Map<String, Object> arg1 = (Map) arguments.get(0);
-            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
-            final List<Object> localArguments = new ArrayList<>();
-            result = false;
-            for (String key : arg1.keySet()) {
-                final Object value = arg1.get(key);
-                localArguments.clear();
-                localArguments.add(key);
-                localArguments.add(value);
-                if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
-                    result = true;
-                    break;
-                }
-            }
-        }   break;
-        case "filter": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
-                return null;
-            }
-            final Map<String, Object> arg1 = (Map) arguments.get(0);
-            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
-            final List<Object> localArguments = new ArrayList<>();
-            final Map d = new TreeMap<>(DICT_COMPARATOR);
-            for (String key : arg1.keySet()) {
-                final Object value = arg1.get(key);
-                localArguments.clear();
-                localArguments.add(key);
-                localArguments.add(value);
-                if (Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
-                    d.put(key, value);
-                }
-            }
-            result = d;
-        }   break;
-        case "findleft": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final String arg2 = (String) arguments.get(1);
-            final BigInteger arg3 = (BigInteger) arguments.get(2);
-            result = BigInteger.valueOf(arg1.indexOf(arg2, arg3.intValueExact()));
-        }   break;
-        case "findright": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final String arg2 = (String) arguments.get(1);
-            final BigInteger arg3 = (BigInteger) arguments.get(2);
-            result = BigInteger.valueOf(arg1.lastIndexOf(arg2, arg3.intValueExact()));
-        }   break;
-        case "fold": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_ANY, TYPE_FUNC)) {
-                return null;
-            }
-            final Map<String, Object> arg1 = (Map) arguments.get(0);
-            final Object arg2 = arguments.get(1);
-            final LambdaExpressionContext arg3 = (LambdaExpressionContext) arguments.get(2);
-            final List<Object> localArguments = new ArrayList<>();
-            result = arg2;
-            for (String key : arg1.keySet()) {
-                final Object value = arg1.get(key);
-                localArguments.clear();
-                localArguments.add(result);
-                localArguments.add(value);
-                result = callFunction(ctx, arg3, localArguments);
-            }
-        }   break;
-        case "forall": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
-                return null;
-            }
-            final Map<String, Object> arg1 = (Map) arguments.get(0);
-            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
-            final List<Object> localArguments = new ArrayList<>();
-            result = true;
-            for (String key : arg1.keySet()) {
-                final Object value = arg1.get(key);
-                localArguments.clear();
-                localArguments.add(key);
-                localArguments.add(value);
-                if (!Boolean.TRUE.equals(callFunction(ctx, arg2, localArguments))) {
-                    result = false;
-                    break;
-                }
-            }
-        }   break;
-        case "foreach": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
-                return null;
-            }
-            final Map<String, Object> arg1 = (Map) arguments.get(0);
-            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
-            final List<Object> localArguments = new ArrayList<>();
-            for (String key : arg1.keySet()) {
-                final Object value = arg1.get(key);
-                localArguments.clear();
-                localArguments.add(key);
-                localArguments.add(value);
-                callFunction(ctx, arg2, localArguments);
-            }
-            result = null;
+            result = arg1.isEmpty() ? "" : arg1.substring(1);
         }   break;
         case "gcd": {
             if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
@@ -1325,64 +1452,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             result = arg1.gcd(arg2);
         }   break;
-        case "head": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            result = arg1.isEmpty() ? "" : arg1.substring(0, 1);
-        }   break;
-        case "join": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_DICT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final Map arg2 = (Map) arguments.get(1);
-            // FIXME this won't call my custom toString() method on the individual values
-            result = String.join(arg1, arg2.values());
-        }   break;
-        case "left": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final BigInteger arg2 = (BigInteger) arguments.get(1);
-            result = arg1.substring(0, arg2.intValueExact());
-        }   break;
-        case "length": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            result = BigInteger.valueOf(arg1.length());
-        }   break;
-        case "map": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT, TYPE_FUNC)) {
-                return null;
-            }
-            final Map<String, Object> arg1 = (Map) arguments.get(0);
-            final LambdaExpressionContext arg2 = (LambdaExpressionContext) arguments.get(1);
-            final List<Object> localArguments = new ArrayList<>();
-            final Map d = new TreeMap<>(DICT_COMPARATOR);
-            for (String key : arg1.keySet()) {
-                final Object value = arg1.get(key);
-                localArguments.clear();
-                localArguments.add(key);
-                localArguments.add(value);
-                final Object newValue = callFunction(ctx, arg2, localArguments);
-                d.put(key, newValue);
-            }
-            result = d;
-        }   break;
-        case "mid": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final BigInteger arg2 = (BigInteger) arguments.get(1);
-            final BigInteger arg3 = (BigInteger) arguments.get(2);
-            result = arg1.substring(arg2.intValueExact(), arg2.intValueExact() + arg3.intValueExact());
-        }   break;
         case "pow": {
             if (!checkArgs(ctx, arguments, TYPE_INT, TYPE_INT)) {
                 return null;
@@ -1391,31 +1460,6 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg2 = (BigInteger) arguments.get(1);
             result = arg1.pow(arg2.intValueExact());
         }   break;
-        case "repeat": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final BigInteger arg2 = (BigInteger) arguments.get(1);
-            result = arg1.repeat(arg2.intValueExact());
-        }   break;
-        case "replace": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final String arg2 = (String) arguments.get(1);
-            final String arg3 = (String) arguments.get(2);
-            result = arg1.replace(arg2, arg3);
-        }   break;
-        case "right": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final BigInteger arg2 = (BigInteger) arguments.get(1);
-            result = arg1.substring(arg1.length() - arg2.intValueExact());
-        }   break;
         case "sgn": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
@@ -1423,56 +1467,12 @@ public class Interpreter extends AbstractParseTreeVisitor<Object> implements Aqu
             final BigInteger arg1 = (BigInteger) arguments.get(0);
             result = BigInteger.valueOf(arg1.signum());
         }   break;
-        case "size": {
-            if (!checkArgs(ctx, arguments, TYPE_DICT)) {
-                return null;
-            }
-            final Map arg1 = (Map) arguments.get(0);
-            result = BigInteger.valueOf(arg1.size());
-        }   break;
-        case "split": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final String arg2 = (String) arguments.get(1);
-            final String[] parts = arg2.split(arg1, -1);
-            final Map d = new TreeMap<>(DICT_COMPARATOR);
-            for (int i = 0; i < parts.length; i++) {
-                d.put(Integer.toString(i), parts[i]);
-            }
-            result = d;
-        }   break;
         case "sqrt": {
             if (!checkArgs(ctx, arguments, TYPE_INT)) {
                 return null;
             }
             final BigInteger arg1 = (BigInteger) arguments.get(0);
             result = arg1.sqrt();
-        }   break;
-        case "substring1": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final BigInteger arg2 = (BigInteger) arguments.get(1);
-            result = arg1.substring(arg2.intValueExact());
-        }   break;
-        case "substring2": {
-            if (!checkArgs(ctx, arguments, TYPE_STR, TYPE_INT, TYPE_INT)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            final BigInteger arg2 = (BigInteger) arguments.get(1);
-            final BigInteger arg3 = (BigInteger) arguments.get(2);
-            result = arg1.substring(arg2.intValueExact(), arg3.intValueExact());
-        }   break;
-        case "tail": {
-            if (!checkArgs(ctx, arguments, TYPE_STR)) {
-                return null;
-            }
-            final String arg1 = (String) arguments.get(0);
-            result = arg1.isEmpty() ? "" : arg1.substring(1);
         }   break;
         default:
             final Map d = variables.peek();

@@ -34,57 +34,57 @@
 
         <context id="builtin" style-ref="builtin">
           <!-- variables: -->
-          <keyword>args</keyword>
-          <keyword>env</keyword>
+          <keyword>Args</keyword>
+          <keyword>Env</keyword>
           <!-- functions: -->
           <keyword>BoolToStr</keyword>
+          <keyword>CharAt</keyword>
           <keyword>CharToOrd</keyword>
           <keyword>DictToStr</keyword>
+          <keyword>Error</keyword>
+          <keyword>Exists</keyword>
+          <keyword>Filter</keyword>
+          <keyword>FindLeft</keyword>
+          <keyword>FindRight</keyword>
+          <keyword>Fold</keyword>
+          <keyword>ForAll</keyword>
+          <keyword>ForEach</keyword>
+          <keyword>Head</keyword>
           <keyword>IntToStr</keyword>
           <keyword>IsBoolean</keyword>
           <keyword>IsDictionary</keyword>
           <keyword>IsFunction</keyword>
           <keyword>IsInteger</keyword>
           <keyword>IsString</keyword>
+          <keyword>Join</keyword>
+          <keyword>Left</keyword>
+          <keyword>Length</keyword>
+          <keyword>Map</keyword>
+          <keyword>Mid</keyword>
           <keyword>OrdToChar</keyword>
+          <keyword>Repeat</keyword>
+          <keyword>Replace</keyword>
+          <keyword>Right</keyword>
+          <keyword>Size</keyword>
+          <keyword>Split</keyword>
           <keyword>StrToBool</keyword>
           <keyword>StrToDict</keyword>
           <keyword>StrToInt</keyword>
-          <keyword>charat</keyword>
-          <keyword>error</keyword>
-          <keyword>exists</keyword>
-          <keyword>filter</keyword>
-          <keyword>findleft</keyword>
-          <keyword>findright</keyword>
-          <keyword>fold</keyword>
-          <keyword>forall</keyword>
-          <keyword>foreach</keyword>
+          <keyword>SubString1</keyword>
+          <keyword>SubString2</keyword>
+          <keyword>Tail</keyword>
           <keyword>gcd</keyword>
-          <keyword>head</keyword>
-          <keyword>join</keyword>
-          <keyword>left</keyword>
-          <keyword>length</keyword>
-          <keyword>map</keyword>
-          <keyword>mid</keyword>
           <keyword>pow</keyword>
-          <keyword>repeat</keyword>
-          <keyword>replace</keyword>
-          <keyword>right</keyword>
           <keyword>sgn</keyword>
-          <keyword>size</keyword>
-          <keyword>split</keyword>
           <keyword>sqrt</keyword>
-          <keyword>substring1</keyword>
-          <keyword>substring2</keyword>
-          <keyword>tail</keyword>
         </context>
 
         <context id="keyword1" style-ref="keyword">
-          <keyword>Default</keyword>
           <keyword>Call</keyword>
           <keyword>Case</keyword>
-          <keyword>ElseIf</keyword>
+          <keyword>Default</keyword>
           <keyword>Else</keyword>
+          <keyword>ElseIf</keyword>
           <keyword>EndFor</keyword>
           <keyword>EndIf</keyword>
           <keyword>EndLet</keyword>

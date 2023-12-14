@@ -1,18 +1,18 @@
 #!/usr/local/bin/aq
 
-Binomial := \a, b ->
+binomial := \a, b ->
     Let aux = \a, b, c, d ->
         If b = 0: c / d
         ElseIf a = 0: 0
         Else: aux(a - 1, b - 1, c * a, d * b)
         EndIf:
-        If a < 0 or b < 0: error('Illegal argument')
+        If a < 0 or b < 0: Error('Illegal argument')
         Else: aux(a, b, 1, 1)
         EndIf
     EndLet;
 
-LCM := \a, b ->
-    If a < 0 or b < 0: error('Illegal argument')
+lcm := \a, b ->
+    If a < 0 or b < 0: Error('Illegal argument')
     ElseIf a = 0 and b = 0: 0
     Else: |a * b| / gcd(a, b)
     EndIf;

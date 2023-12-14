@@ -5,7 +5,7 @@
 
 ownpow := \m : Integer, n : Integer ->
     If m < 0 or n < 0:
-        error('Illegal argument')
+        Error('Illegal argument')
     ElseIf n = 0:
         1
     ElseIf m <= 1 or n = 1:

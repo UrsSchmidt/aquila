@@ -9,12 +9,12 @@ Like := \s : String, p : String ->
     ElseIf p eq '': false
     ElseIf ContainsOnly(p, '*'): true
     Else:
-        Let hs = head(s), ts = tail(s),
-            hp = head(p), tp = tail(p),
+        Let hs = Head(s), ts = Tail(s),
+            hp = Head(p), tp = Tail(p),
             LikeH = \t : String, q : String ->
                 # TODO can't use `and` here because it does not short circuit (yet?)
                 #t ne '' and (Like(t, q) or LikeH(tail(t), q));
-                If t ne '': Like(t, q) or LikeH(tail(t), q) Else: false EndIf:
+                If t ne '': Like(t, q) or LikeH(Tail(t), q) Else: false EndIf:
             Switch hp:
             Case '?', hs: Like(ts, tp)
             Case '*': LikeH(s, tp)

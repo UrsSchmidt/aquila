@@ -2,7 +2,7 @@
 
 f := \i : Integer, j : Integer ->
     If j < 2:
-        error('Illegal argument')
+        Error('Illegal argument')
     ElseIf i mod j = 0:
         i
     ElseIf j > 2:

@@ -3,50 +3,50 @@
 # TODO this file is a work in progress
 
 Count := \s : String, t : String ->
-    size(split(t, s)) - 1;
+    Size(Split(t, s)) - 1;
 
 AddSlash := \s : String ->
     If s ew '/': s
     Else: s & '/'
     EndIf;
 DropSlash := \s : String ->
-    If s ew '/': left(s, length(s) - 1)
+    If s ew '/': Left(s, Length(s) - 1)
     Else: s
     EndIf;
 
 Base := \s : String ->
     Let t = DropSlash(s):
-        If '/' in t: substring1(t, findright(t, '/', length(t)) + 1)
+        If '/' in t: SubString1(t, FindRight(t, '/', Length(t)) + 1)
         Else: t
         EndIf
     EndLet;
 Extension := \s : String ->
-    If s ew '/': error('Illegal argument')
-    ElseIf '.' in s: substring1(s, findright(s, '.', length(s)) + 1)
+    If s ew '/': Error('Illegal argument')
+    ElseIf '.' in s: SubString1(s, FindRight(s, '.', Length(s)) + 1)
     Else: ''
     EndIf;
 Parent := \s : String ->
-    If not s sw '/': error('Illegal argument')
-    Else: left(s, findright(DropSlash(s), '/', length(s)) + 1)
+    If not s sw '/': Error('Illegal argument')
+    Else: Left(s, FindRight(DropSlash(s), '/', Length(s)) + 1)
     EndIf;
 
 Absolute := \root : String, s : String ->
-    If not root sw '/' or not root ew '/': error('Illegal argument')
+    If not root sw '/' or not root ew '/': Error('Illegal argument')
     ElseIf s sw '/': s
-    ElseIf s sw './': Absolute(root, substring1(s, 2))
-    ElseIf s sw '../': Absolute(Parent(root), substring1(s, 3))
+    ElseIf s sw './': Absolute(root, SubString1(s, 2))
+    ElseIf s sw '../': Absolute(Parent(root), SubString1(s, 3))
     Else: root & s
     EndIf;
 Relative := \root : String, s : String ->
-    If not root sw '/' or not root ew '/': error('Illegal argument')
+    If not root sw '/' or not root ew '/': Error('Illegal argument')
     ElseIf not s sw '/': s
-    ElseIf s sw root: substring1(s, length(root))
+    ElseIf s sw root: SubString1(s, Length(root))
     Else:
         Let f = \t : String, u : String ->
-                If head(t) eq head(u): 1 + f(tail(t), tail(u))
+                If Head(t) eq Head(u): 1 + f(Tail(t), Tail(u))
                 Else: 0
                 EndIf,
             l = f(root, s):
-            repeat('../', Count(substring1(root, l), '/')) & substring1(s, l)
+            Repeat('../', Count(SubString1(root, l), '/')) & SubString1(s, l)
         EndLet
     EndIf;

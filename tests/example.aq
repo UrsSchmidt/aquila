@@ -4,17 +4,17 @@ abc.def := 2;
 Write IntToStr(abc.def);
 
 a := {
-    mykey: 'myvalue',
-    ['mystringkey']: 'myvalue2',
+    MyKey: 'MyValue',
+    ['MyStringKey']: 'MyValue2',
     [2 + 3 * 4]: 42 * 3,
 };
-Write IntToStr(size(a));
+Write IntToStr(Size(a));
 Write DictToStr(a);
-Write a.mykey;
-Write BoolToStr('myvalue' : a);
+Write a.MyKey;
+Write BoolToStr('MyValue' : a);
 
-Remove a['mystringkey'];
-Call foreach(a, \k, v -> {
+Remove a['MyStringKey'];
+Call ForEach(a, \k, v -> {
     If IsInteger(v):
         Write k & ': ' & IntToStr(v);
     ElseIf IsString(v):
@@ -25,10 +25,10 @@ Call foreach(a, \k, v -> {
 });
 
 # array example
-array := { 5, 4, 3, 2, 1 };
-array[4] := 42;
-Remove array[2];
-Write DictToStr(array);
-Call foreach(array, \k, v -> {
+Array := { 5, 4, 3, 2, 1 };
+Array[4] := 42;
+Remove Array[2];
+Write DictToStr(Array);
+Call ForEach(Array, \k, v -> {
     Write IntToStr(v);
 });

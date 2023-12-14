@@ -7,11 +7,11 @@ Run 'StringFunctions.aq';
 Format := \s : String, d : Dictionary ->
     If s eq '': ''
     ElseIf s sw '%':
-        Let nextchar = charat(s, 1):
-            If IsDigit(nextchar): d[nextchar]
-            Else: nextchar
+        Let c = CharAt(s, 1):
+            If IsDigit(c): d[c]
+            Else: c
             EndIf
         EndLet
-        & Format(substring1(s, 2), d)
-    Else: head(s) & Format(tail(s), d)
+        & Format(SubString1(s, 2), d)
+    Else: Head(s) & Format(Tail(s), d)
     EndIf;

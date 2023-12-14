@@ -1,10 +1,10 @@
 {
-before: 'before',
+Before: 'Before',
 }
 {
-after: 'after',
-before: 'before',
+After: 'After',
+Before: 'Before',
 }
 {
-before: 'before',
+Before: 'Before',
 }

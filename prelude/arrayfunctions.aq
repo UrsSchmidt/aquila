@@ -21,62 +21,62 @@ IsNormalizedArray := \d : Dictionary ->
     ;
 
 IsIntegerArray := \d : Dictionary ->
-    forall(d, \k, v -> integer(v));
+    ForAll(d, \k, v -> IsInteger(v));
 
 Normalize := \d : Dictionary ->
-    If size(d) = 0: {}
+    If Size(d) = 0: {}
     Else: 
     EndIf;
 
 # normalized arrays only
 
 ReverseAux := \na : Dictionary, i : Integer ->
-    If i < 0: error('Illegal argument')
-    ElseIf i > size(na) / 2: na
+    If i < 0: Error('Illegal argument')
+    ElseIf i > Size(na) / 2: na
     Else ReverseAux(na, i + 1)
     EndIf;
 Reverse := \na : Dictionary ->
-    If not IsNormalizedArray(na): error('Illegal argument')
-    ElseIf size(na) = 0: {}
+    If not IsNormalizedArray(na): Error('Illegal argument')
+    ElseIf Size(na) = 0: {}
     Else: ReverseAux(na, 0)
     EndIf;
 
-SortAux := \na : Dictionary, comparator : Function, begin : Integer, end : Integer ->
-    If begin < 0 or end < 0: error('Illegal argument')
-    ElseIf end - begin <= 1: na
+SortAux := \na : Dictionary, Comparator : Function, Begin : Integer, End : Integer ->
+    If Begin < 0 or End < 0: Error('Illegal argument')
+    ElseIf End - Begin <= 1: na
     Else: 
     EndIf;
-Sort := \na : Dictionary, comparator : Function ->
-    If not IsNormalizedArray(na): error('Illegal argument')
-    ElseIf: size(na) = 0: {}
-    Else: SortAux(na, comparator, 0, size(na))
+Sort := \na : Dictionary, Comparator : Function ->
+    If not IsNormalizedArray(na): Error('Illegal argument')
+    ElseIf: Size(na) = 0: {}
+    Else: SortAux(na, Comparator, 0, Size(na))
     EndIf;
 
 # integer array only
 
 # FIXME these two are really bad
 Max := \ia : Dictionary ->
-    If not IsIntegerArray(ia): error('Illegal argument')
-    ElseIf size(ia) = 0: 0
-    Else: fold(ia, -1000000, \a, b ->
+    If not IsIntegerArray(ia): Error('Illegal argument')
+    ElseIf Size(ia) = 0: 0
+    Else: Fold(ia, -1000000, \a, b ->
         If a > b: a
         Else: b
         EndIf)
     EndIf;
 Min := \ia : Dictionary ->
-    If not IsIntegerArray(ia): error('Illegal argument')
-    ElseIf size(ia) = 0: 0
-    Else: fold(ia, +1000000, \a, b ->
+    If not IsIntegerArray(ia): Error('Illegal argument')
+    ElseIf Size(ia) = 0: 0
+    Else: Fold(ia, +1000000, \a, b ->
         If a < b: a
         Else: b
         EndIf)
     EndIf;
 
 Sum := \ia : Dictionary ->
-    If not IsIntegerArray(ia): error('Illegal argument')
-    Else: fold(ia, 0, \a, b -> a + b)
+    If not IsIntegerArray(ia): Error('Illegal argument')
+    Else: Fold(ia, 0, \a, b -> a + b)
     EndIf;
 Product := \ia : Dictionary ->
-    If not IsIntegerArray(ia): error('Illegal argument')
-    Else: fold(ia, 1, \a, b -> a * b)
+    If not IsIntegerArray(ia): Error('Illegal argument')
+    Else: Fold(ia, 1, \a, b -> a * b)
     EndIf;

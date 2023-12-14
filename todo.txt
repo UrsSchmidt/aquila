@@ -1,5 +1,4 @@
-move predefined functions to CamelCase
-move all remaining local variables to CamelCase (except one letter variables like `i` etc)
+rename all *.aq files to CamelCase
 
 on a new branch:
 add hex() oct() bin() odd() etc functions?
@@ -15,8 +14,8 @@ rewrite the Interpreter in C++ as aquila4c
 finish all work in progresses
     examples/conways-game-of-life.aq
     examples/zebra-puzzle.aq
-    prelude/arrayfunctions.aq
-    prelude/paths.aq
+    prelude/ArrayFunctions.aq
+    prelude/Paths.aq
 
 fix all TODOs/FIXMEs
 
@@ -26,31 +25,31 @@ use cpplint & cppcheck for aquila4c
 predefined functions:
     on strings:
         implement in Aquila as part of the prelude: matches (regex)
-    finish arrayfunctions.aq
+    finish ArrayFunctions.aq
     files and directories:
         pwd()
         chdir/cd()
         paths:
-            parent('/path/to/file') : String # returns '/path/to/'
-            parent('/path/to/dir/') : String # returns '/path/to/'
-            base('/path/to/file') : String # returns 'file'
-            base('/path/to/dir/') : String # returns 'dir'
-            extension('/path/to/file.ext') : String # returns 'ext'
-            absolute(root, '../file') : String # return '/absolute/path/to/file'
-            relative(root, '/absolute/path/to/file') : String # return '../file'
+            Parent('/path/to/file') : String # returns '/path/to/'
+            Parent('/path/to/dir/') : String # returns '/path/to/'
+            Base('/path/to/file') : String # returns 'file'
+            Base('/path/to/dir/') : String # returns 'dir'
+            Extension('/path/to/file.ext') : String # returns 'ext'
+            Absolute(root, '../file') : String # return '/absolute/path/to/file'
+            Relative(root, '/absolute/path/to/file') : String # return '../file'
         operations:
-            exists('/path/to/file') : Boolean
-            exists('/path/to/dir/') : Boolean
-            create('/path/to/file');
-            create('/path/to/dir/');
-            move('/src/file', '/dst/file');
-            move('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
-            move('/src/dir/', '/dst/dir/');
-            copy('/src/file', '/dst/file');
-            copy('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
-            copy('/src/dir/', '/dst/dir/');
-            delete('/path/to/file');
-            delete('/path/to/dir/');
+            Exists('/path/to/file') : Boolean
+            Exists('/path/to/dir/') : Boolean
+            Create('/path/to/file');
+            Create('/path/to/dir/');
+            Move('/src/file', '/dst/file');
+            Move('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
+            Move('/src/dir/', '/dst/dir/');
+            Copy('/src/file', '/dst/file');
+            Copy('/src/file', '/dst/dir/'); # comes out as /dst/dir/file
+            Copy('/src/dir/', '/dst/dir/');
+            Delete('/path/to/file');
+            Delete('/path/to/dir/');
             for each file in directory do ...
         content operations:
             read/write file line-by-line

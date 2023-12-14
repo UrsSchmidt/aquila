@@ -24,40 +24,40 @@ Write BoolToStr('あいうえお' ew 'うえお');
 Write BoolToStr('あいうえお' ew 'いうえ');
 
 # functions
-Write IntToStr(length(str));
+Write IntToStr(Length(str));
 
 Write IntToStr(CharToOrd(str));
-Write IntToStr(CharToOrd(right(str, 1)));
+Write IntToStr(CharToOrd(Right(str, 1)));
 
-Write charat(str, 1);
-Write substring1(str, 5);
-Write substring2(str, 1, 6);
+Write CharAt(str, 1);
+Write SubString1(str, 5);
+Write SubString2(str, 1, 6);
 
-Write left(str, 5);
-Write mid(str, 1, 5);
-Write right(str, 5);
+Write Left(str, 5);
+Write Mid(str, 1, 5);
+Write Right(str, 5);
 
-Write head(str);
-Write tail(str);
+Write Head(str);
+Write Tail(str);
 
-Write IntToStr(findleft(str, 'He', 0));
-Write IntToStr(findleft(str, 'lO', 0));
-Write IntToStr(findright(str, 'He', length(str)));
-Write IntToStr(findright(str, 'lO', length(str)));
+Write IntToStr(FindLeft(str, 'He', 0));
+Write IntToStr(FindLeft(str, 'lO', 0));
+Write IntToStr(FindRight(str, 'He', Length(str)));
+Write IntToStr(FindRight(str, 'lO', Length(str)));
 
 s := '1;2;3';
 Write s;
-p := split(';', s);
+p := Split(';', s);
 Write DictToStr(p);
-t := join(',', p);
+t := Join(',', p);
 Write t;
 
-Write repeat(' ', 10);
-Write repeat('あいう', 0);
-Write repeat('あいう', 3);
+Write Repeat(' ', 10);
+Write Repeat('あいう', 0);
+Write Repeat('あいう', 3);
 
-Write replace('abcde', 'bcd', '_');
-Write replace('abcde', '.', '_');
+Write Replace('abcde', 'bcd', '_');
+Write Replace('abcde', '.', '_');
 
 # prelude functions
 Write BoolToStr(IsAllPrintableASCII('This is all in printable ASCII.'));

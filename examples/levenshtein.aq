@@ -6,19 +6,19 @@ min3 := \a : Integer, b : Integer, c : Integer ->
         If x < c: x Else: c EndIf
     EndLet;
 
-levenshtein := \a : String, b : String ->
+Levenshtein := \a : String, b : String ->
     If b eq '':
-        length(a)
+        Length(a)
     ElseIf a eq '':
-        length(b)
-    ElseIf head(a) eq head(b):
-        levenshtein(tail(a), tail(b))
+        Length(b)
+    ElseIf Head(a) eq Head(b):
+        Levenshtein(Tail(a), Tail(b))
     Else:
-        Let ta = tail(a), tb = tail(b):
-            1 + min3(levenshtein(ta, b),
-                     levenshtein(a, tb),
-                     levenshtein(ta, tb))
+        Let ta = Tail(a), tb = Tail(b):
+            1 + min3(Levenshtein(ta, b),
+                     Levenshtein(a, tb),
+                     Levenshtein(ta, tb))
         EndLet
     EndIf;
 
-Write IntToStr(levenshtein('kitten', 'sitting')); # 3
+Write IntToStr(Levenshtein('kitten', 'sitting')); # 3

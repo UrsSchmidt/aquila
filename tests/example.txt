@@ -2,13 +2,13 @@
 3
 {
 14: 126,
-mykey: 'myvalue',
-mystringkey: 'myvalue2',
+MyKey: 'MyValue',
+MyStringKey: 'MyValue2',
 }
-myvalue
+MyValue
 true
 14: 126
-mykey: myvalue
+MyKey: MyValue
 {
 0: 5,
 1: 4,

@@ -12,24 +12,24 @@ d := \x : Any -> x;
 # functions
 DictForeach := { 'Hello, world!', 'abc' };
 FuncForeach := \k, v -> {If IsString(v): Write v; EndIf};
-Call foreach(DictForeach, FuncForeach);
+Call ForEach(DictForeach, FuncForeach);
 
 DictForall := { 'Hello, world!', 'abc' };
-FuncForall := \k, v : String -> length(v) > 3;
-Write BoolToStr(forall(DictForall, FuncForall));
+FuncForall := \k, v : String -> Length(v) > 3;
+Write BoolToStr(ForAll(DictForall, FuncForall));
 
 DictExists := { 'Hello, world!', 'abc' };
-FuncExists := \k, v : String -> length(v) > 3;
-Write BoolToStr(exists(DictExists, FuncExists));
+FuncExists := \k, v : String -> Length(v) > 3;
+Write BoolToStr(Exists(DictExists, FuncExists));
 
 DictFilter := { 'Hello, world!', 'abc' };
-FuncFilter := \k, v : String -> length(v) > 3;
-Write DictToStr(filter(DictFilter, FuncFilter));
+FuncFilter := \k, v : String -> Length(v) > 3;
+Write DictToStr(Filter(DictFilter, FuncFilter));
 
 DictMap := { 'Hello, world!', 'abc' };
-FuncMap := \k, v : String -> length(v);
-Write DictToStr(map(DictMap, FuncMap));
+FuncMap := \k, v : String -> Length(v);
+Write DictToStr(Map(DictMap, FuncMap));
 
 DictFold := { 'Hello, world!', 'abc' };
 FuncFold := \l : String, r : String -> l & r;
-Write fold(DictFold, '', FuncFold);
+Write Fold(DictFold, '', FuncFold);

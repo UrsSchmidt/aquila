@@ -15,8 +15,8 @@ Write BoolToStr(2 : { 1, 2, 3 });
 Write BoolToStr(4 : { 1, 2, 3 });
 
 # functions
-Write IntToStr(size({}));
-Write IntToStr(size({ 1, 2, 3 }));
+Write IntToStr(Size({}));
+Write IntToStr(Size({ 1, 2, 3 }));
 
 # DictToStr
 d := { a: \x, y -> x * y };

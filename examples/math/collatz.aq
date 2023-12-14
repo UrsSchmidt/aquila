@@ -1,16 +1,16 @@
 #!/usr/local/bin/aq
 
-collatz := \n : Integer ->
+Collatz := \n : Integer ->
     If n = 1:
         1
     ElseIf n > 1 and n mod 2 = 0:
-        collatz(n / 2)
+        Collatz(n / 2)
     ElseIf n > 1 and n mod 2 = 1:
-        collatz(3 * n + 1)
+        Collatz(3 * n + 1)
     Else:
-        error('Illegal argument')
+        Error('Illegal argument')
     EndIf;
 
 For i From 1 To 10:
-    Write 'collatz(' & IntToStr(i) & ') = ' & IntToStr(collatz(i));
+    Write 'Collatz(' & IntToStr(i) & ') = ' & IntToStr(Collatz(i));
 EndFor

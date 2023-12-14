@@ -102,7 +102,7 @@ The following operations are available on strings:
 The following predefined functions are available on strings:
 
 General functions:
- * `length(a)` returns the number of characters in `a`
+ * `Length(a)` returns the number of characters in `a`
 
 Type conversion functions:
  * `CharToOrd(a)` returns the Unicode value of the first character of `a` as an `Integer`
@@ -110,31 +110,31 @@ Type conversion functions:
  * `StrToDict(a)` parsing `a` to a `Dictionary`
  * `StrToInt(a)` parsing `a` to an `Integer`
 
-Java style charat/substring functions:
- * `charat(a, b)` returns the character with the index `b` in `a`
- * `substring1(a, b)` returns the substring from `a` that starts at `b`
- * `substring2(a, b, c)` returns the substring from `a` that starts at `b` and ends at `c`
+Java style CharAt/SubString functions:
+ * `CharAt(a, b)` returns the character with the index `b` in `a`
+ * `SubString1(a, b)` returns the substring from `a` that starts at `b`
+ * `SubString2(a, b, c)` returns the substring from `a` that starts at `b` and ends at `c`
 
-VB style left/mid/right functions:
- * `left(a, b)` returns the substring from `a` that starts at `0` and has length `b`
- * `mid(a, b, c)` returns the substring from `a` that starts at `b` and has length `c`
- * `right(a, b)` returns the substring from `a` that starts at `length - b` and has length `b`
+VB style Left/Mid/Right functions:
+ * `Left(a, b)` returns the substring from `a` that starts at `0` and has length `b`
+ * `Mid(a, b, c)` returns the substring from `a` that starts at `b` and has length `c`
+ * `Right(a, b)` returns the substring from `a` that starts at `length - b` and has length `b`
 
-Haskell style head/tail functions:
- * `head(a)` returns the first character of `a`
- * `tail(a)` returns everything after the first character of `a`
+Haskell style Head/Tail functions:
+ * `Head(a)` returns the first character of `a`
+ * `Tail(a)` returns everything after the first character of `a`
 
 Finding substrings in strings:
- * `findleft(a, b, c)` returns the first occurrence of `b` in `a` starting from the left at `c`
- * `findright(a, b, c)` returns the first occurrence of `b` in `a` starting from the right at `c`
+ * `FindLeft(a, b, c)` returns the first occurrence of `b` in `a` starting from the left at `c`
+ * `FindRight(a, b, c)` returns the first occurrence of `b` in `a` starting from the right at `c`
 
 Splitting and joining strings:
- * `split(a, b)` returns the `String` `b` splitted at `String` `a` as a `Dictionary`
- * `join(a, b)` returns the `Dictionary` `b` joined with `String` `a` as a `String`
+ * `Split(a, b)` returns the `String` `b` splitted at `String` `a` as a `Dictionary`
+ * `Join(a, b)` returns the `Dictionary` `b` joined with `String` `a` as a `String`
 
 Other functions:
- * `repeat(a, b)` returns `a` repeated `b` times
- * `replace(a, b, c)` replace all occurrences of `b` in `a` with `c`
+ * `Repeat(a, b)` returns `a` repeated `b` times
+ * `Replace(a, b, c)` replace all occurrences of `b` in `a` with `c`
 
 There are also predefined `String` functions available under `prelude/StringFunctions.aq`, which can be used by first running `run 'prelude/StringFunctions.aq';`.
 
@@ -144,7 +144,7 @@ Functions are always written as lambdas: `\x, y -> x + y`
 
 You can assign functions to variables like any other value: `a := \x -> 2 * x;`
 
-You can write recursive functions using the variable that you assign the function to: `factorial := \n -> If n = 0: 1 Else: n * factorial(n - 1) EndIf;`
+You can write recursive functions using the variable that you assign the function to: `Factorial := \n -> If n = 0: 1 Else: n * Factorial(n - 1) EndIf;`
 
 You can add additional runtime type-safety by stating what type each of parameters has: `a := \x : Integer -> 2 * x;`
 
@@ -153,27 +153,27 @@ Here you can also use `Any` to explicitly state, that the argument can take any 
 You can write void functions using code blocks: `a := \s -> {Write s;};`
 
 The following predefined functions are available on functions:
- * `foreach(d : Dictionary, f : Function)`
+ * `ForEach(d : Dictionary, f : Function)`
 
    `(Dictionary, (Any, Any) -> Void) -> Void`
 
- * `forall(d : Dictionary, f : Function)`
+ * `ForAll(d : Dictionary, f : Function)`
 
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
 
- * `exists(d : Dictionary, f : Function)`
+ * `Exists(d : Dictionary, f : Function)`
 
    `(Dictionary, (Any, Any) -> Boolean)) -> Boolean`
 
- * `filter(d : Dictionary, f : Function)`
+ * `Filter(d : Dictionary, f : Function)`
 
    `(Dictionary, (Any, Any) -> Boolean)) -> Dictionary`
 
- * `map(d : Dictionary, f : Function)`
+ * `Map(d : Dictionary, f : Function)`
 
    `(Dictionary, (Any, Any) -> Any)) -> Dictionary`
 
- * `fold(d : Dictionary, n : Any, f : Function)`
+ * `Fold(d : Dictionary, n : Any, f : Function)`
 
    `(Dictionary, Any, (Any, Any) -> Any) -> Any`
 
@@ -193,7 +193,7 @@ The following operations are available on dictionaries:
 The following predefined functions are available on dictionaries:
 
 General functions:
- * `size(a)` returns the number of key/value pairs in `a`
+ * `Size(a)` returns the number of key/value pairs in `a`
  
 Type conversion functions:
  * `DictToStr(a)` returns `a` as a `String`
@@ -247,45 +247,45 @@ There can be 0..n `Case` parts and the `Default` part is mandatory.
 
 ### Misc. built-in functions
 
- * `error(a)` exits the current script with the error message `a` and exit code 1
+ * `Error(a)` exits the current script with the error message `a` and exit code 1
 
 ## Assignments
 
-You can assign values to variables using: `myVariable := myValue;`
+You can assign values to variables using: `MyVariable := MyValue;`
 
 ## Simple statements
 
 ### Call statements
 
-You can call a void `Function` using: `Call myVoidFunction(p1, p2);`
+You can call a void `Function` using: `Call MyVoidFunction(p1, p2);`
 
 ### Exit statements
 
-You can exit the current script with a specific exit code using: `Exit myExitCode;`
+You can exit the current script with a specific exit code using: `Exit MyExitCode;`
 
 ### Now statements
 
-You can put the current time in milliseconds into an `Integer` using: `Now myTimeVariable;`
+You can put the current time in milliseconds into an `Integer` using: `Now MyTimeVariable;`
 
 ### Random statements
 
-You can put a random number that is in a certain range into an `Integer` using: `Random myVariable From 1 To 10;`
+You can put a random number that is in a certain range into an `Integer` using: `Random MyVariable From 1 To 10;`
 
 ### Read statements
 
-You can read a line from the command line into a `String` using: `Read myVariable;`
+You can read a line from the command line into a `String` using: `Read MyVariable;`
 
 ### Remove statements
 
-You can remove variables or key/value pairs from dictionaries using: `Remove myVariable;` and `Remove myDictionary.myKey;` respectively
+You can remove variables or key/value pairs from dictionaries using: `Remove MyVariable;` and `Remove MyDictionary.MyKey;` respectively
 
 ### Run statements
 
-You can run other external Aquila scripts using: `Run 'script.aq';`
+You can run other external Aquila scripts using: `Run 'Script.aq';`
 
 ### Sleep statements
 
-You can sleep/wait for a specific amount of milliseconds using: `Sleep myVariableHoldingMilliseconds;`
+You can sleep/wait for a specific amount of milliseconds using: `Sleep MyVariableHoldingMilliseconds;`
 
 ### Write statements
 
@@ -358,8 +358,8 @@ If not needed, the `Step` part can be omitted, it will default to `Step 1`.
 
 ## Using command line arguments
 
-Command line arguments are stored in the `args` variable.
+Command line arguments are stored in the `Args` variable.
 
 ## Using environment variables
 
-Environment variables are stored in the `env` variable. You **cannot** set environment variables from inside your script.
+Environment variables are stored in the `Env` variable. You **cannot** set environment variables from inside your script.
