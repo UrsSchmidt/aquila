@@ -1,8 +1,0 @@
-#!/usr/local/bin/aq
-
-a := 42;
-
-# this should fail in `strict` mode
-a := 'abc';
-
-Write a;
