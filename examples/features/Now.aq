@@ -1,0 +1,5 @@
+#!/usr/local/bin/aq
+
+Now n;
+
+Write IntToStr(n);

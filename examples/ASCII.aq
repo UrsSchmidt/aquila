@@ -1,0 +1,11 @@
+#!/usr/local/bin/aq
+
+l := '';
+For c From CharToOrd(' ') To CharToOrd('~'):
+    l := l & OrdToChar(c);
+    If c mod 0x10 = 0x0f:
+        Write l;
+        l := '';
+    EndIf
+EndFor
+Write l;

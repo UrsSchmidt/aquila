@@ -1,0 +1,12 @@
+#!/usr/local/bin/aq
+
+Write BoolToStr(IsBoolean(true));
+Write BoolToStr(IsBoolean('abc'));
+Write BoolToStr(IsDictionary({}));
+Write BoolToStr(IsDictionary(true));
+Write BoolToStr(IsFunction(\x -> x));
+Write BoolToStr(IsFunction({}));
+Write BoolToStr(IsInteger(1));
+Write BoolToStr(IsInteger(\x -> x));
+Write BoolToStr(IsString('abc'));
+Write BoolToStr(IsString(1));

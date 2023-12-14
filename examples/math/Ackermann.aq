@@ -1,0 +1,18 @@
+#!/usr/local/bin/aq
+
+A := \m : Integer, n : Integer ->
+    If m = 0:
+        n + 1
+    ElseIf m > 0 and n = 0:
+        A(m - 1, 1)
+    ElseIf m > 0 and n > 0:
+        A(m - 1, A(m, n - 1))
+    Else:
+        Error('Illegal argument')
+    EndIf;
+
+For n From 0 To 3:
+    For m From 0 To 4:
+        Write 'A(' & IntToStr(n) & ', ' & IntToStr(m) & ') = ' & IntToStr(A(n, m));
+    EndFor
+EndFor

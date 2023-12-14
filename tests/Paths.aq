@@ -1,0 +1,43 @@
+#!/usr/local/bin/aq
+
+Run '../prelude/Paths.aq';
+
+Write IntToStr(Count('aaaabbbbaaaa', 'a'));
+
+Write AddSlash('abc');
+Write AddSlash('abc/');
+Write DropSlash('abc');
+Write DropSlash('abc/');
+
+Write Base('/absolute/path/to/file');
+Write Base('/absolute/path/to/dir/');
+Write Base('relative/path/to/file');
+Write Base('relative/path/to/dir/');
+Write Extension('abc');
+Write Extension('abc.ext');
+Write Extension('/absolute/path/to/file');
+Write Extension('/absolute/path/to/file.ext');
+Write Extension('relative/path/to/file');
+Write Extension('relative/path/to/file.ext');
+Write Parent('/absolute/path/to/file');
+Write Parent('/absolute/path/to/dir/');
+
+Write Absolute('/this/is/root/', '/absolute/path/to/file');
+Write Absolute('/this/is/root/', '/absolute/path/to/dir/');
+Write Absolute('/this/is/root/', 'relative/path/to/file');
+Write Absolute('/this/is/root/', 'relative/path/to/dir/');
+Write Absolute('/this/is/root/', './path/to/file');
+Write Absolute('/this/is/root/', './path/to/dir/');
+Write Absolute('/this/is/root/', '../path/to/file');
+Write Absolute('/this/is/root/', '../path/to/dir/');
+Write Absolute('/this/is/root/', '../../path/to/file');
+Write Absolute('/this/is/root/', '../../path/to/dir/');
+
+Write Relative('/this/is/root/', '/absolute/path/to/file');
+Write Relative('/this/is/root/', '/absolute/path/to/dir/');
+Write Relative('/this/is/root/', '/this/is/an/absolute/path/to/file');
+Write Relative('/this/is/root/', '/this/is/an/absolute/path/to/dir/');
+Write Relative('/this/is/root/', '/this/is/root/file');
+Write Relative('/this/is/root/', '/this/is/root/dir/');
+Write Relative('/this/is/root/', 'relative/path/to/file');
+Write Relative('/this/is/root/', 'relative/path/to/dir/');

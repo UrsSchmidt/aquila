@@ -1,5 +1,3 @@
-rename all *.aq files to CamelCase
-
 on a new branch:
 add hex() oct() bin() odd() etc functions?
 add a ForEach key,value In map structure?

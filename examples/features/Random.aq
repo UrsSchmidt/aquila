@@ -1,0 +1,6 @@
+#!/usr/local/bin/aq
+
+For i From 1 To 10:
+    Random n From 1 To 10;
+    Write IntToStr(n);
+EndFor
