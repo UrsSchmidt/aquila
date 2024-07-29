@@ -12,9 +12,9 @@ f := \i : Integer, j : Integer ->
     EndIf;
 
 # initialize sieve
-numbers := {};
+Numbers := {};
 For i From 2 To 100:
-    numbers[i] := true;
+    Numbers[i] := true;
 EndFor
 
 # sieve out non-primes
@@ -23,10 +23,10 @@ For i From 2 To 100:
     If sq >= 2:
         i2 := f(i, sq);
         If i2 >= 2:
-            numbers[i2] := false;
+            Numbers[i2] := false;
         EndIf
     EndIf
 EndFor
 
 # print remaining numbers (the primes)
-Write DictToStr(numbers);
+Write DictToStr(Numbers);

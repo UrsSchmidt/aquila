@@ -10,9 +10,8 @@ Then run `ant package` to build the `aquila4j.jar` file.
 
 ## Installing the interpreter on Ubuntu
 
-Change the path in `aq.sh` to point to your `aquila4j.jar` file.
-Then run `cp aq.sh /usr/local/bin/aq`. You might need sudo rights.
-You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the `aq.sh` script and in turn call the interpreter.
+Run `./install.sh`. You might need sudo rights.
+You can then use `#!/usr/local/bin/aq` as the shebang in your scripts, which will call the interpreter.
 
 ## Implementation details
 
