@@ -3,7 +3,7 @@
 #include "antlr4-runtime.h"
 #include "../gen/AquilaLexer.h"
 #include "../gen/AquilaParser.h"
-#include "Interpreter.h"
+#include "Interpreter.hpp"
 
 #include <filesystem>
 #include <fstream>

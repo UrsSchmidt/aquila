@@ -6,7 +6,7 @@ This is the Java 17 implementation of Aquila.
 
 You will need `ant 1.10.7` and `antlr 4.12.0` to build the interpreter.
 Make sure to put the `antlr-4.12.0-complete.jar` file into the parent directory of this repository.
-Then run `ant package` to build the `aquila4j.jar` file.
+Then run `ant package` to build the `aquila4j.jar` jar file.
 
 ## Installing the interpreter on Ubuntu
 

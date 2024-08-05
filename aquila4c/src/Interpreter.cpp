@@ -1,7 +1,7 @@
 #include "antlr4-runtime.h"
-#include "Helper.h"
-#include "Interpreter.h"
-#include "Main.h"
+#include "Helper.hpp"
+#include "Interpreter.hpp"
+#include "Main.hpp"
 
 #include <filesystem>
 #include <sstream>
