@@ -10,9 +10,9 @@ SRC=src
 GRAMMAR=../Aquila.g4
 
 SRCCPPFILES=$(wildcard $(SRC)/*.cpp)
-SRCOFILES=$(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCCPPFILES))
+SRCOFILES=$(SRCCPPFILES:$(SRC)/%.cpp=$(OBJ)/%.o)
 GENCPPFILES=$(GEN)/AquilaBaseVisitor.cpp $(GEN)/AquilaLexer.cpp $(GEN)/AquilaParser.cpp $(GEN)/AquilaVisitor.cpp
-GENOFILES=$(patsubst $(GEN)/%.cpp,$(OBJ)/%.o,$(GENCPPFILES))
+GENOFILES=$(GENCPPFILES:$(GEN)/%.cpp=$(OBJ)/%.o)
 
 CXX=g++
 CXXFLAGS=-std=c++17 -I/usr/local/include/antlr4-runtime
@@ -22,23 +22,16 @@ $(TARGET_EXEC): $(SRCOFILES) $(GENOFILES)
 	$(CXX) -o $@ $^ $(LDLIBS)
 
 $(OBJ)/Aquila%.o: $(GEN)/Aquila%.cpp
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(OBJ)/%.o: $(SRC)/%.cpp $(GEN)/AquilaVisitor.cpp
-	mkdir -p $(dir $@)
+$(OBJ)/%.o: $(SRC)/%.cpp $(GENCPPFILES)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -Wall -Wpedantic -c -o $@ $<
 
-# any other of the four Aquila*.cpp files would do the job as well
-$(GEN)/AquilaVisitor.cpp: $(GRAMMAR)
-	mkdir -p $(dir $@)
-	java -jar ../../antlr-4.12.0-complete.jar $(shell pwd)/$(GRAMMAR) -Dlanguage=Cpp -visitor -no-listener -encoding utf8 -o $(dir $@)
-
-# prevent make from removing these files
-.PRECIOUS: $(GENCPPFILES)
-# catch-all rule to prevent errors
-$(GEN)/%.cpp:
-	mkdir -p $(dir $@)
+$(GENCPPFILES)&: $(GRAMMAR)
+	@mkdir -p $(dir $@)
+	java -jar ../../antlr-4.12.0-complete.jar $(shell pwd)/$^ -Dlanguage=Cpp -visitor -no-listener -encoding utf8 -o $(dir $@)
 
 # install/uninstall targets
 
