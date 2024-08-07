@@ -21,11 +21,11 @@ LDLIBS=-lantlr4-runtime -lgmp
 $(TARGET_EXEC): $(SRCOFILES) $(GENOFILES)
 	$(CXX) -o $@ $^ $(LDLIBS)
 
-$(OBJ)/Aquila%.o: $(GEN)/Aquila%.cpp
+$(GENOFILES): $(OBJ)/%.o: $(GEN)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(OBJ)/%.o: $(SRC)/%.cpp $(GENCPPFILES)
+$(SRCOFILES): $(OBJ)/%.o: $(SRC)/%.cpp $(GENCPPFILES)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -Wall -Wpedantic -c -o $@ $<
 
